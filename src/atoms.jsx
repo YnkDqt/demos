@@ -180,3 +180,23 @@ export const ProgressBar = ({ value, max = 100, C, height = 8 }) => {
     </div>
   )
 }
+
+// ─── Spinner ──────────────────────────────────────────────────
+export const Spinner = ({ C, size = 24 }) => (
+  <>
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      border: `2px solid ${C.border}`, borderTopColor: C.primary,
+      animation: 'spin .8s linear infinite', display: 'inline-block'
+    }}/>
+    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+  </>
+)
+
+// ─── ErrorBox ─────────────────────────────────────────────────
+export const ErrorBox = ({ message, C }) => (
+  <Card C={C} style={{ borderColor: C.red, background: C.redPale }}>
+    <div style={{ color: C.red, fontWeight: 500, marginBottom: 4 }}>Erreur de chargement</div>
+    <div style={{ fontSize: 13, color: C.text }}>{message}</div>
+  </Card>
+)

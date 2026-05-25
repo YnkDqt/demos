@@ -6,6 +6,7 @@ import Topbar from './layout/Topbar.jsx'
 import Drawer from './layout/Drawer.jsx'
 import StubPage from './pages/StubPage.jsx'
 import PageMonCoin from './pages/PageMonCoin.jsx'
+import PageMesElus from './pages/PageMesElus.jsx'
 import PageReglages from './pages/PageReglages.jsx'
 
 export default function App() {
@@ -25,7 +26,7 @@ export default function App() {
   const page = useMemo(() => {
     switch (route) {
       case 'mon-coin':  return <PageMonCoin profile={profile} C={C} />
-      case 'mes-elus':  return <StubPage title="Mes élus"  subtitle="Annuaire des députés, fiches détaillées, votes et cohérence." C={C} />
+      case 'mes-elus':  return <PageMesElus C={C} />
       case 'mon-match': return <StubPage title="Mon match" subtitle="20 propositions, 3 niveaux, ton classement avec les partis et les députés." C={C} />
       case 'decrypter': return <StubPage title="Décrypter" subtitle="Échiquier politique, cartes story, méthodologie." C={C} />
       case 'mes-idees': return <StubPage title="Mes idées" subtitle="Interpellation, pétitions locales, associations, conso responsable." C={C} />

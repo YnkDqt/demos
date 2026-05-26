@@ -10,6 +10,7 @@
     "fetch:deputes": "node scripts/fetch-deputes.js --legis 17",
     "fetch:scrutins": "node scripts/fetch-scrutins.js --legis 17",
     "build:index": "node scripts/build-votes-index.js",
+    "build:profiles": "node scripts/build-party-profiles.js",
     "fetch:all": "npm run fetch:deputes && npm run fetch:scrutins && npm run build:index",
     "shortlist": "node scripts/extract-shortlist.js"
   },

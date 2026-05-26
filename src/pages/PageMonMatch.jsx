@@ -1,22 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI } from '../atoms.jsx'
-import { usePropositions } from '../hooks.js'
+import React, { useState, useMemo } from 'react'
+import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty } from '../atoms.jsx'
+import { usePropositions, useProfiles, useDeputes } from '../hooks.js'
+import { computeMatches } from '../matching.js'
 import GlossText from '../GlossText.jsx'
-
-/**
- * Le Match — collecte des réponses.
- *
- * Pour chaque question (20 au total, ordre aléatoire à chaque session),
- * l'utilisateur peut noter chaque position (5 par question) sur une
- * échelle de 0/25/50/75/100% d'adhésion, indépendamment.
- *
- * Réponses stockées dans le state local — pas de persistance V1.
- * En fin de Match, écran récapitulatif brut (le matching avec partis vient en P2.4).
- */
 
 const PALIERS = [0, 25, 50, 75, 100]
 
-// Mélange tableau (Fisher-Yates) — utilisé pour randomiser l'ordre des questions à chaque session
 const shuffle = (arr) => {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -28,44 +17,31 @@ const shuffle = (arr) => {
 
 export default function PageMonMatch({ C }) {
   const { data, loading, error } = usePropositions()
+  const profiles = useProfiles()
+  const D = useDeputes()
 
-  // Phases : 'intro' → 'questions' → 'recap'
-  const [phase, setPhase] = useState('intro')
-  // Index de la question courante (dans l'ordre randomisé)
-  const [idx, setIdx] = useState(0)
-  // Réponses : { questionId: { positionId: 0..100 } }
+  const [phase, setPhase]       = useState('intro')
+  const [idx, setIdx]           = useState(0)
   const [reponses, setReponses] = useState({})
-  // Bloc "En bref" ouvert ?
   const [enBrefOpen, setEnBrefOpen] = useState(false)
-  // Ordre randomisé des questions (calculé une fois au démarrage du Match)
-  const [ordre, setOrdre] = useState([])
+  const [ordre, setOrdre]       = useState([])
 
-  // Au démarrage du Match, on randomise
   const startMatch = () => {
     if (!data) return
     setOrdre(shuffle(data.questions.map(q => q.id)))
-    setIdx(0)
-    setReponses({})
-    setEnBrefOpen(false)
-    setPhase('questions')
+    setIdx(0); setReponses({}); setEnBrefOpen(false); setPhase('questions')
     window.scrollTo({ top: 0 })
   }
 
   const restart = () => {
-    setPhase('intro')
-    setIdx(0)
-    setReponses({})
-    setOrdre([])
-    setEnBrefOpen(false)
+    setPhase('intro'); setIdx(0); setReponses({}); setOrdre([]); setEnBrefOpen(false)
     window.scrollTo({ top: 0 })
   }
 
-  // Question courante
-  const questionsById = useMemo(() => {
-    if (!data) return {}
-    return Object.fromEntries(data.questions.map(q => [q.id, q]))
-  }, [data])
-
+  const questionsById = useMemo(
+    () => data ? Object.fromEntries(data.questions.map(q => [q.id, q])) : {},
+    [data]
+  )
   const question = phase === 'questions' && ordre.length > 0 ? questionsById[ordre[idx]] : null
   const reponsesQuestion = question ? (reponses[question.id] || {}) : {}
 
@@ -79,39 +55,33 @@ export default function PageMonMatch({ C }) {
 
   const next = () => {
     if (idx < ordre.length - 1) {
-      setIdx(i => i + 1)
-      setEnBrefOpen(false)
-      window.scrollTo({ top: 0 })
+      setIdx(i => i + 1); setEnBrefOpen(false); window.scrollTo({ top: 0 })
     } else {
-      setPhase('recap')
-      window.scrollTo({ top: 0 })
+      setPhase('recap'); window.scrollTo({ top: 0 })
     }
   }
-
   const prev = () => {
-    if (idx > 0) {
-      setIdx(i => i - 1)
-      setEnBrefOpen(false)
-      window.scrollTo({ top: 0 })
-    }
+    if (idx > 0) { setIdx(i => i - 1); setEnBrefOpen(false); window.scrollTo({ top: 0 }) }
   }
 
-  // Statistiques pour le récap
   const stats = useMemo(() => {
     if (phase !== 'recap' || !data) return null
     let total = 0, repondues = 0, ignorees = 0
     for (const q of data.questions) {
       total++
       const r = reponses[q.id] || {}
-      const hasReponse = Object.values(r).some(v => v > 0)
-      if (hasReponse) repondues++
-      else ignorees++
+      Object.values(r).some(v => v > 0) ? repondues++ : ignorees++
     }
     return { total, repondues, ignorees }
   }, [phase, data, reponses])
 
-  // ─── PHASES ──────────────────────────────────────────────────
+  // Matching — calculé seulement en phase recap, si les profils sont dispos
+  const matches = useMemo(() => {
+    if (phase !== 'recap' || !profiles.data || !D.data) return null
+    return computeMatches(reponses, profiles.data, D.data.deputes, { topPartis: 3, topDeputes: 5 })
+  }, [phase, profiles.data, D.data, reponses])
 
+  // ─── LOADING / ERROR ─────────────────────────────────────────
   if (loading) return (
     <div className="fadeUp">
       <Card C={C} style={{ textAlign: 'center', padding: 40 }}>
@@ -120,13 +90,11 @@ export default function PageMonMatch({ C }) {
       </Card>
     </div>
   )
-
   if (error) return (
     <div className="fadeUp">
       <ErrorBox C={C} message="Le fichier des questions est introuvable. Vérifie que public/data/propositions-match.json est bien présent." />
     </div>
   )
-
   if (!data) return null
 
   // ─── INTRO ───────────────────────────────────────────────────
@@ -148,10 +116,10 @@ export default function PageMonMatch({ C }) {
             Pour chaque question, tu as <strong>5 positions</strong> qui couvrent les principales sensibilités politiques. Tu indiques à quel point tu adhères à chacune, sur une échelle de <strong>0 à 100%</strong>. Tu peux trouver plusieurs positions valables — c'est même le but.
           </p>
           <p style={{ marginBottom: 12 }}>
-            À la fin, on calcule quels partis et députés sont le plus proches de tes idées <em>(à venir)</em>.
+            À la fin, on calcule quels partis et députés sont le plus proches de tes idées <em>en croisant tes réponses avec leurs votes réels à l'Assemblée</em>.
           </p>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 8, fontSize: 13, color: C.muted, flexWrap: 'wrap' }}>
-            <span>⏱ {data.questions.length === 20 ? '~10 minutes' : `~${Math.ceil(data.questions.length / 2)} minutes`}</span>
+            <span>⏱ ~10 minutes</span>
             <span>·</span>
             <span>🔒 Aucune donnée n'est envoyée, tout reste sur ton appareil</span>
           </div>
@@ -173,11 +141,16 @@ export default function PageMonMatch({ C }) {
 
   // ─── RECAP ───────────────────────────────────────────────────
   if (phase === 'recap') {
+    const hasMatching = matches && matches.partis.length > 0
+    const matchingReady = profiles.data && (profiles.data.nbScrutinsMappes || 0) > 0
+
     return (
       <div className="fadeUp">
         <PageTitle
-          title="Tes réponses sont enregistrées"
-          subtitle="Le calcul des affinités avec les partis et députés arrive bientôt."
+          title="Tes résultats"
+          subtitle={matchingReady
+            ? `Calculés à partir de ${profiles.data.nbScrutinsMappes} scrutins de référence.`
+            : "Tes réponses sont enregistrées."}
           C={C}
         />
 
@@ -186,15 +159,84 @@ export default function PageMonMatch({ C }) {
           <KPI label="Questions ignorées"  value={stats.ignorees} hint="(toutes positions à 0%)" C={C} />
         </div>
 
-        <Card C={C} style={{ marginBottom: 16, background: C.primaryPale, borderColor: C.primary }}>
-          <div style={{ fontWeight: 500, color: C.primaryDeep, marginBottom: 4 }}>🚧 En construction</div>
-          <div style={{ fontSize: 14, color: C.text }}>
-            Le moteur de matching avec les partis et les députés est en cours de développement.
-            Pour l'instant, tu peux voir ci-dessous le détail brut de tes réponses.
-          </div>
-        </Card>
+        {!matchingReady && (
+          <Card C={C} style={{ marginBottom: 16, background: C.primaryPale, borderColor: C.primary }}>
+            <div style={{ fontWeight: 500, color: C.primaryDeep, marginBottom: 4 }}>🚧 Matching en préparation</div>
+            <div style={{ fontSize: 14, color: C.text }}>
+              Le mapping des scrutins de référence est en cours. Reviens bientôt pour découvrir tes affinités avec les partis et députés.
+            </div>
+          </Card>
+        )}
 
-        <h2 style={{ marginBottom: 12, marginTop: 24 }}>Détail de tes réponses</h2>
+        {matchingReady && !hasMatching && (
+          <Empty
+            title="Pas assez de réponses pour calculer un match"
+            message="Reprends le Match en exprimant une adhésion sur au moins quelques positions."
+            C={C}
+          />
+        )}
+
+        {hasMatching && (
+          <>
+            <h2 style={{ marginBottom: 12 }}>Tes partis les plus proches</h2>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
+              {matches.partis.map((p, i) => (
+                <Card C={C} key={p.code} padding={16}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{
+                      fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600,
+                      color: C.muted, width: 28, textAlign: 'center'
+                    }}>#{i + 1}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                        <BadgeParti code={p.code} C={C} />
+                        <span style={{ fontWeight: 500 }}>{p.nom}</span>
+                        <span style={{ fontSize: 12, color: C.muted }}>· {p.nbDeputes} députés</span>
+                      </div>
+                      <ProgressBar value={p.score} max={100} C={C} height={8} />
+                    </div>
+                    <div style={{
+                      fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600,
+                      color: C.primary, minWidth: 70, textAlign: 'right'
+                    }}>{p.score}%</div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <h2 style={{ marginBottom: 12 }}>Tes députés les plus proches</h2>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
+              {matches.deputes.map((d, i) => (
+                <Card C={C} key={d.id} padding={14}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{
+                      fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600,
+                      color: C.muted, width: 24, textAlign: 'center'
+                    }}>#{i + 1}</div>
+                    <Avatar name={d.nom} C={C} size={36} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>{d.nom}</div>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 2, flexWrap: 'wrap' }}>
+                        {d.groupe && <BadgeParti code={d.groupe} C={C} />}
+                        {d.circo && <span style={{ fontSize: 12, color: C.muted }}>{d.circo.dept} · circo {d.circo.numero}</span>}
+                      </div>
+                    </div>
+                    <div style={{
+                      fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600,
+                      color: C.primary, minWidth: 60, textAlign: 'right'
+                    }}>{d.score}%</div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <div style={{ fontSize: 12, color: C.muted, marginBottom: 24, fontStyle: 'italic' }}>
+              Le score est une similarité entre tes positions et les votes réels des députés/partis à l'Assemblée nationale, sur {matches.nbScrutinsMappes} scrutins de référence. Il ne reflète pas une appartenance politique mais une proximité de positions.
+            </div>
+          </>
+        )}
+
+        <h2 style={{ marginBottom: 12, marginTop: 16 }}>Détail de tes réponses</h2>
         <div style={{ display: 'grid', gap: 12 }}>
           {data.questions.map(q => {
             const r = reponses[q.id] || {}
@@ -238,7 +280,6 @@ export default function PageMonMatch({ C }) {
 
   return (
     <div className="fadeUp">
-      {/* Barre de progression */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: 13, color: C.muted }}>
           <span>Question {idx + 1} sur {ordre.length}</span>
@@ -247,7 +288,6 @@ export default function PageMonMatch({ C }) {
         <ProgressBar value={idx + 1} max={ordre.length} C={C} height={6} />
       </div>
 
-      {/* En-tête question */}
       <Card C={C} style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 13, color: C.muted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
           {question.emoji} {question.theme}
@@ -257,7 +297,6 @@ export default function PageMonMatch({ C }) {
           <GlossText texte={question.question} glossaire={data.glossaire} C={C} />
         </div>
 
-        {/* En bref dépliable */}
         {question.enBref && (
           <div style={{ marginTop: 16 }}>
             <button
@@ -285,12 +324,10 @@ export default function PageMonMatch({ C }) {
         )}
       </Card>
 
-      {/* Consigne */}
       <div style={{ marginBottom: 12, fontSize: 14, color: C.muted, textAlign: 'center' }}>
         Pour chaque position, indique à quel point tu y adhères. <strong style={{ color: C.text }}>Tu peux laisser à 0%</strong> si elle ne te parle pas du tout.
       </div>
 
-      {/* Positions */}
       <div style={{ display: 'grid', gap: 10, marginBottom: 24 }}>
         {question.positions.map(p => {
           const adhesion = reponsesQuestion[p.id] || 0
@@ -304,7 +341,6 @@ export default function PageMonMatch({ C }) {
                 </div>
               </div>
 
-              {/* Paliers 0/25/50/75/100 */}
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {PALIERS.map(palier => {
                   const active = adhesion === palier
@@ -329,7 +365,6 @@ export default function PageMonMatch({ C }) {
         })}
       </div>
 
-      {/* Boutons précédent / suivant */}
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 40 }}>
         <Btn variant="ghost" onClick={prev} C={C} disabled={idx === 0}>← Précédent</Btn>
         <Btn variant="primary" onClick={next} C={C}>

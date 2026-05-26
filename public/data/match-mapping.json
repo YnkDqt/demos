@@ -1,0 +1,21 @@
+{
+  "_doc": "Mapping scrutin → position du Match. Édité à la main par l'équipe édito.",
+  "_format": {
+    "scrutins": {
+      "<numeroScrutin>": {
+        "positionId": "<id d'une position dans propositions-match.json>",
+        "poids": "1 par défaut (0..1). Plus le scrutin est emblématique de la position, plus le poids est élevé.",
+        "note": "Optionnel — pour la traçabilité éditoriale."
+      }
+    }
+  },
+  "_exemple": {
+    "6899": {
+      "positionId": "exemple-position-id",
+      "poids": 1,
+      "note": "Vote sur l'ensemble du PLF 2026 — incarne la position X."
+    }
+  },
+  "generatedAt": null,
+  "scrutins": {}
+}

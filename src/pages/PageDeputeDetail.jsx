@@ -98,8 +98,8 @@ export default function PageDeputeDetail({ deputeId, onBack, C }) {
               <div style={{ fontSize: 13, color: C.muted }}>{depute.profession}</div>
             )}
           </div>
-          {depute.url && (
-            <a href={depute.url} target="_blank" rel="noopener noreferrer">
+          {depute.id && (
+            <a href={`https://www2.assemblee-nationale.fr/deputes/fiche/OMC_${depute.id}`} target="_blank" rel="noopener noreferrer">
               <Btn variant="ghost" C={C}>Fiche officielle ↗</Btn>
             </a>
           )}

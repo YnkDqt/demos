@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { PageTitle, Card, KPI, Empty, Spinner, ErrorBox } from '../atoms.jsx'
 import { useDeputes, useScrutins } from '../hooks.js'
 import { formatDate } from '../utils.js'
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
 
 export default function PageMonCoin({ profile, C }) {
   const D = useDeputes()
@@ -20,6 +21,25 @@ export default function PageMonCoin({ profile, C }) {
   }, [D.data, S.data])
 
   const recents = useMemo(() => (S.data?.scrutins || []).slice(0, 8), [S.data])
+
+  // Activité par mois sur les 12 derniers mois
+  const activiteMensuelle = useMemo(() => {
+    if (!S.data) return []
+    const buckets = new Map()
+    const now = new Date()
+    // Init 12 mois en arrière
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      buckets.set(key, { mois: key, label: d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }), scrutins: 0 })
+    }
+    for (const s of S.data.scrutins) {
+      if (!s.date) continue
+      const key = s.date.slice(0, 7) // YYYY-MM
+      if (buckets.has(key)) buckets.get(key).scrutins++
+    }
+    return [...buckets.values()]
+  }, [S.data])
 
   const loading = D.loading || S.loading
   const error = D.error || S.error
@@ -56,6 +76,36 @@ export default function PageMonCoin({ profile, C }) {
             <KPI label="Groupes politiques"  value={stats.nbGroupes}   hint="À l'Assemblée" C={C} />
             <KPI label="Dernier scrutin"     value={formatDate(stats.dernierScrutin) || '—'} C={C} />
           </div>
+
+          <Card C={C} style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 12 }}>
+              <h3 style={{ marginBottom: 2 }}>Activité parlementaire</h3>
+              <div style={{ fontSize: 13, color: C.muted }}>Nombre de scrutins par mois sur les 12 derniers mois</div>
+            </div>
+            <div style={{ width: '100%', height: 220 }}>
+              <ResponsiveContainer>
+                <AreaChart data={activiteMensuelle} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                  <defs>
+                    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"   stopColor={C.primary} stopOpacity={0.35} />
+                      <stop offset="100%" stopColor={C.primary} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke={C.border} strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="label" stroke={C.muted} fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke={C.muted} fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip
+                    contentStyle={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13 }}
+                    labelStyle={{ color: C.text, fontWeight: 500 }}
+                    itemStyle={{ color: C.primary }}
+                    formatter={(v) => [`${v} scrutins`, '']}
+                    labelFormatter={(l) => l}
+                  />
+                  <Area type="monotone" dataKey="scrutins" stroke={C.primary} strokeWidth={2} fill="url(#grad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
 
           <h2 style={{ marginBottom: 12 }}>Derniers scrutins</h2>
           {recents.length === 0 ? (

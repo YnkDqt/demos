@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI } from './atoms.jsx'
-import { usePropositions } from './hooks.js'
-import GlossText from './GlossText.jsx'
+import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI } from '../atoms.jsx'
+import { usePropositions } from '../hooks.js'
+import GlossText from '../GlossText.jsx'
 
 /**
  * Le Match — collecte des réponses.

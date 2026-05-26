@@ -27,3 +27,4 @@ export function useJSON(path) {
 export const useDeputes  = () => useJSON('/data/deputes.json')
 export const useScrutins = () => useJSON('/data/scrutins-index.json')
 export const useVote     = (scrutinId) => useJSON(`/data/votes/${scrutinId}.json`)
+export const useVotesByDepute = () => useJSON('/data/votes-by-depute.json')

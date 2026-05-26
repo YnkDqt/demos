@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "fetch:deputes": "node scripts/fetch-deputes.js --legis 17",
     "fetch:scrutins": "node scripts/fetch-scrutins.js --legis 17",
-    "fetch:all": "npm run fetch:deputes && npm run fetch:scrutins"
+    "build:index": "node scripts/build-votes-index.js",
+    "fetch:all": "npm run fetch:deputes && npm run fetch:scrutins && npm run build:index"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -7,6 +7,7 @@ import Drawer from './layout/Drawer.jsx'
 import StubPage from './pages/StubPage.jsx'
 import PageMonCoin from './pages/PageMonCoin.jsx'
 import PageMesElus from './pages/PageMesElus.jsx'
+import PageDeputeDetail from './pages/PageDeputeDetail.jsx'
 import PageReglages from './pages/PageReglages.jsx'
 
 export default function App() {
@@ -15,18 +16,27 @@ export default function App() {
   const [route, setRoute]   = useState('mon-coin')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [profile, setProfile] = useState({ prenom: '', codePostal: '', themes: THEMES_DEFAULT })
+  const [selectedDeputeId, setSelectedDeputeId] = useState(null)
 
   const C = dark ? C_DARK : C_LIGHT
   const isAdmin = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('admin') === '1'
 
   const go = useCallback((id) => {
-    setRoute(id); setDrawerOpen(false); window.scrollTo({ top: 0 })
+    setRoute(id); setDrawerOpen(false); setSelectedDeputeId(null); window.scrollTo({ top: 0 })
+  }, [])
+
+  const selectDepute = useCallback((id) => {
+    setSelectedDeputeId(id); window.scrollTo({ top: 0 })
   }, [])
 
   const page = useMemo(() => {
+    // Si une fiche député est ouverte, elle prend la priorité sur les autres routes
+    if (route === 'mes-elus' && selectedDeputeId) {
+      return <PageDeputeDetail deputeId={selectedDeputeId} onBack={() => setSelectedDeputeId(null)} C={C} />
+    }
     switch (route) {
       case 'mon-coin':  return <PageMonCoin profile={profile} C={C} />
-      case 'mes-elus':  return <PageMesElus C={C} />
+      case 'mes-elus':  return <PageMesElus onSelectDepute={selectDepute} C={C} />
       case 'mon-match': return <StubPage title="Mon match" subtitle="20 propositions, 3 niveaux, ton classement avec les partis et les députés." C={C} />
       case 'decrypter': return <StubPage title="Décrypter" subtitle="Échiquier politique, cartes story, méthodologie." C={C} />
       case 'mes-idees': return <StubPage title="Mes idées" subtitle="Interpellation, pétitions locales, associations, conso responsable." C={C} />
@@ -40,7 +50,7 @@ export default function App() {
       )
       default: return null
     }
-  }, [route, profile, expert, dark, C])
+  }, [route, selectedDeputeId, profile, expert, dark, C, selectDepute])
 
   return (
     <>

@@ -2,13 +2,12 @@ import React, { useMemo, useState } from 'react'
 import { PageTitle, Card, Empty, Spinner, ErrorBox, Avatar, BadgeParti, Btn, Field } from '../atoms.jsx'
 import { useDeputes } from '../hooks.js'
 
-export default function PageMesElus({ C }) {
+export default function PageMesElus({ onSelectDepute, C }) {
   const { data, loading, error } = useDeputes()
   const [q, setQ] = useState('')
   const [groupe, setGroupe] = useState('')
   const [dept, setDept] = useState('')
 
-  // Listes uniques pour les filtres
   const groupes = useMemo(() => {
     if (!data) return []
     const m = new Map()
@@ -25,7 +24,6 @@ export default function PageMesElus({ C }) {
     return [...s].sort()
   }, [data])
 
-  // Liste filtrée
   const filtered = useMemo(() => {
     if (!data) return []
     const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -92,24 +90,29 @@ export default function PageMesElus({ C }) {
               gap: 12
             }}>
               {filtered.slice(0, 200).map(d => (
-                <Card C={C} key={d.id} padding={14}>
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <Avatar name={`${d.prenom} ${d.nom}`} C={C} size={40} />
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 500, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {d.prenom} {d.nom}
-                      </div>
-                      <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
-                        {d.circo ? `${d.circo.dept} · circo ${d.circo.numero}` : '—'}
+                <div key={d.id} onClick={() => onSelectDepute(d.id)}
+                  style={{ cursor: 'pointer', transition: 'transform .12s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+                  <Card C={C} padding={14}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                      <Avatar name={`${d.prenom} ${d.nom}`} C={C} size={40} />
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontWeight: 500, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {d.prenom} {d.nom}
+                        </div>
+                        <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
+                          {d.circo ? `${d.circo.dept} · circo ${d.circo.numero}` : '—'}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {d.groupe?.code && (
-                    <div style={{ marginTop: 10 }}>
-                      <BadgeParti code={d.groupe.code} C={C} />
-                    </div>
-                  )}
-                </Card>
+                    {d.groupe?.code && (
+                      <div style={{ marginTop: 10 }}>
+                        <BadgeParti code={d.groupe.code} C={C} />
+                      </div>
+                    )}
+                  </Card>
+                </div>
               ))}
             </div>
           )}

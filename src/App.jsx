@@ -8,6 +8,7 @@ import StubPage from './pages/StubPage.jsx'
 import PageMonCoin from './pages/PageMonCoin.jsx'
 import PageMesElus from './pages/PageMesElus.jsx'
 import PageDeputeDetail from './pages/PageDeputeDetail.jsx'
+import PageMonMatch from './pages/PageMonMatch.jsx'
 import PageReglages from './pages/PageReglages.jsx'
 
 export default function App() {
@@ -30,14 +31,13 @@ export default function App() {
   }, [])
 
   const page = useMemo(() => {
-    // Si une fiche député est ouverte, elle prend la priorité sur les autres routes
     if (route === 'mes-elus' && selectedDeputeId) {
       return <PageDeputeDetail deputeId={selectedDeputeId} onBack={() => setSelectedDeputeId(null)} C={C} />
     }
     switch (route) {
       case 'mon-coin':  return <PageMonCoin profile={profile} C={C} />
       case 'mes-elus':  return <PageMesElus onSelectDepute={selectDepute} C={C} />
-      case 'mon-match': return <StubPage title="Mon match" subtitle="20 propositions, 3 niveaux, ton classement avec les partis et les députés." C={C} />
+      case 'mon-match': return <PageMonMatch C={C} />
       case 'decrypter': return <StubPage title="Décrypter" subtitle="Échiquier politique, cartes story, méthodologie." C={C} />
       case 'mes-idees': return <StubPage title="Mes idées" subtitle="Interpellation, pétitions locales, associations, conso responsable." C={C} />
       case 'reglages':  return (

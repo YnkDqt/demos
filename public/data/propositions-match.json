@@ -1,0 +1,424 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-26",
+  "count": 20,
+  "note": "Tous les chiffres marqués [à vérifier] doivent être validés contre les sources officielles avant publication. Les sources citées sont indicatives et doivent être consolidées.",
+
+  "glossaire": {
+    "répartition": "Système de retraite où les cotisations des actifs financent immédiatement les pensions des retraités. C'est le modèle français depuis 1945.",
+    "capitalisation": "Système de retraite où chaque actif épargne pour sa propre retraite, via des placements financiers. C'est le modèle dominant aux États-Unis ou au Royaume-Uni.",
+    "loi SRU": "Loi de 2000 imposant aux communes de plus de 3 500 habitants d'avoir au moins 25% de logements sociaux. De nombreuses communes ne respectent pas ce quota.",
+    "regroupement familial": "Procédure permettant à un étranger résidant légalement en France de faire venir son conjoint et ses enfants. Soumise à conditions de revenus et de logement.",
+    "49.3": "Article de la Constitution permettant au gouvernement d'adopter un texte sans vote du Parlement. Le texte est adopté sauf si une motion de censure le rejette.",
+    "loi de 1905": "Loi de séparation des Églises et de l'État, fondatrice de la laïcité française. Garantit la liberté des cultes mais interdit à l'État de financer ou reconnaître une religion.",
+    "PMA": "Procréation Médicalement Assistée. Techniques médicales pour aider à concevoir un enfant. Ouverte à toutes les femmes (seules ou en couple) depuis 2021.",
+    "GPA": "Gestation Pour Autrui. Une femme porte un enfant pour le compte d'un couple. Interdite en France, autorisée et encadrée dans certains pays.",
+    "RGPD": "Règlement européen de 2018 protégeant les données personnelles. Impose aux entreprises de demander le consentement et de garantir la sécurité des données.",
+    "GAFAM": "Acronyme désignant les 5 géants américains du numérique : Google, Apple, Facebook (Meta), Amazon, Microsoft.",
+    "subsidiarité": "Principe selon lequel les décisions doivent être prises au niveau le plus proche du citoyen possible. L'échelon supérieur n'intervient que si nécessaire.",
+    "Vᵉ République": "Régime politique français actuel, instauré en 1958 par De Gaulle. Caractérisé par un exécutif fort (Président élu au suffrage universel).",
+    "VIᵉ République": "Projet de nouveau régime politique défendu notamment par LFI. Viserait à réduire les pouvoirs du Président et renforcer le Parlement.",
+    "RIC": "Référendum d'Initiative Citoyenne. Mécanisme permettant aux citoyens de provoquer un référendum sur une loi, son abrogation ou la révocation d'un élu.",
+    "OTAN": "Alliance militaire occidentale fondée en 1949, regroupant 32 pays dont la France, les États-Unis et la plupart des pays européens. Pacte de défense mutuelle.",
+    "PIB": "Produit Intérieur Brut. Mesure la richesse totale produite dans un pays sur une année.",
+    "prélèvements obligatoires": "Ensemble des impôts, taxes et cotisations sociales payés par les ménages et les entreprises. Mesure le poids global de l'État dans l'économie.",
+    "superprofits": "Bénéfices exceptionnellement élevés réalisés par certaines entreprises lors de circonstances particulières (crises, hausses brutales des prix). Le débat porte sur leur taxation.",
+    "captage carbone": "Technologies permettant de capturer le CO₂ avant qu'il atteigne l'atmosphère, ou de l'aspirer une fois émis. Encore expérimental à grande échelle.",
+    "antispécisme": "Courant de pensée qui refuse la hiérarchie entre espèces animales (dont l'humain) et défend l'égale considération morale de tous les êtres sensibles.",
+    "ESS": "Économie Sociale et Solidaire. Ensemble des entreprises (coopératives, mutuelles, associations) qui privilégient l'utilité sociale sur le profit.",
+    "SCOP": "Société Coopérative et Participative. Entreprise détenue majoritairement par ses salariés, qui élisent leurs dirigeants.",
+    "exception culturelle": "Principe selon lequel les biens culturels (films, livres, musique) ne sont pas des marchandises comme les autres et doivent être protégés des règles du commerce international.",
+    "CNC": "Centre National du Cinéma. Établissement public qui finance et régule le cinéma français via une taxe sur les billets et les diffuseurs.",
+    "Arcom": "Autorité de Régulation de la Communication Audiovisuelle et Numérique. Successeur du CSA. Régule télévision, radio, plateformes en ligne.",
+    "Brexit": "Sortie du Royaume-Uni de l'Union européenne, effective en 2020 après un référendum en 2016.",
+    "loi de 2000 (SRU)": "Voir loi SRU.",
+    "loi de 2023 (retraites)": "Réforme qui a relevé l'âge légal de départ de 62 à 64 ans et accéléré l'allongement de la durée de cotisation.",
+    "désertion médicale": "Phénomène où certains territoires (souvent ruraux) manquent cruellement de médecins, obligeant les habitants à parcourir de longues distances pour se soigner.",
+    "carte scolaire": "Système qui attribue chaque enfant à une école publique en fonction de son adresse. Critiqué pour figer les inégalités sociales selon les quartiers.",
+    "fédéralisme": "Organisation politique où plusieurs États (ou régions) partagent leur souveraineté avec un pouvoir central. Modèle de l'Allemagne, des États-Unis, de la Suisse.",
+    "souveraineté": "Capacité d'un pays à décider de lui-même de ses lois, sa monnaie, ses frontières, sans qu'une autorité supérieure puisse s'y opposer."
+  },
+
+  "questions": [
+    {
+      "id": "q1-richesses",
+      "ordre": 1,
+      "theme": "eco",
+      "emoji": "💰",
+      "titre": "Comment répartir les richesses ?",
+      "enBref": {
+        "texte": "La France prélève 46% du PIB en [[prélèvements obligatoires]] (3ᵉ d'Europe), et redistribue 32% en prestations sociales (1ʳᵉ d'Europe). Les 10% les plus riches détiennent 47% du patrimoine national. 9,1 millions de personnes vivent sous le seuil de pauvreté.",
+        "sources": "INSEE, Eurostat, Observatoire des inégalités (2023-2024)"
+      },
+      "question": "La France a l'un des plus hauts niveaux de [[prélèvements obligatoires]] d'Europe, mais aussi l'une des protections sociales les plus développées. Quelle approche te semble la plus juste ?",
+      "positions": [
+        { "id": "redistribuer", "label": "Redistribuer", "texte": "Augmenter fortement les impôts sur les hauts revenus, les grosses successions et les [[superprofits]], pour financer des services publics renforcés et des prestations sociales plus généreuses." },
+        { "id": "preserver", "label": "Préserver", "texte": "Le système français est globalement protecteur et équilibré. Il faut le maintenir, l'ajuster à la marge, et continuer à corriger les inégalités sans tout bouleverser." },
+        { "id": "inciter", "label": "Inciter", "texte": "Baisser les impôts sur le travail et les entreprises pour relancer l'économie, créer des emplois et laisser plus de pouvoir d'achat. La redistribution doit rester ciblée sur ceux qui en ont vraiment besoin." },
+        { "id": "liberer", "label": "Libérer", "texte": "Réduire fortement la dépense publique, alléger massivement les impôts, désengager l'État de pans entiers de l'économie. La prospérité vient d'une économie qui respire." },
+        { "id": "proteger", "label": "Protéger", "texte": "Notre richesse fuit à cause de la concurrence déloyale et de la mondialisation. Avant de débattre de la répartition, il faut produire en France, protéger nos entreprises et nos emplois par des frontières économiques." }
+      ]
+    },
+    {
+      "id": "q2-ecologie",
+      "ordre": 2,
+      "theme": "env",
+      "emoji": "🌍",
+      "titre": "L'effort écologique, qui le porte ?",
+      "enBref": {
+        "texte": "La France émet 1% des émissions mondiales de CO₂, mais 8 tonnes par habitant et par an (objectif : 2 tonnes en 2050). 100 entreprises sont responsables de 71% des émissions mondiales. Les transports représentent 32% des émissions françaises, le bâtiment 18%, l'agriculture 19%.",
+        "sources": "Citepa, CDP Carbon Majors, Haut Conseil pour le Climat (2023)"
+      },
+      "question": "Tout le monde s'accorde sur l'urgence climatique, mais pas sur le moyen d'y répondre. Selon toi, l'effort doit reposer en priorité sur qui ?",
+      "positions": [
+        { "id": "contraindre", "label": "Contraindre", "texte": "Imposer des règles strictes aux entreprises polluantes, planifier la sortie des énergies fossiles, taxer les [[superprofits]]. Le problème vient du système productif, pas des individus." },
+        { "id": "accompagner", "label": "Accompagner", "texte": "Mettre des objectifs clairs, accompagner la transition par des aides et des normes progressives, sans détruire la compétitivité ni surcharger les ménages modestes." },
+        { "id": "innover", "label": "Innover", "texte": "Le progrès technologique (nucléaire, [[captage carbone]], hydrogène) et les incitations économiques résoudront le problème mieux que les interdictions. Pas d'écologie punitive." },
+        { "id": "decroitre", "label": "Décroître", "texte": "Réduire la consommation matérielle globale, plafonner les hauts revenus et patrimoines, repenser nos modes de vie. Le [[PIB]] n'est pas un objectif." },
+        { "id": "relativiser", "label": "Relativiser", "texte": "L'urgence climatique est exagérée ou la France ne représente qu'une part marginale des émissions mondiales. Les efforts demandés pèsent surtout sur les classes populaires et la [[souveraineté]] énergétique du pays." }
+      ]
+    },
+    {
+      "id": "q3-securite",
+      "ordre": 3,
+      "theme": "secu",
+      "emoji": "🛡️",
+      "titre": "Sécurité ou libertés ?",
+      "enBref": {
+        "texte": "La France compte environ 250 000 policiers et gendarmes pour 68 millions d'habitants. 75 000 personnes sont incarcérées pour 60 000 places (taux d'occupation : 125%). Les atteintes aux personnes ont augmenté de 17% sur 5 ans, les atteintes aux biens diminué de 12%.",
+        "sources": "Ministère de l'Intérieur, Ministère de la Justice (2024)"
+      },
+      "question": "Face à la délinquance, au terrorisme et aux nouvelles menaces, comment équilibrer sécurité publique et libertés individuelles ?",
+      "positions": [
+        { "id": "reprimer", "label": "Réprimer", "texte": "Plus de policiers, plus de prisons, peines minimales, présence régalienne forte partout. La protection des Français passe avant tout." },
+        { "id": "equilibrer", "label": "Équilibrer", "texte": "Soutenir les forces de l'ordre tout en investissant dans la prévention, l'éducation, la justice de proximité. Pas d'opposition entre fermeté et accompagnement." },
+        { "id": "encadrer", "label": "Encadrer", "texte": "La société de surveillance n'est pas la solution. Vidéosurveillance massive, fichage, dérives policières doivent être strictement contrôlés. Traiter les causes sociales de la délinquance." },
+        { "id": "refonder", "label": "Refonder", "texte": "La police et la prison telles qu'elles existent reproduisent les inégalités et la violence. Démilitariser, désarmer, investir dans des modèles alternatifs (médiation, justice restaurative)." },
+        { "id": "autodefendre", "label": "S'autodéfendre", "texte": "L'État ne peut plus assurer la sécurité partout. Élargir les droits des citoyens à se défendre eux-mêmes (légitime défense étendue, armement), responsabiliser plutôt qu'attendre l'État." }
+      ]
+    },
+    {
+      "id": "q4-travail",
+      "ordre": 4,
+      "theme": "travail",
+      "emoji": "💼",
+      "titre": "Quelle place pour le travail dans nos vies ?",
+      "enBref": {
+        "texte": "Les Français travaillent en moyenne 35,9 heures par semaine, et 1 600 heures par an (vs 1 700h en Allemagne, 1 900h aux États-Unis). 12% des salariés se déclarent en burn-out. Le taux d'emploi est de 68% (objectif gouvernemental : 75%).",
+        "sources": "Eurostat, DARES, OCDE (2023)"
+      },
+      "question": "Le rapport au travail évolue : burn-out, télétravail, semaine de 4 jours, débats sur le sens du travail. Quelle direction te semble la bonne ?",
+      "positions": [
+        { "id": "reduire", "label": "Réduire", "texte": "Moins d'heures, semaine de 4 jours, retraite à 60 ans. Le travail doit prendre moins de place dans nos vies pour libérer du temps personnel, familial, citoyen." },
+        { "id": "securiser", "label": "Sécuriser", "texte": "Renforcer les protections des salariés (CDI, droit de grève, conventions collectives), revaloriser les salaires. Le travail libère, à condition qu'il soit bien encadré." },
+        { "id": "flexibiliser", "label": "Flexibiliser", "texte": "Simplifier le code du travail, faciliter les embauches et les licenciements, encourager la négociation entreprise par entreprise. La rigidité actuelle freine l'emploi." },
+        { "id": "merite", "label": "Valoriser le mérite", "texte": "Récompenser ceux qui travaillent plus et mieux, baisser les charges, lutter contre l'assistanat. Le travail doit payer plus que l'inactivité." },
+        { "id": "emanciper", "label": "Émanciper", "texte": "Inventer d'autres modèles : revenu universel, coopératives, autogestion, sortie progressive du salariat. Notre rapport au travail est à réinventer en profondeur." }
+      ]
+    },
+    {
+      "id": "q5-retraites",
+      "ordre": 5,
+      "theme": "travail",
+      "emoji": "💼",
+      "titre": "À quel âge partir à la retraite ?",
+      "enBref": {
+        "texte": "Depuis [[loi de 2023 (retraites)|2023]], l'âge légal de départ est de 64 ans (62 auparavant). L'espérance de vie en bonne santé est de 64,4 ans pour les femmes, 63,4 pour les hommes. La France compte 17 millions de retraités pour 28 millions d'actifs. Les retraites représentent 14% du [[PIB]].",
+        "sources": "INSEE, DREES, COR (2024)"
+      },
+      "question": "Le système de retraites par [[répartition]] est sous tension : plus de retraités, moins d'actifs. Comment garantir son avenir ?",
+      "positions": [
+        { "id": "60ans", "label": "Revenir à 60 ans", "texte": "La retraite à 60 ans à taux plein est un acquis social essentiel. Financer par les hauts revenus et les [[superprofits]], pas par le travail forcé." },
+        { "id": "62ans", "label": "Stabiliser à 62 ans", "texte": "Le compromis historique reste juste. Pas de nouvel allongement, mais des ajustements ciblés (carrières longues, pénibilité, femmes)." },
+        { "id": "64ans", "label": "Maintenir 64 ans", "texte": "La [[loi de 2023 (retraites)|réforme de 2023]] est nécessaire pour équilibrer le système. Refuser l'allongement, c'est condamner les générations futures à une retraite plus précaire." },
+        { "id": "67ans", "label": "Aller plus loin", "texte": "Aligner sur les standards européens (65-67 ans), encourager la [[capitalisation]] individuelle en complément, donner plus de choix aux actifs." },
+        { "id": "capitalisation", "label": "Sortir de la répartition", "texte": "Le système par [[répartition]] est à bout. Passer à un système majoritairement par [[capitalisation]], à l'image d'autres pays, pour redonner aux actifs la maîtrise de leur épargne retraite." }
+      ]
+    },
+    {
+      "id": "q6-sante",
+      "ordre": 6,
+      "theme": "sante",
+      "emoji": "🏥",
+      "titre": "Comment sauver l'hôpital ?",
+      "enBref": {
+        "texte": "L'hôpital public a perdu 5 700 lits sur 5 ans. 6 millions de Français n'ont pas de médecin traitant. La France consacre 12% du [[PIB]] à la santé (moyenne UE : 10,5%). 30% des médecins ont plus de 60 ans. Les [[désertion médicale|déserts médicaux]] touchent 30% du territoire.",
+        "sources": "DREES, OCDE, Ordre des médecins (2023)"
+      },
+      "question": "L'hôpital public craque : pénuries, urgences saturées, [[désertion médicale|déserts médicaux]]. Quelle priorité ?",
+      "positions": [
+        { "id": "reinvestir", "label": "Réinvestir massivement", "texte": "Embaucher des dizaines de milliers de soignants, rouvrir les lits, revaloriser les salaires, sortir de la logique comptable. La santé n'est pas un coût, c'est un investissement." },
+        { "id": "reformer", "label": "Réformer la gouvernance", "texte": "Garder l'hôpital public fort mais le moderniser : alléger la bureaucratie, redonner le pouvoir aux soignants, mieux coordonner ville-hôpital." },
+        { "id": "concilier", "label": "Concilier public et privé", "texte": "Renforcer la complémentarité entre hôpital public, cliniques privées et médecine de ville. Faire jouer la concurrence pour améliorer la qualité et réduire les délais." },
+        { "id": "responsabiliser", "label": "Responsabiliser", "texte": "Lutter contre l'abus des arrêts maladie, le nomadisme médical, les dépenses non essentielles. Augmenter les franchises pour responsabiliser les patients." },
+        { "id": "territoires", "label": "Lutter contre les déserts", "texte": "La priorité absolue, c'est l'accès aux soins partout. Coercition d'installation des médecins, missions de service public obligatoires, vraie politique territoriale." }
+      ]
+    },
+    {
+      "id": "q7-ecole",
+      "ordre": 7,
+      "theme": "educ",
+      "emoji": "🎓",
+      "titre": "Quelle école pour demain ?",
+      "enBref": {
+        "texte": "La France est passée de la 13ᵉ à la 26ᵉ place en mathématiques au classement PISA en 20 ans. Elle dépense 5,2% de son [[PIB]] pour l'éducation. Un enseignant gagne 2 800 € net en début de carrière (vs 4 200 € en Allemagne). Un élève sur cinq est scolarisé dans le privé sous contrat.",
+        "sources": "PISA, OCDE, Ministère de l'Éducation (2023)"
+      },
+      "question": "L'école française décline dans les classements internationaux. Quelle direction prendre ?",
+      "positions": [
+        { "id": "egalite", "label": "Égalité radicale", "texte": "Mixité sociale imposée, fin du financement public au privé, plus de moyens dans les zones défavorisées. L'école doit corriger les inégalités, pas les reproduire. Refonte de la [[carte scolaire]]." },
+        { "id": "profs", "label": "Soutenir les profs", "texte": "Revaloriser fortement les salaires, restaurer l'autorité, alléger les classes, faire confiance aux équipes pédagogiques. La clé, c'est l'institution." },
+        { "id": "liberte", "label": "Liberté de choix", "texte": "Garder une école publique forte mais préserver la liberté pédagogique (privé, hors contrat, école à la maison). La diversité des modèles enrichit le système." },
+        { "id": "fondamentaux", "label": "Retour aux fondamentaux", "texte": "Maths, français, ordre, mérite, uniforme, suppression du collège unique. Recentrer l'école sur la transmission des savoirs et de l'autorité." },
+        { "id": "reinventer", "label": "Réinventer", "texte": "L'école traditionnelle est obsolète. Méthodes alternatives (Freinet, Montessori), apprentissage par projet, place du numérique, sortir du modèle XIXᵉ siècle." }
+      ]
+    },
+    {
+      "id": "q8-logement",
+      "ordre": 8,
+      "theme": "logement",
+      "emoji": "🏠",
+      "titre": "Se loger : quelle politique ?",
+      "enBref": {
+        "texte": "4 millions de personnes sont mal logées en France. Les prix de l'immobilier ont doublé en 20 ans, les loyers augmenté de 30%. La France manque de 1 million de logements sociaux selon la Fondation Abbé Pierre. La construction neuve est à son plus bas niveau depuis 25 ans.",
+        "sources": "Fondation Abbé Pierre, INSEE, Ministère du Logement (2023-2024)"
+      },
+      "question": "Les loyers explosent dans les grandes villes, les jeunes ne peuvent plus accéder à la propriété, le logement social manque. Quelle action ?",
+      "positions": [
+        { "id": "encadrer", "label": "Encadrer le marché", "texte": "Encadrement strict des loyers, taxation des résidences secondaires et des locations touristiques, fin de la spéculation immobilière. Le logement n'est pas une marchandise." },
+        { "id": "social", "label": "Construire plus de social", "texte": "Massifier la construction de HLM, faire respecter la [[loi SRU]], garantir un logement digne à tous. La solution est dans l'offre publique." },
+        { "id": "construction", "label": "Libérer la construction", "texte": "Simplifier les normes, faciliter les permis, encourager la promotion privée. Le problème, c'est la pénurie d'offre, pas la spéculation." },
+        { "id": "propriete", "label": "Favoriser la propriété", "texte": "Aides à l'accession, prêt à taux zéro élargi, baisse des droits de mutation. Permettre aux classes moyennes de devenir propriétaires." },
+        { "id": "territoires-log", "label": "Réinvestir les territoires", "texte": "Le problème n'est pas le logement mais la concentration. Décentraliser, redynamiser les villes moyennes et la ruralité pour désengorger les métropoles." }
+      ]
+    },
+    {
+      "id": "q9-immigration",
+      "ordre": 9,
+      "theme": "inter",
+      "emoji": "🌐",
+      "titre": "Quelle politique migratoire ?",
+      "enBref": {
+        "texte": "La France accueille environ 320 000 immigrés légaux par an (0,5% de la population). 7,7 millions d'immigrés vivent en France (11% de la population), 5,3 millions sont français par acquisition. Le solde migratoire est de +160 000 par an. 130 000 demandes d'asile en 2023, 30% acceptées.",
+        "sources": "INSEE, OFPRA, Eurostat (2023)"
+      },
+      "question": "L'immigration divise profondément le débat politique. Quelle position se rapproche le plus de la tienne ?",
+      "positions": [
+        { "id": "accueillir", "label": "Accueillir mieux", "texte": "Renforcer le droit d'asile, accélérer les régularisations, créer des voies de migration légales, lutter contre l'exploitation des sans-papiers. La France peut et doit accueillir." },
+        { "id": "reguler", "label": "Réguler humainement", "texte": "Une politique d'accueil équilibrée : asile pour ceux qui en ont besoin, intégration par le travail et la langue, fermeté contre les filières illégales." },
+        { "id": "maitriser", "label": "Maîtriser les flux", "texte": "Réduire significativement l'immigration légale, durcir le [[regroupement familial]], lier prestations sociales à la durée de résidence. Une nation a le droit de choisir qui elle accueille." },
+        { "id": "preference", "label": "Préférence nationale", "texte": "Réserver certaines aides et emplois aux Français, expulser systématiquement les irréguliers, sortir de certains traités migratoires européens. Protéger les nationaux d'abord." },
+        { "id": "ouvertes", "label": "Repenser les frontières", "texte": "La libre circulation est un droit. Ouvrir les frontières, en finir avec la criminalisation des migrations, traiter les causes (guerre, climat, pauvreté) à la racine." }
+      ]
+    },
+    {
+      "id": "q10-justice",
+      "ordre": 10,
+      "theme": "secu",
+      "emoji": "⚖️",
+      "titre": "Quel rapport à la justice pénale ?",
+      "enBref": {
+        "texte": "Un procès aux prud'hommes dure en moyenne 16 mois. La France compte 11 juges pour 100 000 habitants (moyenne UE : 21). 60% des peines de prison ferme de moins de 2 ans sont aménagées. Le taux de récidive est de 60% pour les peines courtes, 30% pour les peines aménagées.",
+        "sources": "Ministère de la Justice, CEPEJ, INSEE (2023)"
+      },
+      "question": "La justice française est critiquée à la fois pour son laxisme et sa sévérité. Quelle évolution te semble nécessaire ?",
+      "positions": [
+        { "id": "reparer", "label": "Réparer plutôt que punir", "texte": "Développer la justice restaurative, les peines alternatives à la prison, la réinsertion. La prison fabrique de la récidive plus qu'elle n'en prévient." },
+        { "id": "moyens", "label": "Donner des moyens", "texte": "La justice manque de juges, de greffiers, de moyens. Plus de magistrats, des délais raccourcis, une justice de proximité accessible. C'est l'institution qui est en souffrance." },
+        { "id": "appliquer", "label": "Appliquer fermement la loi", "texte": "Trop de classements sans suite, de remises de peine, de petits délits impunis. Les peines prononcées doivent être appliquées intégralement, sans aménagement systématique." },
+        { "id": "durcir", "label": "Durcir les peines", "texte": "Peines planchers, perpétuité réelle, peines minimales pour récidivistes, fin de l'aménagement de peine en dessous d'un seuil. La fermeté seule fait reculer la délinquance." },
+        { "id": "populaire", "label": "Justice populaire", "texte": "La justice est trop éloignée des citoyens. Élection des juges, jurys citoyens élargis, référendums sur les peines lourdes. Rendre la justice au peuple." }
+      ]
+    },
+    {
+      "id": "q11-europe",
+      "ordre": 11,
+      "theme": "inter",
+      "emoji": "🇪🇺",
+      "titre": "Quelle place pour l'Europe ?",
+      "enBref": {
+        "texte": "La France verse environ 26 milliards d'euros par an à l'UE et en reçoit environ 17 milliards (contributeur net). L'UE produit 70% du [[PIB]] de l'Eurozone. 60% des lois françaises sont d'inspiration européenne directe ou indirecte. Le Royaume-Uni a quitté l'UE en 2020 ([[Brexit]]).",
+        "sources": "Commission européenne, Parlement français, Office des publications de l'UE (2023)"
+      },
+      "question": "L'Union européenne traverse une crise de légitimité. Quelle direction te semble la meilleure ?",
+      "positions": [
+        { "id": "federer", "label": "Fédéraliser", "texte": "Aller vers les États-Unis d'Europe : armée commune, fiscalité harmonisée, gouvernement européen élu. Seule une Europe forte peut peser face aux États-Unis et à la Chine. [[fédéralisme]]." },
+        { "id": "approfondir", "label": "Approfondir", "texte": "Renforcer l'intégration sur les sujets stratégiques (défense, énergie, technologie) tout en respectant la diversité des nations. Plus d'Europe, mais lucide." },
+        { "id": "nations", "label": "Europe des nations", "texte": "Garder le cadre mais redonner le pouvoir aux États : moins de directives, plus de [[subsidiarité]], droit de veto national renforcé. L'Europe doit servir, pas commander." },
+        { "id": "main", "label": "Reprendre la main", "texte": "Renégocier les traités, désobéir aux normes européennes qui nuisent à nos intérêts, rétablir le contrôle sur nos frontières et notre monnaie de fait sinon de droit." },
+        { "id": "sortir", "label": "Sortir", "texte": "Quitter l'UE et/ou l'euro pour retrouver pleine [[souveraineté]] nationale, comme l'a fait le Royaume-Uni ([[Brexit]]). Notre déclin est lié à cette construction européenne." }
+      ]
+    },
+    {
+      "id": "q12-international",
+      "ordre": 12,
+      "theme": "inter",
+      "emoji": "🌍",
+      "titre": "Quelle politique étrangère ?",
+      "enBref": {
+        "texte": "La France consacre 2% de son [[PIB]] à la défense (objectif [[OTAN]] atteint en 2025). Elle possède l'arme nucléaire (290 ogives), siège permanent au Conseil de sécurité de l'ONU, et 4 800 militaires déployés dans 17 opérations extérieures. Elle est le 3ᵉ exportateur d'armes mondial.",
+        "sources": "SIPRI, Ministère des Armées, ONU (2023-2024)"
+      },
+      "question": "Guerre en Ukraine, conflit au Proche-Orient, montée des tensions avec la Chine. Quel rôle pour la France dans le monde ?",
+      "positions": [
+        { "id": "atlantiste", "label": "Atlantiste", "texte": "Renforcer notre engagement dans l'[[OTAN]], soutenir massivement l'Ukraine, s'aligner étroitement avec les alliés occidentaux face aux régimes autoritaires." },
+        { "id": "europeen", "label": "Européen souverain", "texte": "Construire une défense européenne autonome, capable d'agir avec ou sans les États-Unis. Une voie médiane entre Washington et Moscou." },
+        { "id": "singuliere", "label": "Voix singulière", "texte": "La tradition gaulliste : indépendance stratégique, dialogue avec tous (Russie, Chine, Sud global), pas d'alignement automatique. La France parle à tout le monde." },
+        { "id": "nonaligne", "label": "Non-alignement", "texte": "Sortir de l'[[OTAN]], refuser la logique de bloc, rester neutre dans les conflits qui ne nous concernent pas directement. Diplomatie de paix." },
+        { "id": "repli", "label": "Repli national", "texte": "Réduire fortement notre engagement international, recentrer les ressources de défense sur la protection du territoire et nos intérêts vitaux directs." }
+      ]
+    },
+    {
+      "id": "q13-democratie",
+      "ordre": 13,
+      "theme": "demo",
+      "emoji": "🏛️",
+      "titre": "Notre démocratie va-t-elle bien ?",
+      "enBref": {
+        "texte": "L'abstention aux législatives 2024 était de 33% au 1ᵉʳ tour. 55% des Français font confiance à leur maire, 26% au président, 22% à l'Assemblée. Depuis 1958, le [[49.3]] a été utilisé plus de 100 fois. La France est la 7ᵉ démocratie européenne au classement de The Economist.",
+        "sources": "Ministère de l'Intérieur, CEVIPOF, The Economist Democracy Index (2024)"
+      },
+      "question": "Abstention massive, défiance envers les élus, [[49.3]] à répétition. Comment renouveler la démocratie française ?",
+      "positions": [
+        { "id": "directe", "label": "Démocratie directe", "texte": "[[RIC|Référendum d'initiative citoyenne]], votations régulières, mandats révocables. Le peuple doit pouvoir trancher directement, pas seulement tous les 5 ans." },
+        { "id": "proportionnelle", "label": "Proportionnelle et participation", "texte": "Introduire la proportionnelle aux législatives, généraliser les budgets participatifs, donner du pouvoir aux corps intermédiaires (syndicats, associations)." },
+        { "id": "stabilite", "label": "Stabilité institutionnelle", "texte": "La [[Vᵉ République]] fonctionne, ne la déstabilisons pas. Réformer à la marge oui, mais préserver l'exécutif fort qui permet à la France de gouverner." },
+        { "id": "presidentialiser", "label": "Présidentialiser", "texte": "Renforcer encore l'exécutif : septennat non renouvelable, suppression du Premier ministre, référendums décisionnels présidentiels. Un chef clair, une responsabilité claire." },
+        { "id": "refonder", "label": "Refonder", "texte": "[[VIᵉ République]], parlementarisme rationalisé, nouveau partage des pouvoirs entre Assemblée, Sénat, citoyens. La [[Vᵉ République|Vᵉ]] s'est dévoyée, il faut tout repenser." }
+      ]
+    },
+    {
+      "id": "q14-laicite",
+      "ordre": 14,
+      "theme": "laic",
+      "emoji": "⚖️",
+      "titre": "Quelle laïcité ?",
+      "enBref": {
+        "texte": "La [[loi de 1905]] sépare les Églises et l'État. 51% des Français se déclarent sans religion, 32% catholiques, 8% musulmans, 3% protestants. La loi interdit les signes religieux ostensibles à l'école publique depuis 2004 ; à l'université ils restent autorisés. L'abaya a été interdite dans les écoles en 2023.",
+        "sources": "INSEE, IFOP, Observatoire de la laïcité (2023)"
+      },
+      "question": "La laïcité est un principe fondamental de la République, mais son interprétation divise. Quelle approche défends-tu ?",
+      "positions": [
+        { "id": "combat", "label": "Laïcité de combat", "texte": "Étendre la [[loi de 1905]] : interdire tous les signes religieux à l'université, dans le sport, voire dans la rue. Refus net du communautarisme et de l'islam politique." },
+        { "id": "republicaine", "label": "Laïcité républicaine", "texte": "Maintenir la [[loi de 1905]] telle qu'elle est : neutralité de l'État, liberté des cultes, signes religieux limités à l'école publique et aux agents publics." },
+        { "id": "apaisement", "label": "Laïcité d'apaisement", "texte": "Mieux dialoguer avec les religions, lutter contre les discriminations envers les croyants, sortir de la stigmatisation des musulmans. Laïcité = liberté de croire ou non." },
+        { "id": "racines", "label": "Reconnaître les racines chrétiennes", "texte": "Assumer l'héritage culturel chrétien de la France (crèches dans les mairies, jours fériés, patrimoine), tout en garantissant la liberté des autres cultes." },
+        { "id": "liberte-totale", "label": "Liberté totale", "texte": "Sortir du cadre laïque strict, autoriser tous les signes religieux partout sans exception, comme dans le modèle anglo-saxon. L'État n'a pas à dicter ce qu'on porte." }
+      ]
+    },
+    {
+      "id": "q15-culture",
+      "ordre": 15,
+      "theme": "culture",
+      "emoji": "🎭",
+      "titre": "Médias, culture : quel financement ?",
+      "enBref": {
+        "texte": "L'audiovisuel public reçoit environ 3,8 milliards d'euros par an. 90% des Français consomment chaque jour des médias appartenant à 11 groupes dont 4 milliardaires. La presse écrite reçoit 800 millions d'aides publiques. Le [[CNC]] redistribue 700 millions au cinéma.",
+        "sources": "Ministère de la Culture, [[Arcom]], Reporters sans frontières (2023)"
+      },
+      "question": "Audiovisuel public, presse, cinéma, [[exception culturelle]] française : faut-il maintenir le modèle ?",
+      "positions": [
+        { "id": "renforcer-public", "label": "Renforcer le public", "texte": "Sécuriser le financement de l'audiovisuel public, soutenir la presse indépendante, lutter contre la concentration des médias entre les mains de quelques milliardaires." },
+        { "id": "exception", "label": "Préserver l'exception culturelle", "texte": "Garder le système actuel ([[Arcom]], quotas, aides), qui protège la diversité culturelle française face aux géants américains." },
+        { "id": "moderniser", "label": "Moderniser et alléger", "texte": "Réformer l'audiovisuel public, supprimer les aides redondantes, faire des économies, mais garder un service public ciblé." },
+        { "id": "privatiser", "label": "Privatiser", "texte": "Vendre France Télévisions et Radio France, supprimer les aides à la presse, laisser le marché décider de la culture qu'il finance. L'État n'a rien à faire là." },
+        { "id": "democratiser", "label": "Démocratiser", "texte": "Sortir du modèle [[CNC]]/aides traditionnelles, financer directement les créateurs émergents, donner du pouvoir aux citoyens sur les budgets culturels (financement participatif public)." }
+      ]
+    },
+    {
+      "id": "q16-famille",
+      "ordre": 16,
+      "theme": "societe",
+      "emoji": "👪",
+      "titre": "Quel modèle de famille ?",
+      "enBref": {
+        "texte": "44% des enfants naissent hors mariage, le mariage a baissé de 30% en 20 ans. La [[PMA]] a été ouverte aux couples de femmes en 2021. La [[GPA]] reste interdite en France. 230 000 divorces sont prononcés chaque année. Les familles monoparentales représentent 25% des familles avec enfants.",
+        "sources": "INSEE, Ministère de la Justice (2023)"
+      },
+      "question": "[[PMA]], [[GPA]], divorce, mariage, autorité parentale : les structures familiales évoluent. Quelle position défends-tu ?",
+      "positions": [
+        { "id": "elargir", "label": "Élargir les droits", "texte": "[[PMA]] pour toutes, ouverture de la [[GPA]] éthique, simplification du divorce, reconnaissance des familles arc-en-ciel. La loi doit refléter toutes les formes de couples et de parentalités." },
+        { "id": "accompagner-evol", "label": "Accompagner les évolutions", "texte": "Continuer à étendre les droits avec prudence, dans le respect des libertés individuelles, sans bouleverser les repères symboliques." },
+        { "id": "stabiliser", "label": "Stabiliser", "texte": "Le cadre actuel est globalement bon. Pas de nouveau bouleversement (notamment sur la [[GPA]]), valoriser la famille comme structure d'éducation et de transmission." },
+        { "id": "traditionnel", "label": "Conserver le modèle traditionnel", "texte": "Promouvoir le mariage et la famille hétérosexuelle comme socle, restreindre [[PMA]] et [[GPA]], défendre l'autorité parentale et la transmission des valeurs." },
+        { "id": "decadrer", "label": "Sortir des cadres", "texte": "La famille traditionnelle est un carcan. Reconnaître toutes les formes d'union (polyamour, communautés, parentalités multiples), désinstitutionnaliser le couple." }
+      ]
+    },
+    {
+      "id": "q17-numerique",
+      "ordre": 17,
+      "theme": "num",
+      "emoji": "💻",
+      "titre": "Le numérique nous échappe-t-il ?",
+      "enBref": {
+        "texte": "Les [[GAFAM]] capitalisent plus que l'économie française entière. Les Français passent en moyenne 4h30 par jour devant un écran. L'IA générative (ChatGPT, Mistral) bouleverse 40% des métiers selon l'OCDE. 1 Français sur 3 a déjà été victime de cyberharcèlement.",
+        "sources": "Bloomberg, ARCOM, OCDE, CNIL (2023-2024)"
+      },
+      "question": "[[GAFAM]], IA, surveillance, désinformation : quel rapport entretenir avec le numérique ?",
+      "positions": [
+        { "id": "reguler-num", "label": "Réguler fermement", "texte": "Taxer massivement les [[GAFAM]], démanteler les monopoles, imposer la transparence des algorithmes, protéger nos données par la loi. L'État doit reprendre la main." },
+        { "id": "souverain-eu", "label": "Souveraineté européenne", "texte": "Construire des géants européens du numérique, investir dans l'IA et le cloud souverain, harmoniser les règles à l'échelle de l'UE pour peser." },
+        { "id": "encadrer-num", "label": "Encadrer sans freiner", "texte": "Mettre des garde-fous ([[RGPD]], modération) sans étouffer l'innovation. La France doit rester attractive pour les startups et les talents tech." },
+        { "id": "liberte-entreprendre", "label": "Liberté d'entreprendre", "texte": "Trop de réglementation tue l'innovation. Laisser faire le marché, lever les contraintes, attirer les capitaux. La concurrence mondiale ne nous attendra pas." },
+        { "id": "controle-individuel", "label": "Reprendre le contrôle individuel", "texte": "Le problème n'est pas l'État ou les entreprises mais notre dépendance. Sobriété numérique, droit à la déconnexion, alternatives libres, low-tech." }
+      ]
+    },
+    {
+      "id": "q18-animaux",
+      "ordre": 18,
+      "theme": "animaux",
+      "emoji": "🐾",
+      "titre": "Animaux, chasse, élevage : quelle place ?",
+      "enBref": {
+        "texte": "1,1 milliard d'animaux sont abattus chaque année en France pour la consommation. 80% des élevages sont qualifiés d'\"intensifs\". La France compte 1 million de chasseurs (5ᵉ pays au monde). Les ventes de produits végétaux ont doublé en 5 ans mais représentent 3% du marché alimentaire. La corrida reste légale dans 9 départements du Sud.",
+        "sources": "Agreste, Fédération nationale des chasseurs, Xerfi (2023)"
+      },
+      "question": "Bien-être animal, élevage intensif, chasse, expérimentation : comment trancher entre les usages humains et les droits des animaux ?",
+      "positions": [
+        { "id": "droits-animaux", "label": "Droits des animaux", "texte": "Interdire la chasse à courre, la corrida, l'expérimentation, sortir de l'élevage intensif. Les animaux sont des êtres sensibles qui méritent une protection juridique." },
+        { "id": "encadrer-bien-etre", "label": "Mieux encadrer", "texte": "Renforcer le bien-être animal (labels, contrôles, fin des cages), accompagner la transition vers des élevages plus éthiques, sans rupture brutale." },
+        { "id": "equilibre-rural", "label": "Équilibre ruralité-bien-être", "texte": "Préserver les traditions rurales (chasse, élevage, gastronomie), tout en améliorant les conditions des animaux. Respecter les territoires et leurs cultures." },
+        { "id": "traditions", "label": "Défendre les traditions", "texte": "La chasse, l'élevage, la corrida font partie de notre patrimoine. Refuser la \"morale urbaine\" qui veut imposer ses valeurs aux territoires ruraux." },
+        { "id": "antispe", "label": "Antispécisme", "texte": "Sortir totalement du modèle d'exploitation animale : végétalisation des cantines, fin de l'élevage, abolition de la chasse et de la pêche, refonte juridique du statut animal. [[antispécisme]]." }
+      ]
+    },
+    {
+      "id": "q19-etat-eco",
+      "ordre": 19,
+      "theme": "eco",
+      "emoji": "🏢",
+      "titre": "Quel poids pour l'État dans l'économie ?",
+      "enBref": {
+        "texte": "La France compte 5,7 millions d'agents publics (20% de l'emploi total, plus haut taux d'Europe avec les pays scandinaves). La dépense publique représente 57% du [[PIB]] (moyenne UE : 50%). EDF, La Poste, SNCF ont été partiellement ou totalement privatisées depuis 1990.",
+        "sources": "INSEE, Eurostat, DGAFP (2023)"
+      },
+      "question": "La France a un secteur public très étendu. Faut-il le renforcer, le réduire, le transformer ?",
+      "positions": [
+        { "id": "nationaliser", "label": "Nationalisations", "texte": "Reprendre le contrôle public des secteurs stratégiques : énergie, transports, banques, autoroutes. Le marché ne doit pas dicter les choix vitaux du pays." },
+        { "id": "strategie", "label": "État stratège", "texte": "Garder un État fort dans la planification (énergie, industrie, recherche) mais laisser opérer le privé. Moderniser la fonction publique sans la démanteler." },
+        { "id": "reduire-perim", "label": "Réduire le périmètre", "texte": "L'État fait trop de choses qu'il fait mal. Recentrer sur le régalien et la solidarité, externaliser ou privatiser le reste (audiovisuel, transports, services)." },
+        { "id": "reformer-fonction", "label": "Réformer en profondeur", "texte": "Réduire le nombre de fonctionnaires, supprimer les statuts protégés, généraliser le contrat de droit privé. Une administration plus efficace et moins coûteuse." },
+        { "id": "ess", "label": "Économie sociale", "texte": "Sortir du faux choix public/privé : développer massivement coopératives, [[SCOP]], mutuelles, [[ESS|économie sociale et solidaire]]. Une autre voie entre étatisme et capitalisme." }
+      ]
+    },
+    {
+      "id": "q20-territoires",
+      "ordre": 20,
+      "theme": "territoires",
+      "emoji": "🗺️",
+      "titre": "Quelle relation entre Paris et les territoires ?",
+      "enBref": {
+        "texte": "Paris et l'Île-de-France concentrent 31% du [[PIB]] pour 18% de la population. 27% des Français vivent dans des communes rurales. La Corse, la Polynésie, la Nouvelle-Calédonie bénéficient de statuts particuliers. La Nouvelle-Calédonie a rejeté 3 fois l'indépendance par référendum (2018, 2020, 2021). Les régions reçoivent en moyenne 2% du budget de l'État.",
+        "sources": "INSEE, Ministère de l'Intérieur, Cour des comptes (2023)"
+      },
+      "question": "Métropoles vs ruralité, hexagone vs outre-mer, Paris vs régions : la France est-elle bien équilibrée ?",
+      "positions": [
+        { "id": "decentraliser-fort", "label": "Décentraliser fort", "texte": "Donner beaucoup plus de pouvoir aux régions et aux collectivités, dont fiscal. Reconnaître les spécificités (corse, basque, breton, outre-mer), aller vers un [[fédéralisme]] à la française." },
+        { "id": "reequilibrer", "label": "Rééquilibrer", "texte": "Mieux répartir les services publics, les administrations, les emplois sur tout le territoire. Garder un État fort mais présent partout, pas que dans les métropoles." },
+        { "id": "unite", "label": "Préserver l'unité nationale", "texte": "La République est une et indivisible. Décentralisation oui, mais pas au prix de la cohésion nationale. Pas de statuts particuliers, partout les mêmes règles." },
+        { "id": "recentraliser", "label": "Recentraliser", "texte": "Trop de décentralisation a créé des inégalités et des baronnies locales. Reprendre la main au niveau national pour garantir l'égalité républicaine." },
+        { "id": "autodetermination", "label": "Autodétermination", "texte": "Reconnaître le droit des peuples (Kanaks, Corses, Polynésiens, Antillais) à décider eux-mêmes de leur avenir, y compris l'indépendance s'ils la demandent." }
+      ]
+    }
+  ]
+}

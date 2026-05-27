@@ -1,9 +1,14 @@
-import React, { useState, useMemo } from 'react'
-import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty } from '../atoms.jsx'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
+import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty, ConfirmDialog, Modal } from '../atoms.jsx'
 import { usePropositions, useProfiles, useDeputes } from '../hooks.js'
 import { computeMatches } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, desaccords } from '../matchAnalysis.js'
 import GlossText from '../GlossText.jsx'
+import {
+  saveMatchCurrent, loadMatchCurrent, clearMatchCurrent,
+  saveMatchToHistory, listMatchHistory, deleteMatchFromHistory
+} from '../storage.js'
+import { formatDate } from '../utils.js'
 import {
   ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, Legend
 } from 'recharts'
@@ -30,22 +35,104 @@ export default function PageMonMatch({ C }) {
   const [enBrefOpen, setEnBrefOpen] = useState(false)
   const [ordre, setOrdre]       = useState([])
 
-  // Recap : parti choisi pour la comparaison + mode inversion
-  const [compareCode, setCompareCode] = useState(null) // code parti à superposer
-  const [inversion, setInversion]     = useState(false) // remplace le profil user par celui du parti
+  const [compareCode, setCompareCode] = useState(null)
+  const [inversion, setInversion]     = useState(false)
+
+  // Persistance
+  const [hasResumable, setHasResumable] = useState(false)
+  const [history, setHistory] = useState([])
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [confirmRestart, setConfirmRestart] = useState(false)
+  const initialLoaded = useRef(false)
+  const savedToHistory = useRef(false)
+
+  // Au montage : détecter un Match en cours + charger l'historique
+  useEffect(() => {
+    (async () => {
+      const cur = await loadMatchCurrent()
+      if (cur && cur.phase === 'questions' && Array.isArray(cur.ordre) && cur.ordre.length > 0) {
+        setHasResumable(true)
+      }
+      const h = await listMatchHistory()
+      setHistory(h)
+      initialLoaded.current = true
+    })()
+  }, [])
+
+  // Auto-save du Match en cours (à chaque modif pertinente)
+  useEffect(() => {
+    if (!initialLoaded.current) return
+    if (phase === 'questions') {
+      saveMatchCurrent({ reponses, ordre, idx, phase })
+    }
+  }, [reponses, ordre, idx, phase])
+
+  // En entrant en recap : sauver dans l'historique + nettoyer le "current"
+  useEffect(() => {
+    if (phase !== 'recap' || savedToHistory.current) return
+    if (Object.keys(reponses).length === 0) return // sécurité : Match vide
+    savedToHistory.current = true
+    ;(async () => {
+      await saveMatchToHistory({ reponses, ordre, completedAt: new Date().toISOString() })
+      await clearMatchCurrent()
+      const h = await listMatchHistory()
+      setHistory(h)
+    })()
+  }, [phase, reponses, ordre])
 
   const startMatch = () => {
     if (!data) return
+    savedToHistory.current = false
     setOrdre(shuffle(data.questions.map(q => q.id)))
     setIdx(0); setReponses({}); setEnBrefOpen(false); setPhase('questions')
     setCompareCode(null); setInversion(false)
+    setHasResumable(false)
+    window.scrollTo({ top: 0 })
+  }
+
+  const resumeMatch = async () => {
+    const cur = await loadMatchCurrent()
+    if (!cur) { startMatch(); return }
+    savedToHistory.current = false
+    setReponses(cur.reponses || {})
+    setOrdre(cur.ordre || [])
+    setIdx(cur.idx || 0)
+    setPhase(cur.phase || 'questions')
+    setEnBrefOpen(false)
+    setCompareCode(null); setInversion(false)
+    setHasResumable(false)
     window.scrollTo({ top: 0 })
   }
 
   const restart = () => {
     setPhase('intro'); setIdx(0); setReponses({}); setOrdre([]); setEnBrefOpen(false)
     setCompareCode(null); setInversion(false)
+    savedToHistory.current = false
     window.scrollTo({ top: 0 })
+  }
+
+  const restartAndClear = async () => {
+    await clearMatchCurrent()
+    setHasResumable(false)
+    setConfirmRestart(false)
+    startMatch()
+  }
+
+  const openHistoryItem = (m) => {
+    savedToHistory.current = true // déjà en historique, ne pas ré-enregistrer
+    setReponses(m.reponses || {})
+    setOrdre(m.ordre || [])
+    setIdx(0)
+    setPhase('recap')
+    setHistoryOpen(false)
+    setCompareCode(null); setInversion(false)
+    window.scrollTo({ top: 0 })
+  }
+
+  const removeFromHistory = async (id) => {
+    await deleteMatchFromHistory(id)
+    const h = await listMatchHistory()
+    setHistory(h)
   }
 
   const questionsById = useMemo(
@@ -90,21 +177,16 @@ export default function PageMonMatch({ C }) {
     return computeMatches(reponses, profiles.data, D.data.deputes, { topPartis: 3, topDeputes: 5 })
   }, [phase, profiles.data, D.data, reponses])
 
-  // Profil parti choisi pour comparaison/inversion
   const partiSelectionne = useMemo(() => {
     if (!compareCode || !profiles.data) return null
     return profiles.data.partis[compareCode] || null
   }, [compareCode, profiles.data])
 
-  // Données radar : si inversion → user remplacé par parti
   const radarRows = useMemo(() => {
     if (phase !== 'recap' || !data) return []
     if (inversion && partiSelectionne) {
-      // En inversion : on convertit le profil parti (-100..+100) en pseudo-réponses user
-      // Adhésion fictive = max(0, score) sur chaque position
       const pseudoRep = {}
       for (const [posId, score] of Object.entries(partiSelectionne.profil)) {
-        // Trouve la question de cette position
         for (const q of data.questions) {
           const p = q.positions.find(pp => pp.id === posId)
           if (p) {
@@ -160,8 +242,29 @@ export default function PageMonMatch({ C }) {
         <PageTitle
           title="Mon match"
           subtitle="Trouve quels partis et députés te ressemblent vraiment."
+          right={history.length > 0 ? (
+            <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>
+              Historique ({history.length})
+            </Btn>
+          ) : null}
           C={C}
         />
+
+        {hasResumable && (
+          <Card C={C} style={{ marginBottom: 16, background: C.primaryPale, borderColor: C.primary }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontWeight: 500, color: C.primaryDeep, marginBottom: 2 }}>Un Match en cours</div>
+                <div style={{ fontSize: 13, color: C.text }}>Tu peux reprendre où tu en étais, ou en redémarrer un nouveau.</div>
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <Btn variant="ghost" onClick={() => setConfirmRestart(true)} C={C}>Recommencer</Btn>
+                <Btn variant="primary" onClick={resumeMatch} C={C}>Reprendre →</Btn>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Card C={C} style={{ marginBottom: 16 }}>
           <h3 style={{ marginBottom: 12 }}>Comment ça marche ?</h3>
           <p style={{ marginBottom: 12 }}>
@@ -176,18 +279,50 @@ export default function PageMonMatch({ C }) {
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 8, fontSize: 13, color: C.muted, flexWrap: 'wrap' }}>
             <span>⏱ ~10 minutes</span>
             <span>·</span>
-            <span>🔒 Aucune donnée n'est envoyée, tout reste sur ton appareil</span>
+            <span>💾 Tes réponses sont sauvegardées sur ton appareil</span>
           </div>
         </Card>
 
-        <Card C={C} style={{ marginBottom: 16, background: C.yellowPale, borderColor: C.yellow }}>
-          <div style={{ fontWeight: 500, color: C.yellow, marginBottom: 4 }}>⚠️ Avant de commencer</div>
-          <div style={{ fontSize: 14, color: C.text }}>
-            Si tu fermes l'onglet, tes réponses sont perdues. Prévois de finir le test d'une traite.
-          </div>
-        </Card>
+        {!hasResumable && (
+          <Btn variant="primary" size="lg" onClick={startMatch} C={C}>Commencer le Match →</Btn>
+        )}
 
-        <Btn variant="primary" size="lg" onClick={startMatch} C={C}>Commencer le Match →</Btn>
+        <ConfirmDialog
+          open={confirmRestart}
+          title="Recommencer le Match ?"
+          message="Ton Match en cours sera perdu. Tes Matchs précédents dans l'historique restent intacts."
+          confirmLabel="Recommencer"
+          danger
+          onConfirm={restartAndClear}
+          onCancel={() => setConfirmRestart(false)}
+          C={C}
+        />
+
+        <Modal open={historyOpen} onClose={() => setHistoryOpen(false)} title={`Historique (${history.length})`} C={C}>
+          {history.length === 0 ? (
+            <Empty title="Aucun Match dans l'historique" C={C} />
+          ) : (
+            <div style={{ display: 'grid', gap: 8 }}>
+              {history.map(m => {
+                const nbRep = Object.keys(m.reponses || {}).length
+                return (
+                  <Card C={C} key={m.id} padding={12}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                      <div>
+                        <div style={{ fontWeight: 500, fontSize: 14 }}>Match du {formatDate(m.completedAt)}</div>
+                        <div style={{ fontSize: 12, color: C.muted }}>{nbRep} question{nbRep > 1 ? 's' : ''} répondue{nbRep > 1 ? 's' : ''}</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <Btn variant="ghost" size="sm" onClick={() => removeFromHistory(m.id)} C={C}>Supprimer</Btn>
+                        <Btn variant="primary" size="sm" onClick={() => openHistoryItem(m)} C={C}>Voir</Btn>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </Modal>
       </div>
     )
   }
@@ -205,6 +340,11 @@ export default function PageMonMatch({ C }) {
           subtitle={matchingReady
             ? `Calculés à partir de ${profiles.data.nbScrutinsMappes} scrutins de référence.`
             : "Tes réponses sont enregistrées."}
+          right={history.length > 0 ? (
+            <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>
+              Historique ({history.length})
+            </Btn>
+          ) : null}
           C={C}
         />
 
@@ -214,7 +354,6 @@ export default function PageMonMatch({ C }) {
           <KPI label="Positions fortes"    value={tops.length} hint="adhésion ≥ 75%" C={C} />
         </div>
 
-        {/* ─── RADAR ─────────────────────────────────────── */}
         <Card C={C} style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
             <div>
@@ -280,7 +419,6 @@ export default function PageMonMatch({ C }) {
           </div>
         </Card>
 
-        {/* ─── PROFIL PAR THÈME ──────────────────────────── */}
         {themes.length > 0 && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes positions par thème</h2>
@@ -306,7 +444,6 @@ export default function PageMonMatch({ C }) {
           </>
         )}
 
-        {/* ─── TOP PARTIS ────────────────────────────────── */}
         {hasMatching && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes partis les plus proches</h2>
@@ -331,7 +468,6 @@ export default function PageMonMatch({ C }) {
               ))}
             </div>
 
-            {/* ─── DÉSACCORDS AVEC TOP 1 ─────────────────── */}
             {desacc.length > 0 && top1 && (
               <Card C={C} style={{ marginBottom: 28, background: C.secondaryPale, borderColor: C.secondary }}>
                 <div style={{ marginBottom: 8 }}>
@@ -397,7 +533,6 @@ export default function PageMonMatch({ C }) {
           </Card>
         )}
 
-        {/* ─── TOP POSITIONS ─────────────────────────────── */}
         {tops.length > 0 && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes positions les plus fortes</h2>
@@ -420,7 +555,6 @@ export default function PageMonMatch({ C }) {
           </>
         )}
 
-        {/* ─── DÉTAIL DES RÉPONSES (collapsible) ─────────── */}
         <details style={{ marginBottom: 24 }}>
           <summary style={{ cursor: 'pointer', fontWeight: 500, fontSize: 15, marginBottom: 12, color: C.text }}>
             Voir toutes tes réponses, question par question
@@ -456,8 +590,35 @@ export default function PageMonMatch({ C }) {
         </details>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Btn variant="ghost" onClick={restart} C={C}>Refaire le Match</Btn>
+          <Btn variant="ghost" onClick={restart} C={C}>← Retour à l'accueil</Btn>
+          <Btn variant="primary" onClick={startMatch} C={C}>Refaire un Match</Btn>
         </div>
+
+        <Modal open={historyOpen} onClose={() => setHistoryOpen(false)} title={`Historique (${history.length})`} C={C}>
+          {history.length === 0 ? (
+            <Empty title="Aucun Match dans l'historique" C={C} />
+          ) : (
+            <div style={{ display: 'grid', gap: 8 }}>
+              {history.map(m => {
+                const nbRep = Object.keys(m.reponses || {}).length
+                return (
+                  <Card C={C} key={m.id} padding={12}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                      <div>
+                        <div style={{ fontWeight: 500, fontSize: 14 }}>Match du {formatDate(m.completedAt)}</div>
+                        <div style={{ fontSize: 12, color: C.muted }}>{nbRep} question{nbRep > 1 ? 's' : ''} répondue{nbRep > 1 ? 's' : ''}</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <Btn variant="ghost" size="sm" onClick={() => removeFromHistory(m.id)} C={C}>Supprimer</Btn>
+                        <Btn variant="primary" size="sm" onClick={() => openHistoryItem(m)} C={C}>Voir</Btn>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </Modal>
       </div>
     )
   }

@@ -2,7 +2,11 @@ import React, { useState, useMemo } from 'react'
 import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty } from '../atoms.jsx'
 import { usePropositions, useProfiles, useDeputes } from '../hooks.js'
 import { computeMatches } from '../matching.js'
+import { analyseParTheme, topPositions, radarData, desaccords } from '../matchAnalysis.js'
 import GlossText from '../GlossText.jsx'
+import {
+  ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, Legend
+} from 'recharts'
 
 const PALIERS = [0, 25, 50, 75, 100]
 
@@ -26,15 +30,21 @@ export default function PageMonMatch({ C }) {
   const [enBrefOpen, setEnBrefOpen] = useState(false)
   const [ordre, setOrdre]       = useState([])
 
+  // Recap : parti choisi pour la comparaison + mode inversion
+  const [compareCode, setCompareCode] = useState(null) // code parti à superposer
+  const [inversion, setInversion]     = useState(false) // remplace le profil user par celui du parti
+
   const startMatch = () => {
     if (!data) return
     setOrdre(shuffle(data.questions.map(q => q.id)))
     setIdx(0); setReponses({}); setEnBrefOpen(false); setPhase('questions')
+    setCompareCode(null); setInversion(false)
     window.scrollTo({ top: 0 })
   }
 
   const restart = () => {
     setPhase('intro'); setIdx(0); setReponses({}); setOrdre([]); setEnBrefOpen(false)
+    setCompareCode(null); setInversion(false)
     window.scrollTo({ top: 0 })
   }
 
@@ -75,11 +85,57 @@ export default function PageMonMatch({ C }) {
     return { total, repondues, ignorees }
   }, [phase, data, reponses])
 
-  // Matching — calculé seulement en phase recap, si les profils sont dispos
   const matches = useMemo(() => {
     if (phase !== 'recap' || !profiles.data || !D.data) return null
     return computeMatches(reponses, profiles.data, D.data.deputes, { topPartis: 3, topDeputes: 5 })
   }, [phase, profiles.data, D.data, reponses])
+
+  // Profil parti choisi pour comparaison/inversion
+  const partiSelectionne = useMemo(() => {
+    if (!compareCode || !profiles.data) return null
+    return profiles.data.partis[compareCode] || null
+  }, [compareCode, profiles.data])
+
+  // Données radar : si inversion → user remplacé par parti
+  const radarRows = useMemo(() => {
+    if (phase !== 'recap' || !data) return []
+    if (inversion && partiSelectionne) {
+      // En inversion : on convertit le profil parti (-100..+100) en pseudo-réponses user
+      // Adhésion fictive = max(0, score) sur chaque position
+      const pseudoRep = {}
+      for (const [posId, score] of Object.entries(partiSelectionne.profil)) {
+        // Trouve la question de cette position
+        for (const q of data.questions) {
+          const p = q.positions.find(pp => pp.id === posId)
+          if (p) {
+            if (!pseudoRep[q.id]) pseudoRep[q.id] = {}
+            pseudoRep[q.id][posId] = Math.max(0, score)
+            break
+          }
+        }
+      }
+      return radarData(data, pseudoRep, null)
+    }
+    return radarData(data, reponses, partiSelectionne?.profil || null)
+  }, [phase, data, reponses, partiSelectionne, inversion])
+
+  const themes = useMemo(() => {
+    if (phase !== 'recap' || !data) return []
+    return analyseParTheme(data, reponses)
+  }, [phase, data, reponses])
+
+  const tops = useMemo(() => {
+    if (phase !== 'recap' || !data) return []
+    return topPositions(data, reponses, 5)
+  }, [phase, data, reponses])
+
+  const desacc = useMemo(() => {
+    if (phase !== 'recap' || !matches?.partis?.length || !profiles.data) return []
+    const top1 = matches.partis[0]
+    const profilTop1 = profiles.data.partis[top1.code]?.profil
+    if (!profilTop1) return []
+    return desaccords(data, reponses, profilTop1, 5)
+  }, [phase, matches, profiles.data, data, reponses])
 
   // ─── LOADING / ERROR ─────────────────────────────────────────
   if (loading) return (
@@ -106,7 +162,6 @@ export default function PageMonMatch({ C }) {
           subtitle="Trouve quels partis et députés te ressemblent vraiment."
           C={C}
         />
-
         <Card C={C} style={{ marginBottom: 16 }}>
           <h3 style={{ marginBottom: 12 }}>Comment ça marche ?</h3>
           <p style={{ marginBottom: 12 }}>
@@ -116,7 +171,7 @@ export default function PageMonMatch({ C }) {
             Pour chaque question, tu as <strong>5 positions</strong> qui couvrent les principales sensibilités politiques. Tu indiques à quel point tu adhères à chacune, sur une échelle de <strong>0 à 100%</strong>. Tu peux trouver plusieurs positions valables — c'est même le but.
           </p>
           <p style={{ marginBottom: 12 }}>
-            À la fin, on calcule quels partis et députés sont le plus proches de tes idées <em>en croisant tes réponses avec leurs votes réels à l'Assemblée</em>.
+            À la fin, tu auras un profil par thème, tes positions les plus fortes, et tes affinités avec les partis et députés <em>croisées avec leurs votes réels à l'Assemblée</em>.
           </p>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 8, fontSize: 13, color: C.muted, flexWrap: 'wrap' }}>
             <span>⏱ ~10 minutes</span>
@@ -132,17 +187,16 @@ export default function PageMonMatch({ C }) {
           </div>
         </Card>
 
-        <Btn variant="primary" size="lg" onClick={startMatch} C={C}>
-          Commencer le Match →
-        </Btn>
+        <Btn variant="primary" size="lg" onClick={startMatch} C={C}>Commencer le Match →</Btn>
       </div>
     )
   }
 
   // ─── RECAP ───────────────────────────────────────────────────
   if (phase === 'recap') {
-    const hasMatching = matches && matches.partis.length > 0
+    const hasMatching   = matches && matches.partis.length > 0
     const matchingReady = profiles.data && (profiles.data.nbScrutinsMappes || 0) > 0
+    const top1 = matches?.partis?.[0]
 
     return (
       <div className="fadeUp">
@@ -156,37 +210,111 @@ export default function PageMonMatch({ C }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
           <KPI label="Questions répondues" value={`${stats.repondues}/${stats.total}`} C={C} />
-          <KPI label="Questions ignorées"  value={stats.ignorees} hint="(toutes positions à 0%)" C={C} />
+          <KPI label="Thèmes explorés"     value={themes.length} hint={`sur 8`} C={C} />
+          <KPI label="Positions fortes"    value={tops.length} hint="adhésion ≥ 75%" C={C} />
         </div>
 
-        {!matchingReady && (
-          <Card C={C} style={{ marginBottom: 16, background: C.primaryPale, borderColor: C.primary }}>
-            <div style={{ fontWeight: 500, color: C.primaryDeep, marginBottom: 4 }}>🚧 Matching en préparation</div>
-            <div style={{ fontSize: 14, color: C.text }}>
-              Le mapping des scrutins de référence est en cours. Reviens bientôt pour découvrir tes affinités avec les partis et députés.
+        {/* ─── RADAR ─────────────────────────────────────── */}
+        <Card C={C} style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+            <div>
+              <h3 style={{ marginBottom: 2 }}>Ta carte politique</h3>
+              <div style={{ fontSize: 13, color: C.muted }}>
+                {inversion && partiSelectionne
+                  ? `En train de voir : profil de ${partiSelectionne.nom}`
+                  : `Score d'engagement sur chaque thème (0 = non répondu, 100 = adhésion maximale)`}
+              </div>
             </div>
-          </Card>
+            {matchingReady && (
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                <select
+                  value={compareCode || ''}
+                  onChange={e => { setCompareCode(e.target.value || null); if (!e.target.value) setInversion(false) }}
+                  style={{ width: 'auto', minWidth: 160 }}
+                >
+                  <option value="">Comparer avec un parti…</option>
+                  {Object.entries(profiles.data.partis)
+                    .sort((a, b) => (b[1].nbDeputes || 0) - (a[1].nbDeputes || 0))
+                    .map(([code, p]) => (
+                      <option key={code} value={code}>{code} — {p.nom}</option>
+                    ))}
+                </select>
+                {compareCode && (
+                  <Btn variant={inversion ? 'primary' : 'ghost'} size="sm" onClick={() => setInversion(v => !v)} C={C}>
+                    {inversion ? '← Mon profil' : 'Et si je votais comme eux ?'}
+                  </Btn>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div style={{ width: '100%', height: 360 }}>
+            <ResponsiveContainer>
+              <RadarChart data={radarRows} margin={{ top: 20, right: 30, bottom: 10, left: 30 }}>
+                <PolarGrid stroke={C.border} />
+                <PolarAngleAxis dataKey="themeShort" tick={{ fill: C.muted, fontSize: 12 }} />
+                <PolarRadiusAxis domain={[0, 100]} tick={{ fill: C.muted, fontSize: 10 }} stroke={C.border} />
+                <Radar
+                  name={inversion && partiSelectionne ? partiSelectionne.nom : 'Toi'}
+                  dataKey="user"
+                  stroke={C.primary}
+                  fill={C.primary}
+                  fillOpacity={0.35}
+                />
+                {partiSelectionne && !inversion && (
+                  <Radar
+                    name={partiSelectionne.nom}
+                    dataKey="parti"
+                    stroke={C.secondary}
+                    fill={C.secondary}
+                    fillOpacity={0.25}
+                  />
+                )}
+                <Legend wrapperStyle={{ fontSize: 13 }} />
+                <Tooltip
+                  contentStyle={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13 }}
+                  formatter={(v, n) => [`${v}/100`, n]}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        {/* ─── PROFIL PAR THÈME ──────────────────────────── */}
+        {themes.length > 0 && (
+          <>
+            <h2 style={{ marginBottom: 12 }}>Tes positions par thème</h2>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
+              {themes.map(t => (
+                <Card C={C} key={t.themeId} padding={14}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <div style={{ fontSize: 22 }}>{t.emoji}</div>
+                    <div style={{ flex: 1, minWidth: 160 }}>
+                      <div style={{ fontWeight: 500 }}>{t.label}</div>
+                      <div style={{ fontSize: 13, color: C.muted }}>
+                        Position dominante : <strong style={{ color: C.text }}>{t.dominante.posLabel}</strong>
+                      </div>
+                    </div>
+                    <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.primary }}>
+                      {t.score}/100
+                    </div>
+                  </div>
+                  <ProgressBar value={t.score} max={100} C={C} height={6} />
+                </Card>
+              ))}
+            </div>
+          </>
         )}
 
-        {matchingReady && !hasMatching && (
-          <Empty
-            title="Pas assez de réponses pour calculer un match"
-            message="Reprends le Match en exprimant une adhésion sur au moins quelques positions."
-            C={C}
-          />
-        )}
-
+        {/* ─── TOP PARTIS ────────────────────────────────── */}
         {hasMatching && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes partis les plus proches</h2>
-            <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
               {matches.partis.map((p, i) => (
                 <Card C={C} key={p.code} padding={16}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={{
-                      fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600,
-                      color: C.muted, width: 28, textAlign: 'center'
-                    }}>#{i + 1}</div>
+                    <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.muted, width: 28, textAlign: 'center' }}>#{i + 1}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                         <BadgeParti code={p.code} C={C} />
@@ -195,24 +323,49 @@ export default function PageMonMatch({ C }) {
                       </div>
                       <ProgressBar value={p.score} max={100} C={C} height={8} />
                     </div>
-                    <div style={{
-                      fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600,
-                      color: C.primary, minWidth: 70, textAlign: 'right'
-                    }}>{p.score}%</div>
+                    <div style={{ fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600, color: C.primary, minWidth: 70, textAlign: 'right' }}>
+                      {p.score}%
+                    </div>
                   </div>
                 </Card>
               ))}
             </div>
+
+            {/* ─── DÉSACCORDS AVEC TOP 1 ─────────────────── */}
+            {desacc.length > 0 && top1 && (
+              <Card C={C} style={{ marginBottom: 28, background: C.secondaryPale, borderColor: C.secondary }}>
+                <div style={{ marginBottom: 8 }}>
+                  <h3 style={{ marginBottom: 2 }}>Là où tu t'éloignes de {top1.nom}</h3>
+                  <div style={{ fontSize: 13, color: C.muted }}>
+                    Ces positions sont importantes pour toi, mais les députés de {top1.code} votent souvent contre.
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gap: 6 }}>
+                  {desacc.map((d, i) => (
+                    <div key={i} style={{
+                      background: C.white, padding: '10px 12px', borderRadius: 8,
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'
+                    }}>
+                      <div style={{ flex: 1, minWidth: 200 }}>
+                        <div style={{ fontSize: 13, color: C.muted }}>{d.qEmoji} {d.qTitre}</div>
+                        <div style={{ fontWeight: 500, fontSize: 14 }}>{d.posLabel}</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, fontSize: 12 }}>
+                        <span className="badge" style={{ background: C.primaryPale, color: C.primaryDeep }}>Toi : {d.user}%</span>
+                        <span className="badge" style={{ background: C.redPale, color: C.red }}>Eux : {d.parti}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
 
             <h2 style={{ marginBottom: 12 }}>Tes députés les plus proches</h2>
             <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
               {matches.deputes.map((d, i) => (
                 <Card C={C} key={d.id} padding={14}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={{
-                      fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600,
-                      color: C.muted, width: 24, textAlign: 'center'
-                    }}>#{i + 1}</div>
+                    <div style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, color: C.muted, width: 24, textAlign: 'center' }}>#{i + 1}</div>
                     <Avatar name={d.nom} C={C} size={36} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 500, fontSize: 14 }}>{d.nom}</div>
@@ -221,10 +374,9 @@ export default function PageMonMatch({ C }) {
                         {d.circo && <span style={{ fontSize: 12, color: C.muted }}>{d.circo.dept} · circo {d.circo.numero}</span>}
                       </div>
                     </div>
-                    <div style={{
-                      fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600,
-                      color: C.primary, minWidth: 60, textAlign: 'right'
-                    }}>{d.score}%</div>
+                    <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.primary, minWidth: 60, textAlign: 'right' }}>
+                      {d.score}%
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -236,37 +388,74 @@ export default function PageMonMatch({ C }) {
           </>
         )}
 
-        <h2 style={{ marginBottom: 12, marginTop: 16 }}>Détail de tes réponses</h2>
-        <div style={{ display: 'grid', gap: 12 }}>
-          {data.questions.map(q => {
-            const r = reponses[q.id] || {}
-            const positions = q.positions
-              .map(p => ({ ...p, adhesion: r[p.id] || 0 }))
-              .filter(p => p.adhesion > 0)
-              .sort((a, b) => b.adhesion - a.adhesion)
-            return (
-              <Card C={C} key={q.id} padding={14}>
-                <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>
-                  {q.emoji} {q.titre}
-                </div>
-                {positions.length === 0 ? (
-                  <div style={{ fontSize: 14, color: C.muted, fontStyle: 'italic' }}>Aucune position retenue.</div>
-                ) : (
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
-                    {positions.map(p => (
-                      <span key={p.id} className="badge"
-                        style={{ background: C.primaryPale, color: C.primaryDeep, fontWeight: 500 }}>
-                        {p.label} — {p.adhesion}%
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </Card>
-            )
-          })}
-        </div>
+        {!matchingReady && (
+          <Card C={C} style={{ marginBottom: 24, background: C.primaryPale, borderColor: C.primary }}>
+            <div style={{ fontWeight: 500, color: C.primaryDeep, marginBottom: 4 }}>🚧 Affinités partis & députés en préparation</div>
+            <div style={{ fontSize: 14, color: C.text }}>
+              Le mapping des scrutins de référence est en cours. Reviens bientôt pour découvrir tes affinités.
+            </div>
+          </Card>
+        )}
 
-        <div style={{ marginTop: 24, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {/* ─── TOP POSITIONS ─────────────────────────────── */}
+        {tops.length > 0 && (
+          <>
+            <h2 style={{ marginBottom: 12 }}>Tes positions les plus fortes</h2>
+            <div style={{ display: 'grid', gap: 8, marginBottom: 28 }}>
+              {tops.map((t, i) => (
+                <Card C={C} key={`${t.qId}-${t.posId}`} padding={12}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ fontSize: 18 }}>{t.qEmoji}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, color: C.muted }}>{t.qTitre}</div>
+                      <div style={{ fontWeight: 500, fontSize: 14 }}>{t.posLabel}</div>
+                    </div>
+                    <span className="badge" style={{ background: C.primary, color: '#fff', fontWeight: 600 }}>
+                      {t.adhesion}%
+                    </span>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ─── DÉTAIL DES RÉPONSES (collapsible) ─────────── */}
+        <details style={{ marginBottom: 24 }}>
+          <summary style={{ cursor: 'pointer', fontWeight: 500, fontSize: 15, marginBottom: 12, color: C.text }}>
+            Voir toutes tes réponses, question par question
+          </summary>
+          <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
+            {data.questions.map(q => {
+              const r = reponses[q.id] || {}
+              const positions = q.positions
+                .map(p => ({ ...p, adhesion: r[p.id] || 0 }))
+                .filter(p => p.adhesion > 0)
+                .sort((a, b) => b.adhesion - a.adhesion)
+              return (
+                <Card C={C} key={q.id} padding={14}>
+                  <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>
+                    {q.emoji} {q.titre}
+                  </div>
+                  {positions.length === 0 ? (
+                    <div style={{ fontSize: 14, color: C.muted, fontStyle: 'italic' }}>Aucune position retenue.</div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
+                      {positions.map(p => (
+                        <span key={p.id} className="badge"
+                          style={{ background: C.primaryPale, color: C.primaryDeep, fontWeight: 500 }}>
+                          {p.label} — {p.adhesion}%
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              )
+            })}
+          </div>
+        </details>
+
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <Btn variant="ghost" onClick={restart} C={C}>Refaire le Match</Btn>
         </div>
       </div>
@@ -275,7 +464,6 @@ export default function PageMonMatch({ C }) {
 
   // ─── QUESTIONS ───────────────────────────────────────────────
   if (!question) return null
-
   const progressPct = Math.round(((idx + 1) / ordre.length) * 100)
 
   return (
@@ -340,7 +528,6 @@ export default function PageMonMatch({ C }) {
                   <GlossText texte={p.texte} glossaire={data.glossaire} C={C} />
                 </div>
               </div>
-
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {PALIERS.map(palier => {
                   const active = adhesion === palier

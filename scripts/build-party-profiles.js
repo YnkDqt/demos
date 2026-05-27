@@ -3,41 +3,37 @@
  * build-party-profiles.js
  *
  * Construit le profil idéologique de chaque parti ET de chaque député à partir :
- *   - public/data/match-mapping.json   (scrutin → position du Match, édito)
+ *   - public/data/match-mapping.json   (scrutin → N positions du Match, édito)
  *   - public/data/votes-by-depute.json (index inversé)
- *   - public/data/deputes.json         (pour mapper député → groupe)
+ *   - public/data/deputes.json
+ *   - public/data/propositions-match.json (pour valider les positionId)
  *
  * Sortie : public/data/party-profiles.json
  *
- * Format de sortie :
+ * Format de mapping (V2 — multi-positions) :
  * {
- *   generatedAt: "...",
- *   nbScrutinsMappes: 60,
- *   nbPositions: 100,            // 20 questions * 5 positions
- *   partis: {
- *     "REN": {
- *       nom: "Renaissance",
- *       nbDeputes: 95,
- *       profil: { "positionId": score(-100..+100), ... },
- *       couverture: { "positionId": nbScrutinsPourCettePos, ... }
- *     },
- *     ...
- *   },
- *   deputes: {
- *     "PA722114": { profil: { ... }, couverture: { ... } },
- *     ...
+ *   "scrutins": {
+ *     "6899": {
+ *       "positions": [
+ *         { "positionId": "eco-prog",    "poids": 1   },
+ *         { "positionId": "env-radical", "poids": 0.5 }
+ *       ],
+ *       "note": "optionnel, traçabilité éditoriale"
+ *     }
  *   }
  * }
  *
- * Logique :
- *   Pour chaque scrutin mappé { positionId, poids } :
- *     - vote Pour       → +poids sur cette position
- *     - vote Contre     → -poids sur cette position
- *     - vote Abstention →  0 (mais compté dans la couverture)
- *     - non-votant      → ignoré (pas compté)
- *   Score final = somme / nbScrutinsExprimés, mappé sur [-100..+100].
+ * Rétro-compat V1 : si "positionId" est défini à la racine du scrutin,
+ * il est converti vers le nouveau format au runtime (warning).
  *
- * Usage : npm run build:profiles  (à lancer après build:index)
+ * Logique de calcul (par position) :
+ *   - vote Pour       → +poids
+ *   - vote Contre     → -poids
+ *   - vote Abstention →  0 (compté dans la couverture)
+ *   - non-votant      → ignoré
+ *   Score final = somme / nbExprimés * 100, clamp [-100..+100].
+ *
+ * Usage : npm run build:profiles
  */
 
 import fs from 'node:fs'
@@ -57,36 +53,50 @@ const OUT          = path.join(DATA, 'party-profiles.json')
 for (const f of [MAPPING_FILE, VOTES_FILE, DEPUTES_FILE, PROPOS_FILE]) {
   if (!fs.existsSync(f)) {
     console.error(`[profiles] ${path.relative(ROOT, f)} introuvable.`)
-    if (f === MAPPING_FILE) console.error('           → crée-le depuis le template (cf. README).')
-    else console.error('           → lance les scripts amont (fetch:scrutins / build:index / fetch:deputes).')
     process.exit(1)
   }
 }
 
-const mapping  = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'))
-const votes    = JSON.parse(fs.readFileSync(VOTES_FILE, 'utf8'))
-const deputes  = JSON.parse(fs.readFileSync(DEPUTES_FILE, 'utf8'))
-const propos   = JSON.parse(fs.readFileSync(PROPOS_FILE, 'utf8'))
+const mapping = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'))
+const votes   = JSON.parse(fs.readFileSync(VOTES_FILE, 'utf8'))
+const deputes = JSON.parse(fs.readFileSync(DEPUTES_FILE, 'utf8'))
+const propos  = JSON.parse(fs.readFileSync(PROPOS_FILE, 'utf8'))
 
-const entries = Object.entries(mapping.scrutins || {})
-console.log(`[profiles] ${entries.length} scrutins mappés`)
-console.log(`[profiles] ${deputes.count} députés, ${propos.questions.length} questions Match`)
-
-// Liste des positions valides (sécurité : on ignore tout positionId qui n'existe pas)
+// Positions valides
 const validPositions = new Set()
 for (const q of propos.questions) for (const p of q.positions) validPositions.add(p.id)
 
-// ─── Init profils par député ───────────────────────────────────
-// Structure : profilSum[id][positionId] = { somme, nbExprimes }
-const profilDeputes = new Map()
-const ensureDepute = (id) => {
-  if (!profilDeputes.has(id)) profilDeputes.set(id, { sum: {}, n: {} })
-  return profilDeputes.get(id)
+// ─── Normalisation des entrées mapping (rétro-compat V1) ──────
+const normalizeEntry = (raw, scrutinNum) => {
+  // V2 : { positions: [...] }
+  if (Array.isArray(raw?.positions)) {
+    return raw.positions
+      .filter(p => {
+        if (!validPositions.has(p.positionId)) {
+          console.warn(`[profiles] ⚠ position inconnue "${p.positionId}" (scrutin ${scrutinNum}), ignorée`)
+          return false
+        }
+        return true
+      })
+      .map(p => ({ positionId: p.positionId, poids: p.poids ?? 1 }))
+  }
+  // V1 : { positionId, poids } → convertir
+  if (raw?.positionId) {
+    console.warn(`[profiles] ℹ format V1 détecté pour scrutin ${scrutinNum}, conversion auto`)
+    if (!validPositions.has(raw.positionId)) {
+      console.warn(`[profiles] ⚠ position inconnue "${raw.positionId}" (scrutin ${scrutinNum}), ignorée`)
+      return []
+    }
+    return [{ positionId: raw.positionId, poids: raw.poids ?? 1 }]
+  }
+  return []
 }
 
-// Index inversé : pour chaque scrutin, qui a voté quoi
-// On reconstruit à partir de votes-by-depute (qui est dans l'autre sens)
-// → on génère un map { scrutinNumero → { acteurId → 'pour'|'contre'|'abstention'|'nonVotants' } }
+const entries = Object.entries(mapping.scrutins || {})
+console.log(`[profiles] ${entries.length} scrutins dans le mapping`)
+console.log(`[profiles] ${deputes.count} députés, ${propos.questions.length} questions Match`)
+
+// ─── Index scrutin → votes ─────────────────────────────────────
 console.log('[profiles] Reconstruction index scrutin→votes...')
 const scrutinIndex = new Map()
 for (const [acteurId, v] of Object.entries(votes.byDepute)) {
@@ -100,15 +110,18 @@ for (const [acteurId, v] of Object.entries(votes.byDepute)) {
 console.log(`[profiles] ${scrutinIndex.size} scrutins indexés`)
 
 // ─── Accumulation par député ───────────────────────────────────
+const profilDeputes = new Map()
+const ensureDepute = (id) => {
+  if (!profilDeputes.has(id)) profilDeputes.set(id, { sum: {}, n: {} })
+  return profilDeputes.get(id)
+}
+
 let nbMatched = 0
-for (const [scrutinNum, m] of entries) {
+for (const [scrutinNum, raw] of entries) {
   const num = parseInt(scrutinNum, 10)
-  const positionId = m.positionId
-  const poids = m.poids ?? 1
-  if (!validPositions.has(positionId)) {
-    console.warn(`[profiles] ⚠ position inconnue "${positionId}" pour scrutin ${num}, ignoré`)
-    continue
-  }
+  const positions = normalizeEntry(raw, num)
+  if (positions.length === 0) continue
+
   const votesOnScrutin = scrutinIndex.get(num)
   if (!votesOnScrutin) {
     console.warn(`[profiles] ⚠ scrutin ${num} absent des données, ignoré`)
@@ -119,17 +132,16 @@ for (const [scrutinNum, m] of entries) {
   for (const [acteurId, type] of votesOnScrutin) {
     if (type === 'nonVotants') continue
     const p = ensureDepute(acteurId)
-    p.sum[positionId] = (p.sum[positionId] || 0) + (
-      type === 'pour'   ?  poids :
-      type === 'contre' ? -poids :
-      0  // abstention
-    )
-    p.n[positionId] = (p.n[positionId] || 0) + 1
+    const sign = type === 'pour' ? 1 : type === 'contre' ? -1 : 0
+    for (const { positionId, poids } of positions) {
+      p.sum[positionId] = (p.sum[positionId] || 0) + sign * poids
+      p.n[positionId]   = (p.n[positionId]   || 0) + Math.abs(poids)
+    }
   }
 }
 console.log(`[profiles] ${nbMatched} scrutins effectivement traités`)
 
-// ─── Normalisation : score / nbExprimés * 100, clamp [-100, +100] ──
+// ─── Normalisation ─────────────────────────────────────────────
 const normalize = (raw) => {
   const profil = {}, couverture = {}
   for (const posId of Object.keys(raw.sum)) {
@@ -137,19 +149,16 @@ const normalize = (raw) => {
     if (n === 0) continue
     const score = (raw.sum[posId] / n) * 100
     profil[posId] = Math.max(-100, Math.min(100, Math.round(score)))
-    couverture[posId] = n
+    couverture[posId] = Math.round(n * 10) / 10
   }
   return { profil, couverture }
 }
 
 const deputesOut = {}
-for (const [id, raw] of profilDeputes) {
-  deputesOut[id] = normalize(raw)
-}
+for (const [id, raw] of profilDeputes) deputesOut[id] = normalize(raw)
 
 // ─── Agrégation par parti ──────────────────────────────────────
-// Pour chaque parti : moyenne des profils de ses députés, pondérée par couverture.
-const partis = new Map() // code → { nom, deputeIds: [] }
+const partis = new Map()
 for (const d of deputes.deputes) {
   if (!d.groupe?.code) continue
   if (!partis.has(d.groupe.code)) {
@@ -174,14 +183,9 @@ for (const [code, p] of partis) {
   for (const posId of Object.keys(sumProfil)) {
     if (sumPoids[posId] === 0) continue
     profil[posId] = Math.round(sumProfil[posId] / sumPoids[posId])
-    couverture[posId] = sumPoids[posId]
+    couverture[posId] = Math.round(sumPoids[posId] * 10) / 10
   }
-  partisOut[code] = {
-    nom: p.nom,
-    nbDeputes: p.deputeIds.length,
-    profil,
-    couverture
-  }
+  partisOut[code] = { nom: p.nom, nbDeputes: p.deputeIds.length, profil, couverture }
 }
 
 const out = {
@@ -198,5 +202,5 @@ console.log(`[profiles]   ${Object.keys(partisOut).length} partis · ${Object.ke
 console.log(`[profiles]   Taille : ${(fs.statSync(OUT).size / 1024).toFixed(0)} Ko`)
 
 if (nbMatched === 0) {
-  console.log(`\n[profiles] ⚠ Aucun scrutin n'a été mappé. Remplis public/data/match-mapping.json.`)
+  console.log(`\n[profiles] ⚠ Aucun scrutin n'a été mappé. Remplis public/data/match-mapping.json via l'admin.`)
 }

@@ -10,6 +10,7 @@ import PageMesElus from './pages/PageMesElus.jsx'
 import PageDeputeDetail from './pages/PageDeputeDetail.jsx'
 import PageMonMatch from './pages/PageMonMatch.jsx'
 import PageReglages from './pages/PageReglages.jsx'
+import PageAdminMapping from './pages/PageAdminMapping.jsx'
 
 export default function App() {
   const [dark, setDark]     = useState(false)
@@ -20,7 +21,13 @@ export default function App() {
   const [selectedDeputeId, setSelectedDeputeId] = useState(null)
 
   const C = dark ? C_DARK : C_LIGHT
-  const isAdmin = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('admin') === '1'
+
+  // Modes admin via ?admin=...
+  const adminMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    return new URLSearchParams(window.location.search).get('admin')
+  }, [])
+  const isAdmin = adminMode != null
 
   const go = useCallback((id) => {
     setRoute(id); setDrawerOpen(false); setSelectedDeputeId(null); window.scrollTo({ top: 0 })
@@ -31,6 +38,8 @@ export default function App() {
   }, [])
 
   const page = useMemo(() => {
+    if (adminMode === 'mapping') return <PageAdminMapping C={C} />
+
     if (route === 'mes-elus' && selectedDeputeId) {
       return <PageDeputeDetail deputeId={selectedDeputeId} onBack={() => setSelectedDeputeId(null)} C={C} />
     }
@@ -50,7 +59,7 @@ export default function App() {
       )
       default: return null
     }
-  }, [route, selectedDeputeId, profile, expert, dark, C, selectDepute])
+  }, [route, selectedDeputeId, profile, expert, dark, C, selectDepute, adminMode])
 
   return (
     <>

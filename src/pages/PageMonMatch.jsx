@@ -3,6 +3,7 @@ import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, Badg
 import { usePropositions, useProfiles, useDeputes } from '../hooks.js'
 import { computeMatches } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, desaccords } from '../matchAnalysis.js'
+import { PALIERS, PALIER_BY_VALUE, SKIP, PALIER_BG, PALIER_FG, PALIER_BORDER, migrateReponses } from '../paliers.js'
 import GlossText from '../GlossText.jsx'
 import {
   saveMatchCurrent, loadMatchCurrent, clearMatchCurrent,
@@ -12,8 +13,6 @@ import { formatDate } from '../utils.js'
 import {
   ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, Legend
 } from 'recharts'
-
-const PALIERS = [0, 25, 50, 75, 100]
 
 const shuffle = (arr) => {
   const a = [...arr]
@@ -38,7 +37,6 @@ export default function PageMonMatch({ C }) {
   const [compareCode, setCompareCode] = useState(null)
   const [inversion, setInversion]     = useState(false)
 
-  // Persistance
   const [hasResumable, setHasResumable] = useState(false)
   const [history, setHistory] = useState([])
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -46,7 +44,6 @@ export default function PageMonMatch({ C }) {
   const initialLoaded = useRef(false)
   const savedToHistory = useRef(false)
 
-  // Au montage : détecter un Match en cours + charger l'historique
   useEffect(() => {
     (async () => {
       const cur = await loadMatchCurrent()
@@ -54,12 +51,12 @@ export default function PageMonMatch({ C }) {
         setHasResumable(true)
       }
       const h = await listMatchHistory()
-      setHistory(h)
+      // Migration V1→V2 silencieuse sur l'historique
+      setHistory(h.map(m => ({ ...m, reponses: migrateReponses(m.reponses, m.version || 1) })))
       initialLoaded.current = true
     })()
   }, [])
 
-  // Auto-save du Match en cours (à chaque modif pertinente)
   useEffect(() => {
     if (!initialLoaded.current) return
     if (phase === 'questions') {
@@ -67,16 +64,15 @@ export default function PageMonMatch({ C }) {
     }
   }, [reponses, ordre, idx, phase])
 
-  // En entrant en recap : sauver dans l'historique + nettoyer le "current"
   useEffect(() => {
     if (phase !== 'recap' || savedToHistory.current) return
-    if (Object.keys(reponses).length === 0) return // sécurité : Match vide
+    if (Object.keys(reponses).length === 0) return
     savedToHistory.current = true
     ;(async () => {
       await saveMatchToHistory({ reponses, ordre, completedAt: new Date().toISOString() })
       await clearMatchCurrent()
       const h = await listMatchHistory()
-      setHistory(h)
+      setHistory(h.map(m => ({ ...m, reponses: migrateReponses(m.reponses, m.version || 1) })))
     })()
   }, [phase, reponses, ordre])
 
@@ -94,7 +90,7 @@ export default function PageMonMatch({ C }) {
     const cur = await loadMatchCurrent()
     if (!cur) { startMatch(); return }
     savedToHistory.current = false
-    setReponses(cur.reponses || {})
+    setReponses(migrateReponses(cur.reponses || {}, cur.version || 1))
     setOrdre(cur.ordre || [])
     setIdx(cur.idx || 0)
     setPhase(cur.phase || 'questions')
@@ -119,7 +115,7 @@ export default function PageMonMatch({ C }) {
   }
 
   const openHistoryItem = (m) => {
-    savedToHistory.current = true // déjà en historique, ne pas ré-enregistrer
+    savedToHistory.current = true
     setReponses(m.reponses || {})
     setOrdre(m.ordre || [])
     setIdx(0)
@@ -132,7 +128,7 @@ export default function PageMonMatch({ C }) {
   const removeFromHistory = async (id) => {
     await deleteMatchFromHistory(id)
     const h = await listMatchHistory()
-    setHistory(h)
+    setHistory(h.map(m => ({ ...m, reponses: migrateReponses(m.reponses) })))
   }
 
   const questionsById = useMemo(
@@ -142,12 +138,23 @@ export default function PageMonMatch({ C }) {
   const question = phase === 'questions' && ordre.length > 0 ? questionsById[ordre[idx]] : null
   const reponsesQuestion = question ? (reponses[question.id] || {}) : {}
 
-  const setAdhesion = (positionId, palier) => {
+  const setAdhesion = (positionId, value) => {
     if (!question) return
     setReponses(prev => ({
       ...prev,
-      [question.id]: { ...(prev[question.id] || {}), [positionId]: palier }
+      [question.id]: { ...(prev[question.id] || {}), [positionId]: value }
     }))
+  }
+
+  const skipPosition = (positionId) => setAdhesion(positionId, SKIP)
+
+  // Bouton "Je passe la question" → toutes les positions à SKIP
+  const skipQuestion = () => {
+    if (!question) return
+    const all = {}
+    for (const p of question.positions) all[p.id] = SKIP
+    setReponses(prev => ({ ...prev, [question.id]: all }))
+    setTimeout(next, 100) // petit délai pour feedback visuel
   }
 
   const next = () => {
@@ -167,7 +174,8 @@ export default function PageMonMatch({ C }) {
     for (const q of data.questions) {
       total++
       const r = reponses[q.id] || {}
-      Object.values(r).some(v => v > 0) ? repondues++ : ignorees++
+      const hasReponse = Object.values(r).some(v => v !== SKIP && v !== undefined && typeof v === 'number')
+      hasReponse ? repondues++ : ignorees++
     }
     return { total, repondues, ignorees }
   }, [phase, data, reponses])
@@ -191,7 +199,7 @@ export default function PageMonMatch({ C }) {
           const p = q.positions.find(pp => pp.id === posId)
           if (p) {
             if (!pseudoRep[q.id]) pseudoRep[q.id] = {}
-            pseudoRep[q.id][posId] = Math.max(0, score)
+            pseudoRep[q.id][posId] = score // -100..+100 brut
             break
           }
         }
@@ -219,7 +227,6 @@ export default function PageMonMatch({ C }) {
     return desaccords(data, reponses, profilTop1, 5)
   }, [phase, matches, profiles.data, data, reponses])
 
-  // ─── LOADING / ERROR ─────────────────────────────────────────
   if (loading) return (
     <div className="fadeUp">
       <Card C={C} style={{ textAlign: 'center', padding: 40 }}>
@@ -271,7 +278,7 @@ export default function PageMonMatch({ C }) {
             On va te poser <strong>{data.questions.length} questions</strong> sur les grands sujets politiques français : économie, écologie, sécurité, retraites, immigration, démocratie, etc.
           </p>
           <p style={{ marginBottom: 12 }}>
-            Pour chaque question, tu as <strong>5 positions</strong> qui couvrent les principales sensibilités politiques. Tu indiques à quel point tu adhères à chacune, sur une échelle de <strong>0 à 100%</strong>. Tu peux trouver plusieurs positions valables — c'est même le but.
+            Pour chaque question, tu as <strong>5 positions</strong>. Pour chacune, tu peux te dire <em>très opposé</em>, <em>opposé</em>, <em>favorable</em> ou <em>très favorable</em>. Si une position ne te parle pas, tu peux la passer.
           </p>
           <p style={{ marginBottom: 12 }}>
             À la fin, tu auras un profil par thème, tes positions les plus fortes, et tes affinités avec les partis et députés <em>croisées avec leurs votes réels à l'Assemblée</em>.
@@ -350,8 +357,8 @@ export default function PageMonMatch({ C }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
           <KPI label="Questions répondues" value={`${stats.repondues}/${stats.total}`} C={C} />
-          <KPI label="Thèmes explorés"     value={themes.length} hint={`sur 8`} C={C} />
-          <KPI label="Positions fortes"    value={tops.length} hint="adhésion ≥ 75%" C={C} />
+          <KPI label="Thèmes explorés"     value={themes.length} hint="sur 8" C={C} />
+          <KPI label="Positions tranchées" value={tops.length} hint="très favorable ou très opposé" C={C} />
         </div>
 
         <Card C={C} style={{ marginBottom: 20 }}>
@@ -361,7 +368,7 @@ export default function PageMonMatch({ C }) {
               <div style={{ fontSize: 13, color: C.muted }}>
                 {inversion && partiSelectionne
                   ? `En train de voir : profil de ${partiSelectionne.nom}`
-                  : `Score d'engagement sur chaque thème (0 = non répondu, 100 = adhésion maximale)`}
+                  : `Intensité de tes positions par thème`}
               </div>
             </div>
             {matchingReady && (
@@ -401,13 +408,7 @@ export default function PageMonMatch({ C }) {
                   fillOpacity={0.35}
                 />
                 {partiSelectionne && !inversion && (
-                  <Radar
-                    name={partiSelectionne.nom}
-                    dataKey="parti"
-                    stroke={C.secondary}
-                    fill={C.secondary}
-                    fillOpacity={0.25}
-                  />
+                  <Radar name={partiSelectionne.nom} dataKey="parti" stroke={C.secondary} fill={C.secondary} fillOpacity={0.25} />
                 )}
                 <Legend wrapperStyle={{ fontSize: 13 }} />
                 <Tooltip
@@ -423,23 +424,26 @@ export default function PageMonMatch({ C }) {
           <>
             <h2 style={{ marginBottom: 12 }}>Tes positions par thème</h2>
             <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
-              {themes.map(t => (
-                <Card C={C} key={t.themeId} padding={14}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
-                    <div style={{ fontSize: 22 }}>{t.emoji}</div>
-                    <div style={{ flex: 1, minWidth: 160 }}>
-                      <div style={{ fontWeight: 500 }}>{t.label}</div>
-                      <div style={{ fontSize: 13, color: C.muted }}>
-                        Position dominante : <strong style={{ color: C.text }}>{t.dominante.posLabel}</strong>
+              {themes.map(t => {
+                const tone = t.dominante.val >= 0 ? C.green : C.red
+                return (
+                  <Card C={C} key={t.themeId} padding={14}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
+                      <div style={{ fontSize: 22 }}>{t.emoji}</div>
+                      <div style={{ flex: 1, minWidth: 160 }}>
+                        <div style={{ fontWeight: 500 }}>{t.label}</div>
+                        <div style={{ fontSize: 13, color: C.muted }}>
+                          <strong style={{ color: tone }}>{t.dominante.palierLabel}</strong> à : <span style={{ color: C.text }}>{t.dominante.posLabel}</span>
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.primary }}>
+                        {t.score}/100
                       </div>
                     </div>
-                    <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.primary }}>
-                      {t.score}/100
-                    </div>
-                  </div>
-                  <ProgressBar value={t.score} max={100} C={C} height={6} />
-                </Card>
-              ))}
+                    <ProgressBar value={t.score} max={100} C={C} height={6} />
+                  </Card>
+                )
+              })}
             </div>
           </>
         )}
@@ -473,25 +477,28 @@ export default function PageMonMatch({ C }) {
                 <div style={{ marginBottom: 8 }}>
                   <h3 style={{ marginBottom: 2 }}>Là où tu t'éloignes de {top1.nom}</h3>
                   <div style={{ fontSize: 13, color: C.muted }}>
-                    Ces positions sont importantes pour toi, mais les députés de {top1.code} votent souvent contre.
+                    Positions où tu prends une direction nette, mais où les députés de {top1.code} votent à l'inverse.
                   </div>
                 </div>
                 <div style={{ display: 'grid', gap: 6 }}>
-                  {desacc.map((d, i) => (
-                    <div key={i} style={{
-                      background: C.white, padding: '10px 12px', borderRadius: 8,
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'
-                    }}>
-                      <div style={{ flex: 1, minWidth: 200 }}>
-                        <div style={{ fontSize: 13, color: C.muted }}>{d.qEmoji} {d.qTitre}</div>
-                        <div style={{ fontWeight: 500, fontSize: 14 }}>{d.posLabel}</div>
+                  {desacc.map((d, i) => {
+                    const userLabel = PALIER_BY_VALUE[d.user]?.label || ''
+                    return (
+                      <div key={i} style={{
+                        background: C.white, padding: '10px 12px', borderRadius: 8,
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'
+                      }}>
+                        <div style={{ flex: 1, minWidth: 200 }}>
+                          <div style={{ fontSize: 13, color: C.muted }}>{d.qEmoji} {d.qTitre}</div>
+                          <div style={{ fontWeight: 500, fontSize: 14 }}>{d.posLabel}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, fontSize: 12 }}>
+                          <span className="badge" style={{ background: C.primaryPale, color: C.primaryDeep }}>Toi : {userLabel}</span>
+                          <span className="badge" style={{ background: C.redPale, color: C.red }}>Eux : {d.parti > 0 ? 'Pour' : 'Contre'}</span>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', gap: 8, fontSize: 12 }}>
-                        <span className="badge" style={{ background: C.primaryPale, color: C.primaryDeep }}>Toi : {d.user}%</span>
-                        <span className="badge" style={{ background: C.redPale, color: C.red }}>Eux : {d.parti}</span>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </Card>
             )}
@@ -527,30 +534,31 @@ export default function PageMonMatch({ C }) {
         {!matchingReady && (
           <Card C={C} style={{ marginBottom: 24, background: C.primaryPale, borderColor: C.primary }}>
             <div style={{ fontWeight: 500, color: C.primaryDeep, marginBottom: 4 }}>🚧 Affinités partis & députés en préparation</div>
-            <div style={{ fontSize: 14, color: C.text }}>
-              Le mapping des scrutins de référence est en cours. Reviens bientôt pour découvrir tes affinités.
-            </div>
+            <div style={{ fontSize: 14, color: C.text }}>Le mapping des scrutins de référence est en cours. Reviens bientôt.</div>
           </Card>
         )}
 
         {tops.length > 0 && (
           <>
-            <h2 style={{ marginBottom: 12 }}>Tes positions les plus fortes</h2>
+            <h2 style={{ marginBottom: 12 }}>Tes positions les plus tranchées</h2>
             <div style={{ display: 'grid', gap: 8, marginBottom: 28 }}>
-              {tops.map((t, i) => (
-                <Card C={C} key={`${t.qId}-${t.posId}`} padding={12}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ fontSize: 18 }}>{t.qEmoji}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, color: C.muted }}>{t.qTitre}</div>
-                      <div style={{ fontWeight: 500, fontSize: 14 }}>{t.posLabel}</div>
+              {tops.map(t => {
+                const tone = t.val >= 0 ? C.green : C.red
+                return (
+                  <Card C={C} key={`${t.qId}-${t.posId}`} padding={12}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ fontSize: 18 }}>{t.qEmoji}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 12, color: C.muted }}>{t.qTitre}</div>
+                        <div style={{ fontWeight: 500, fontSize: 14 }}>{t.posLabel}</div>
+                      </div>
+                      <span className="badge" style={{ background: tone, color: '#fff', fontWeight: 600 }}>
+                        {t.palierLabel}
+                      </span>
                     </div>
-                    <span className="badge" style={{ background: C.primary, color: '#fff', fontWeight: 600 }}>
-                      {t.adhesion}%
-                    </span>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                )
+              })}
             </div>
           </>
         )}
@@ -563,24 +571,30 @@ export default function PageMonMatch({ C }) {
             {data.questions.map(q => {
               const r = reponses[q.id] || {}
               const positions = q.positions
-                .map(p => ({ ...p, adhesion: r[p.id] || 0 }))
-                .filter(p => p.adhesion > 0)
-                .sort((a, b) => b.adhesion - a.adhesion)
+                .map(p => ({ ...p, val: r[p.id] }))
+                .filter(p => p.val !== undefined && p.val !== SKIP)
+                .sort((a, b) => Math.abs(b.val) - Math.abs(a.val))
               return (
                 <Card C={C} key={q.id} padding={14}>
                   <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>
                     {q.emoji} {q.titre}
                   </div>
                   {positions.length === 0 ? (
-                    <div style={{ fontSize: 14, color: C.muted, fontStyle: 'italic' }}>Aucune position retenue.</div>
+                    <div style={{ fontSize: 14, color: C.muted, fontStyle: 'italic' }}>Passée.</div>
                   ) : (
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
-                      {positions.map(p => (
-                        <span key={p.id} className="badge"
-                          style={{ background: C.primaryPale, color: C.primaryDeep, fontWeight: 500 }}>
-                          {p.label} — {p.adhesion}%
-                        </span>
-                      ))}
+                      {positions.map(p => {
+                        const palier = PALIER_BY_VALUE[p.val]
+                        if (!palier) return null
+                        const tone = p.val >= 0 ? C.green : C.red
+                        const pale = p.val >= 0 ? C.greenPale : C.redPale
+                        return (
+                          <span key={p.id} className="badge"
+                            style={{ background: pale, color: tone, fontWeight: 500 }}>
+                            {p.label} — {palier.label}
+                          </span>
+                        )
+                      })}
                     </div>
                   )}
                 </Card>
@@ -674,43 +688,71 @@ export default function PageMonMatch({ C }) {
       </Card>
 
       <div style={{ marginBottom: 12, fontSize: 14, color: C.muted, textAlign: 'center' }}>
-        Pour chaque position, indique à quel point tu y adhères. <strong style={{ color: C.text }}>Tu peux laisser à 0%</strong> si elle ne te parle pas du tout.
+        Pour chaque position, indique ton avis. Si une position ne te parle pas, clique <strong style={{ color: C.text }}>Sans avis</strong>.
       </div>
 
-      <div style={{ display: 'grid', gap: 10, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
         {question.positions.map(p => {
-          const adhesion = reponsesQuestion[p.id] || 0
+          const val = reponsesQuestion[p.id]
+          const hasAnswer = val !== undefined && val !== SKIP
+          const isSkipped = val === SKIP
           return (
             <Card C={C} key={p.id} padding={16}
-              style={{ borderColor: adhesion > 0 ? C.primary : C.border, transition: 'border-color .15s' }}>
+              style={{
+                borderColor: hasAnswer ? (val >= 0 ? C.green : C.red) : (isSkipped ? C.muted : C.border),
+                opacity: isSkipped ? 0.55 : 1,
+                transition: 'all .15s'
+              }}>
               <div style={{ marginBottom: 12 }}>
                 <div style={{ fontWeight: 600, marginBottom: 4, fontSize: 15 }}>{p.label}</div>
                 <div style={{ fontSize: 14, lineHeight: 1.5, color: C.text }}>
                   <GlossText texte={p.texte} glossaire={data.glossaire} C={C} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                 {PALIERS.map(palier => {
-                  const active = adhesion === palier
+                  const active = val === palier.value
                   return (
-                    <button key={palier}
-                      onClick={() => setAdhesion(p.id, palier)}
+                    <button key={palier.value}
+                      onClick={() => setAdhesion(p.id, palier.value)}
                       style={{
-                        flex: '1 1 60px', minWidth: 56, padding: '8px 4px',
-                        background: active ? C.primary : C.white,
-                        color: active ? '#fff' : C.text,
-                        border: `1px solid ${active ? C.primary : C.border}`,
-                        borderRadius: 8, fontWeight: 600, fontSize: 14,
+                        flex: '1 1 100px', minWidth: 90, padding: '8px 6px',
+                        background: PALIER_BG(C, palier.value, active),
+                        color: PALIER_FG(C, palier.value, active),
+                        border: `1px solid ${PALIER_BORDER(C, palier.value, active)}`,
+                        borderRadius: 8, fontWeight: 600, fontSize: 13,
                         cursor: 'pointer', transition: 'all .12s'
                       }}>
-                      {palier}%
+                      {palier.label}
                     </button>
                   )
                 })}
+                <button onClick={() => skipPosition(p.id)}
+                  style={{
+                    padding: '8px 12px',
+                    background: isSkipped ? C.sand : 'transparent',
+                    color: C.muted,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 8, fontWeight: 500, fontSize: 13,
+                    cursor: 'pointer', transition: 'all .12s'
+                  }}>
+                  Sans avis
+                </button>
               </div>
             </Card>
           )
         })}
+      </div>
+
+      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+        <button onClick={skipQuestion}
+          style={{
+            background: 'none', border: 'none', color: C.muted,
+            fontSize: 13, cursor: 'pointer', textDecoration: 'underline',
+            textDecorationStyle: 'dotted', textUnderlineOffset: 3
+          }}>
+          Passer toute la question
+        </button>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 40 }}>

@@ -1,9 +1,9 @@
 // Wrapper de persistance isolé.
 //
-// **IMPORTANT** : c'est le SEUL fichier qui touche directement localStorage.
-// Le jour de la migration Supabase, on remplace les implémentations ci-dessous
-// par des appels Supabase async, et le reste de l'app n'a rien à changer
-// (toutes les méthodes sont déjà async).
+// IMPORTANT : c'est le SEUL fichier qui touche directement localStorage.
+// Le jour de la migration Supabase, on remplace les implémentations
+// ci-dessous par des appels Supabase async, et le reste de l'app n'a rien
+// à changer (toutes les méthodes sont déjà async).
 //
 // Convention de clés : namespace par feature, séparé par ':'
 //   "match:current"       → Match en cours (auto-save)
@@ -11,20 +11,22 @@
 //   "match:history:index" → Liste des IDs des Matchs terminés
 //
 // Chaque payload stocké suit la forme : { version: N, savedAt: ISO, ...data }
-// Pour qu'on puisse migrer les anciens enregistrements quand le schéma évoluera.
+//
+// Versions de schéma :
+//   v1 : paliers 0/25/50/75/100 (Lot 4)
+//   v2 : paliers -100/-50/50/100 + SKIP (Lot 5)
+//
+// Les anciennes versions restent lisibles : le caller (PageMonMatch) appelle
+// migrateReponses(payload.reponses, payload.version) après load.
 
 const PREFIX = 'demos:'
 
-// ─── Backend localStorage (V1) ─────────────────────────────────
 const lsAvailable = (() => {
   try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); return true }
   catch { return false }
 })()
 
 const k = (key) => PREFIX + key
-
-// ─── API publique ──────────────────────────────────────────────
-// Toutes les méthodes sont async pour faciliter la migration Supabase.
 
 export async function getItem(key) {
   if (!lsAvailable) return null
@@ -40,7 +42,6 @@ export async function setItem(key, value) {
     localStorage.setItem(k(key), JSON.stringify(value))
     return true
   } catch (e) {
-    // QuotaExceededError ou autre
     console.warn('[storage] setItem failed', e)
     return false
   }
@@ -51,7 +52,6 @@ export async function removeItem(key) {
   try { localStorage.removeItem(k(key)) } catch {}
 }
 
-// Liste les clés (sans le préfixe) qui matchent un pattern
 export async function listKeys(pattern = '') {
   if (!lsAvailable) return []
   const out = []
@@ -64,8 +64,8 @@ export async function listKeys(pattern = '') {
   return out
 }
 
-// ─── Helpers spécifiques Match ─────────────────────────────────
-const MATCH_VERSION = 1
+// ─── Helpers Match ─────────────────────────────────────────────
+const MATCH_VERSION = 2
 
 export async function saveMatchCurrent({ reponses, ordre, idx, phase }) {
   return setItem('match:current', {
@@ -75,9 +75,10 @@ export async function saveMatchCurrent({ reponses, ordre, idx, phase }) {
   })
 }
 
+// Retourne le payload BRUT (avec version), au caller de migrer s'il faut.
 export async function loadMatchCurrent() {
   const data = await getItem('match:current')
-  if (!data || data.version !== MATCH_VERSION) return null
+  if (!data) return null
   return data
 }
 
@@ -85,7 +86,6 @@ export async function clearMatchCurrent() {
   return removeItem('match:current')
 }
 
-// Génère un id court basé sur la date
 const genId = () => {
   const d = new Date()
   const pad = (n) => String(n).padStart(2, '0')
@@ -102,7 +102,6 @@ export async function saveMatchToHistory({ reponses, ordre, completedAt }) {
   })
   if (!ok) return null
 
-  // Maj de l'index
   const idx = (await getItem('match:history:index')) || { ids: [] }
   idx.ids = [id, ...idx.ids.filter(x => x !== id)]
   await setItem('match:history:index', idx)
@@ -113,7 +112,6 @@ export async function saveMatchToHistory({ reponses, ordre, completedAt }) {
 export async function listMatchHistory() {
   const idx = await getItem('match:history:index')
   if (!idx?.ids) return []
-  // On lit tous les Matchs (limite raisonnable : on n'attend pas des milliers d'items)
   const out = []
   for (const id of idx.ids) {
     const m = await getItem(`match:history:${id}`)

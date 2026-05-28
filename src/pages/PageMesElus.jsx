@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react'
 import { PageTitle, Card, Empty, Spinner, ErrorBox, Avatar, BadgeParti, Btn, Field } from '../atoms.jsx'
 import { useDeputes } from '../hooks.js'
 
-export default function PageMesElus({ onSelectDepute, C }) {
+export default function PageMesElus({ onSelectDepute, initialGroupe, C }) {
   const { data, loading, error } = useDeputes()
   const [q, setQ] = useState('')
-  const [groupe, setGroupe] = useState('')
+  const [groupe, setGroupe] = useState(initialGroupe || '')
   const [dept, setDept] = useState('')
 
   const groupes = useMemo(() => {

@@ -7,6 +7,7 @@ import Drawer from './layout/Drawer.jsx'
 import StubPage from './pages/StubPage.jsx'
 import PageMonCoin from './pages/PageMonCoin.jsx'
 import PageMesElus from './pages/PageMesElus.jsx'
+import PageLesPartis from './pages/PageLesPartis.jsx'
 import PageDeputeDetail from './pages/PageDeputeDetail.jsx'
 import PageMonMatch from './pages/PageMonMatch.jsx'
 import PageReglages from './pages/PageReglages.jsx'
@@ -20,6 +21,7 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [profile, setProfile] = useState({ prenom: '', codePostal: '', themes: THEMES_DEFAULT })
   const [selectedDeputeId, setSelectedDeputeId] = useState(null)
+  const [groupeFilter, setGroupeFilter] = useState(null)
 
   const C = dark ? C_DARK : C_LIGHT
 
@@ -31,7 +33,7 @@ export default function App() {
   const isAdmin = adminMode != null
 
   const go = useCallback((id) => {
-    setRoute(id); setDrawerOpen(false); setSelectedDeputeId(null); window.scrollTo({ top: 0 })
+    setRoute(id); setDrawerOpen(false); setSelectedDeputeId(null); setGroupeFilter(null); window.scrollTo({ top: 0 })
   }, [])
 
   const selectDepute = useCallback((id) => {
@@ -40,6 +42,10 @@ export default function App() {
 
   const goToDepute = useCallback((id) => {
     setRoute('mes-elus'); setSelectedDeputeId(id); window.scrollTo({ top: 0 })
+  }, [])
+
+  const goToGroupe = useCallback((code) => {
+    setRoute('mes-elus'); setSelectedDeputeId(null); setGroupeFilter(code); window.scrollTo({ top: 0 })
   }, [])
 
   const page = useMemo(() => {
@@ -51,7 +57,8 @@ export default function App() {
     }
     switch (route) {
       case 'mon-coin':  return <PageMonCoin profile={profile} C={C} />
-      case 'mes-elus':  return <PageMesElus onSelectDepute={selectDepute} C={C} />
+      case 'mes-elus':  return <PageMesElus onSelectDepute={selectDepute} initialGroupe={groupeFilter} key={groupeFilter || 'all'} C={C} />
+      case 'les-partis': return <PageLesPartis onSelectGroupe={goToGroupe} C={C} />
       case 'mon-match': return <PageMonMatch onSelectDepute={goToDepute} C={C} />
       case 'decrypter': return <StubPage title="Décrypter" subtitle="Échiquier politique, cartes story, méthodologie." C={C} />
       case 'mes-idees': return <StubPage title="Mes idées" subtitle="Interpellation, pétitions locales, associations, conso responsable." C={C} />
@@ -65,7 +72,7 @@ export default function App() {
       )
       default: return null
     }
-  }, [route, selectedDeputeId, profile, expert, dark, C, selectDepute, goToDepute, adminMode])
+  }, [route, selectedDeputeId, groupeFilter, profile, expert, dark, C, selectDepute, goToDepute, goToGroupe, adminMode])
 
   return (
     <>

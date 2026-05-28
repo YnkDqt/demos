@@ -18,6 +18,7 @@ export const THEMES_DEFAULT = ['logement', 'env', 'sante', 'eco']
 export const NAVS = [
   { id: 'mon-coin',  label: 'Mon coin' },
   { id: 'mes-elus',  label: 'Mes élus' },
+  { id: 'les-partis', label: 'Les partis' },
   { id: 'mon-match', label: 'Mon match' },
   { id: 'decrypter', label: 'Décrypter' },
   { id: 'mes-idees', label: 'Mes idées' },

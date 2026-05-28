@@ -1,0 +1,45 @@
+{
+  "_doc": "Données factuelles des groupes AN (légis 17) + fiches pédagogiques par FAMILLE politique (pas par parti). Sources : Assemblée nationale, vie-publique.fr, Datan. Le classement par famille est une donnée tierce standard ; les fiches décrivent les grandes familles, non les groupes individuels.",
+  "source": "Assemblée nationale (composition officielle), vie-publique.fr, Datan.fr — légis 17",
+  "familles": {
+    "gauche-radicale": {
+      "label": "Gauche de transformation",
+      "resume": "Veut transformer en profondeur le système économique. Met l'accent sur la redistribution forte des richesses, les services publics, la planification écologique et la remise en cause du capitalisme.",
+      "idees": ["Redistribution forte (impôt sur les hauts patrimoines)", "Services publics étendus", "Planification écologique", "Augmentation des salaires et du SMIC", "Critique du libre-échange"]
+    },
+    "gauche": {
+      "label": "Gauche sociale et écologiste",
+      "resume": "Cherche plus de justice sociale et la transition écologique dans le cadre de l'économie de marché. Privilégie la protection sociale, les droits des minorités et la régulation du capitalisme plutôt que sa suppression.",
+      "idees": ["Protection sociale et solidarité", "Transition écologique", "Régulation du marché", "Droits sociaux et sociétaux", "Service public renforcé"]
+    },
+    "centre": {
+      "label": "Centre / majorité présidentielle",
+      "resume": "Cherche un équilibre entre liberté économique et protection sociale. Favorable à l'économie de marché, à l'Europe et aux réformes dites « pragmatiques », ni franchement à gauche ni à droite sur l'axe économique.",
+      "idees": ["Économie de marché encadrée", "Pro-européen", "Réformes « en même temps »", "Soutien à l'entreprise et à l'innovation", "Modernisation de l'État"]
+    },
+    "droite": {
+      "label": "Droite",
+      "resume": "Met l'accent sur la liberté économique, l'autorité de l'État régalien (sécurité, justice), la maîtrise de l'immigration et la baisse des impôts et des dépenses publiques. Attachée à l'ordre et à la responsabilité individuelle.",
+      "idees": ["Liberté économique, baisse des impôts", "Fermeté sécuritaire et pénale", "Maîtrise de l'immigration", "Réduction de la dépense publique", "Valeurs d'ordre et de mérite"]
+    },
+    "droite-radicale": {
+      "label": "Droite nationale",
+      "resume": "Place la souveraineté nationale et l'identité au cœur de son projet. Met fortement l'accent sur la restriction de l'immigration, la priorité nationale, la sécurité, et une vision critique de l'Union européenne.",
+      "idees": ["Souveraineté nationale", "Forte restriction de l'immigration", "Priorité nationale", "Sécurité et fermeté pénale", "Critique de l'Union européenne"]
+    }
+  },
+  "groupes": {
+    "LFI-NFP": { "famille": "gauche-radicale", "nomComplet": "La France insoumise - Nouveau Front Populaire", "fondation": 2016, "opposition": true, "europe": "The Left", "hemicycle": 1 },
+    "GDR":     { "famille": "gauche-radicale", "nomComplet": "Gauche Démocrate et Républicaine (communistes + ultramarins)", "fondation": 2007, "opposition": true, "europe": "The Left", "hemicycle": 2 },
+    "EcoS":    { "famille": "gauche", "nomComplet": "Écologiste et Social", "fondation": 2024, "opposition": true, "europe": "Verts/ALE", "hemicycle": 3 },
+    "SOC":     { "famille": "gauche", "nomComplet": "Socialistes et apparentés", "fondation": 1988, "opposition": true, "europe": "S&D", "hemicycle": 4 },
+    "Dem":     { "famille": "centre", "nomComplet": "Les Démocrates (MoDem)", "fondation": 2007, "opposition": false, "europe": "Renew Europe", "hemicycle": 5 },
+    "EPR":     { "famille": "centre", "nomComplet": "Ensemble pour la République (Renaissance)", "fondation": 2016, "opposition": false, "europe": "Renew Europe", "hemicycle": 6 },
+    "HOR":     { "famille": "centre", "nomComplet": "Horizons & Indépendants", "fondation": 2021, "opposition": false, "europe": "Renew Europe", "hemicycle": 7 },
+    "LIOT":    { "famille": "centre", "nomComplet": "Libertés, Indépendants, Outre-mer et Territoires", "fondation": 2018, "opposition": false, "europe": null, "hemicycle": 8 },
+    "DR":      { "famille": "droite", "nomComplet": "Droite Républicaine (Les Républicains)", "fondation": 2015, "opposition": false, "europe": "PPE", "hemicycle": 9 },
+    "UDR":     { "famille": "droite-radicale", "nomComplet": "Union des droites pour la République (ciottistes)", "fondation": 2024, "opposition": true, "europe": "PfE", "hemicycle": 10 },
+    "RN":      { "famille": "droite-radicale", "nomComplet": "Rassemblement National", "fondation": 1972, "opposition": true, "europe": "PfE", "hemicycle": 11 },
+    "NI":      { "famille": null, "nomComplet": "Députés non inscrits", "fondation": null, "opposition": null, "europe": null, "hemicycle": 12 }
+  }
+}

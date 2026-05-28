@@ -31,10 +31,14 @@ function PositionList({ items, accord, C }) {
       {items.map((it, i) => {
         const toi = PALIER_BY_VALUE[it.user]?.label || ''
         const eux = intensiteLabel(it.parti)
+        const majeur = !accord && Math.abs(it.user) === 100
         return (
-          <div key={i} style={{ background: C.white, padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>
+          <div key={i} style={{ background: C.white, padding: '8px 10px', borderRadius: 8, border: `1px solid ${majeur ? C.red : C.border}` }}>
             <div style={{ fontSize: 12, color: C.muted }}>{it.qEmoji} {it.qTitre}</div>
-            <div style={{ fontWeight: 500, fontSize: 13, marginBottom: 4 }}>{it.posLabel}</div>
+            <div style={{ fontWeight: 500, fontSize: 13, marginBottom: 4 }}>
+              {it.posLabel}
+              {majeur && <span style={{ color: C.red, fontWeight: 600, fontSize: 11 }}> · désaccord majeur</span>}
+            </div>
             <div style={{ display: 'flex', gap: 6, fontSize: 11, flexWrap: 'wrap' }}>
               <span className="badge" style={{ background: C.primaryPale, color: C.primaryDeep }}>Toi : {toi}</span>
               <span className="badge" style={{ background: accord ? C.greenPale : C.redPale, color: accord ? C.green : C.red }}>Eux : {eux.texte}</span>
@@ -61,6 +65,7 @@ export default function PageMonMatch({ C }) {
   const [compareCode, setCompareCode] = useState(null)
   const [inversion, setInversion]     = useState(false)
   const [openParti, setOpenParti]     = useState(null)
+  const [showAllPartis, setShowAllPartis] = useState(false)
 
   const [hasResumable, setHasResumable] = useState(false)
   const [history, setHistory] = useState([])
@@ -207,7 +212,7 @@ export default function PageMonMatch({ C }) {
 
   const matches = useMemo(() => {
     if (phase !== 'recap' || !profiles.data || !D.data) return null
-    return computeMatches(reponses, profiles.data, D.data.deputes, { topPartis: 3, topDeputes: 5 })
+    return computeMatches(reponses, profiles.data, D.data.deputes, { topPartis: 99, topDeputes: 5 })
   }, [phase, profiles.data, D.data, reponses])
 
   const partiData = useMemo(() => {
@@ -217,10 +222,16 @@ export default function PageMonMatch({ C }) {
       const prof = profiles.data.partis[p.code]?.profil
       if (!prof) continue
       const bd = partiBreakdown(data, reponses, prof)
+      // majeurs (toi ±100) d'abord, puis par écart décroissant
+      const des = [...bd.desaccords].sort((a, b) => {
+        const ma = Math.abs(a.user) === 100, mb = Math.abs(b.user) === 100
+        if (ma !== mb) return ma ? -1 : 1
+        return b.gap - a.gap
+      })
       out[p.code] = {
         themes: matchByTheme(reponses, prof, data),
         accords: bd.accords.slice(0, 5),
-        desaccords: bd.desaccords.slice(0, 5),
+        desaccords: des.slice(0, 6),
         nbMajeurs: bd.nbMajeurs
       }
     }
@@ -454,8 +465,8 @@ export default function PageMonMatch({ C }) {
         {hasMatching && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes partis les plus proches</h2>
-            <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
-              {matches.partis.map((p, i) => {
+            <div style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
+              {(showAllPartis ? matches.partis : matches.partis.slice(0, 3)).map((p, i) => {
                 const open = openParti === p.code
                 const pd = partiData[p.code] || { themes: [], accords: [], desaccords: [], nbMajeurs: 0 }
                 return (
@@ -529,6 +540,14 @@ export default function PageMonMatch({ C }) {
                 )
               })}
             </div>
+
+            {matches.partis.length > 3 && (
+              <div style={{ textAlign: 'center', marginBottom: 28 }}>
+                <Btn variant="ghost" size="sm" onClick={() => setShowAllPartis(v => !v)} C={C}>
+                  {showAllPartis ? 'Réduire' : `Voir tous les partis (${matches.partis.length})`}
+                </Btn>
+              </div>
+            )}
 
             <h2 style={{ marginBottom: 12 }}>Tes députés les plus proches</h2>
             <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>

@@ -117,5 +117,6 @@ tbody tr:hover { background: ${C.sand}; }
   }
   .app-main { padding: 20px 16px 80px; }
   h1 { font-size: 1.6rem; }
+  .themes-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 `

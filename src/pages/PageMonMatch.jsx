@@ -399,7 +399,7 @@ export default function PageMonMatch({ C }) {
         {themes.length > 0 && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes positions par thème</h2>
-            <div style={{ display: 'grid', gap: 10, marginBottom: 28, gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 28, gridTemplateColumns: 'repeat(4, 1fr)' }} className="themes-grid">
               {themes.map(t => {
                 const tone = t.dominante.val >= 0 ? C.green : C.red
                 return (

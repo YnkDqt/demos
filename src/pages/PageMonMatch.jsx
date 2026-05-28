@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty, ConfirmDialog, Modal } from '../atoms.jsx'
 import { usePropositions, useProfiles, useDeputes, useAxesMapping } from '../hooks.js'
 import { carteAxes } from '../axes.js'
-import { computeMatches } from '../matching.js'
+import { computeMatches, matchByTheme } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, desaccords } from '../matchAnalysis.js'
 import { PALIERS, PALIER_BY_VALUE, SKIP, PALIER_BG, PALIER_FG, PALIER_BORDER, migrateReponses } from '../paliers.js'
 import GlossText from '../GlossText.jsx'
@@ -38,6 +38,7 @@ export default function PageMonMatch({ C }) {
 
   const [compareCode, setCompareCode] = useState(null)
   const [inversion, setInversion]     = useState(false)
+  const [openParti, setOpenParti]     = useState(null)
 
   const [hasResumable, setHasResumable] = useState(false)
   const [history, setHistory] = useState([])
@@ -186,6 +187,13 @@ export default function PageMonMatch({ C }) {
     if (phase !== 'recap' || !profiles.data || !D.data) return null
     return computeMatches(reponses, profiles.data, D.data.deputes, { topPartis: 3, topDeputes: 5 })
   }, [phase, profiles.data, D.data, reponses])
+
+  const partiThemes = useMemo(() => {
+    if (!openParti || !profiles.data || !data) return []
+    const prof = profiles.data.partis[openParti]?.profil
+    if (!prof) return []
+    return matchByTheme(reponses, prof, data)
+  }, [openParti, profiles.data, data, reponses])
 
   const partiSelectionne = useMemo(() => {
     if (!compareCode || !profiles.data) return null
@@ -424,9 +432,14 @@ export default function PageMonMatch({ C }) {
           <>
             <h2 style={{ marginBottom: 12 }}>Tes partis les plus proches</h2>
             <div style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
-              {matches.partis.map((p, i) => (
+              {matches.partis.map((p, i) => {
+                const open = openParti === p.code
+                return (
                 <Card C={C} key={p.code} padding={16}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div
+                    onClick={() => setOpenParti(open ? null : p.code)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }}
+                  >
                     <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.muted, width: 28, textAlign: 'center' }}>#{i + 1}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
@@ -439,9 +452,40 @@ export default function PageMonMatch({ C }) {
                     <div style={{ fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600, color: C.primary, minWidth: 70, textAlign: 'right' }}>
                       {p.score}%
                     </div>
+                    <span style={{ color: C.muted, fontSize: 13, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform .15s' }}>›</span>
                   </div>
+
+                  {open && (
+                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: 13, color: C.muted, marginBottom: 10 }}>
+                        Ton accord avec {p.code}, par thème :
+                      </div>
+                      {partiThemes.length === 0 ? (
+                        <div style={{ fontSize: 13, color: C.muted }}>Pas assez de positions communes pour détailler.</div>
+                      ) : (
+                        <div style={{ display: 'grid', gap: 8 }}>
+                          {partiThemes.map(t => {
+                            const tone = t.score >= 66 ? C.green : t.score >= 40 ? C.yellow : C.red
+                            return (
+                              <div key={t.themeId} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <span style={{ fontSize: 16, width: 22 }}>{t.emoji}</span>
+                                <span style={{ flex: 1, fontSize: 13, minWidth: 0 }}>{t.label}</span>
+                                <div style={{ flex: 1, minWidth: 80 }}>
+                                  <div style={{ height: 6, borderRadius: 999, background: C.sandDark, position: 'relative' }}>
+                                    <div style={{ position: 'absolute', inset: 0, width: `${t.score}%`, background: tone, borderRadius: 999 }} />
+                                  </div>
+                                </div>
+                                <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, fontWeight: 600, color: tone, minWidth: 42, textAlign: 'right' }}>{t.score}%</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </Card>
-              ))}
+                )
+              })}
             </div>
 
             {desacc.length > 0 && top1 && (

@@ -7,6 +7,10 @@
 // "Je passe" n'arrive jamais ici : on filtre en amont dans userVector.
 
 import { SKIP } from './paliers.js'
+import { resolveTheme } from './themeResolver.js'
+import { THEMES } from './constants.js'
+
+const THEME_BY_ID = Object.fromEntries(THEMES.map(t => [t.id, t]))
 
 const userVector = (reponses) => {
   const v = {}
@@ -73,4 +77,39 @@ export const computeMatches = (reponses, profiles, deputes, opts = {}) => {
     coverage: nbPositionsUser,
     nbScrutinsMappes: profiles.nbScrutinsMappes
   }
+}
+
+// ─── Accord par thème avec un parti ────────────────────────────
+// Cosinus filtré sur les positions de CHAQUE thème (option D du handover).
+// RÈGLE GRAVÉE : on ne juge pas le volume d'engagement, seulement la direction
+// commune sur les positions où user ET parti se sont exprimés.
+// data : propositions-match.json. profilParti : { positionId: -100..100 }.
+// → [{ themeId, label, emoji, score 0..100, n }] trié par score desc.
+export const matchByTheme = (reponses, profilParti, data) => {
+  if (!reponses || !profilParti || !data) return []
+  const u = userVector(reponses)
+  const buckets = new Map() // themeId → { a:{}, b:{} }
+
+  for (const q of data.questions) {
+    const tid = resolveTheme(q)
+    if (!tid) continue
+    if (!buckets.has(tid)) buckets.set(tid, { a: {}, b: {} })
+    const bk = buckets.get(tid)
+    for (const p of q.positions) {
+      const uv = u[p.id]
+      const pv = profilParti[p.id]
+      if (uv === undefined || pv === undefined) continue
+      bk.a[p.id] = uv
+      bk.b[p.id] = pv
+    }
+  }
+
+  return [...buckets.entries()]
+    .map(([themeId, bk]) => {
+      const n = Object.keys(bk.a).length
+      const def = THEME_BY_ID[themeId] || {}
+      return { themeId, label: def.label || themeId, emoji: def.emoji || '', n, score: n > 0 ? toPct(cosine(bk.a, bk.b)) : null }
+    })
+    .filter(t => t.n > 0)
+    .sort((a, b) => b.score - a.score)
 }

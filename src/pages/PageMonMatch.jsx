@@ -190,24 +190,7 @@ export default function PageMonMatch({ C }) {
     return profiles.data.partis[compareCode] || null
   }, [compareCode, profiles.data])
 
-  const radarRows = useMemo(() => {
-    if (phase !== 'recap' || !data) return []
-    if (inversion && partiSelectionne) {
-      const pseudoRep = {}
-      for (const [posId, score] of Object.entries(partiSelectionne.profil)) {
-        for (const q of data.questions) {
-          const p = q.positions.find(pp => pp.id === posId)
-          if (p) {
-            if (!pseudoRep[q.id]) pseudoRep[q.id] = {}
-            pseudoRep[q.id][posId] = score // -100..+100 brut
-            break
-          }
-        }
-      }
-      return radarData(data, pseudoRep, null)
-    }
-    return radarData(data, reponses, partiSelectionne?.profil || null)
-  }, [phase, data, reponses, partiSelectionne, inversion])
+  // Radar désactivé (calcul d'intensité non fidèle) — refonte à venir. radarData/inversion/compare conservés pour réactivation.
 
   const themes = useMemo(() => {
     if (phase !== 'recap' || !data) return []
@@ -361,62 +344,10 @@ export default function PageMonMatch({ C }) {
           <KPI label="Positions tranchées" value={tops.length} hint="très favorable ou très opposé" C={C} />
         </div>
 
-        <Card C={C} style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
-            <div>
-              <h3 style={{ marginBottom: 2 }}>Ta carte politique</h3>
-              <div style={{ fontSize: 13, color: C.muted }}>
-                {inversion && partiSelectionne
-                  ? `En train de voir : profil de ${partiSelectionne.nom}`
-                  : `Intensité de tes positions par thème`}
-              </div>
-            </div>
-            {matchingReady && (
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                <select
-                  value={compareCode || ''}
-                  onChange={e => { setCompareCode(e.target.value || null); if (!e.target.value) setInversion(false) }}
-                  style={{ width: 'auto', minWidth: 160 }}
-                >
-                  <option value="">Comparer avec un parti…</option>
-                  {Object.entries(profiles.data.partis)
-                    .sort((a, b) => (b[1].nbDeputes || 0) - (a[1].nbDeputes || 0))
-                    .map(([code, p]) => (
-                      <option key={code} value={code}>{code} — {p.nom}</option>
-                    ))}
-                </select>
-                {compareCode && (
-                  <Btn variant={inversion ? 'primary' : 'ghost'} size="sm" onClick={() => setInversion(v => !v)} C={C}>
-                    {inversion ? '← Mon profil' : 'Et si je votais comme eux ?'}
-                  </Btn>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div style={{ width: '100%', height: 360 }}>
-            <ResponsiveContainer>
-              <RadarChart data={radarRows} margin={{ top: 20, right: 30, bottom: 10, left: 30 }}>
-                <PolarGrid stroke={C.border} />
-                <PolarAngleAxis dataKey="themeShort" tick={{ fill: C.muted, fontSize: 12 }} />
-                <PolarRadiusAxis domain={[0, 100]} tick={{ fill: C.muted, fontSize: 10 }} stroke={C.border} />
-                <Radar
-                  name={inversion && partiSelectionne ? partiSelectionne.nom : 'Toi'}
-                  dataKey="user"
-                  stroke={C.primary}
-                  fill={C.primary}
-                  fillOpacity={0.35}
-                />
-                {partiSelectionne && !inversion && (
-                  <Radar name={partiSelectionne.nom} dataKey="parti" stroke={C.secondary} fill={C.secondary} fillOpacity={0.25} />
-                )}
-                <Legend wrapperStyle={{ fontSize: 13 }} />
-                <Tooltip
-                  contentStyle={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13 }}
-                  formatter={(v, n) => [`${v}/100`, n]}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
+        <Card C={C} style={{ marginBottom: 20, textAlign: 'center', padding: '32px 20px' }}>
+          <h3 style={{ marginBottom: 6 }}>Ta carte politique</h3>
+          <div style={{ fontSize: 14, color: C.muted, maxWidth: 460, margin: '0 auto', lineHeight: 1.5 }}>
+            Visualisation par thème en préparation. La précédente comparait des intensités, ce qui ne reflétait pas fidèlement tes positions — on la refait proprement.
           </div>
         </Card>
 

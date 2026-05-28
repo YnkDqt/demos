@@ -391,11 +391,11 @@
     "4745": {
       "positions": [
         {
-          "positionId": "encadrer",
-          "poids": 0.5
+          "positionId": "propriete",
+          "poids": 0.3
         }
       ],
-      "note": "Confiance/équilibre rapports locatifs. Sens à RELIRE (pro-locataire ou pro-bailleur ?).",
+      "note": "Rapports locatifs — RELIRE (loi pro-bailleur assouplissant les locations). Pour = côté propriétaire.",
       "confiance": "check"
     },
     "844": {
@@ -456,6 +456,582 @@
         }
       ],
       "note": "Actualisation programmation militaire 2024-2030. Pour = effort de défense.",
+      "confiance": "check"
+    },
+    "4758": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": 0.3
+        }
+      ],
+      "note": "PLFSS 2026 lecture définitive. Pour = budget social du gouvernement.",
+      "confiance": "check"
+    },
+    "4442": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Loi de fin de gestion 2025 (CMP). Pour = gestion budgétaire gouvernementale.",
+      "confiance": "check"
+    },
+    "518": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Loi de finances fin de gestion 2024 (CMP). Pour = ligne budgétaire gouvernement.",
+      "confiance": "check"
+    },
+    "242": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": 0.3
+        }
+      ],
+      "note": "PLFSS 2025 2e partie. Pour = budget social du gouvernement.",
+      "confiance": "check"
+    },
+    "6184": {
+      "positions": [
+        {
+          "positionId": "flexibiliser",
+          "poids": 0.5
+        },
+        {
+          "positionId": "relativiser",
+          "poids": 0.5
+        }
+      ],
+      "note": "Simplification vie éco (CMP) — supprime ZFE, assouplit code minier. Pour = dérégulation + recul écolo (droite/RN pour, gauche contre).",
+      "confiance": "sure"
+    },
+    "1203": {
+      "positions": [
+        {
+          "positionId": "approfondir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Adaptation au droit UE (éco/financier/env). Pour = alignement européen.",
+      "confiance": "check"
+    },
+    "6135": {
+      "positions": [
+        {
+          "positionId": "flexibiliser",
+          "poids": 0.3
+        }
+      ],
+      "note": "Recouvrement simplifié créances commerciales. Pour = faciliter l'activité éco.",
+      "confiance": "check"
+    },
+    "5427": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Protection commerçants via outils numériques. Pour = soutien commerce/sécurité.",
+      "confiance": "check"
+    },
+    "5432": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Préemption baux commerciaux par mairies. Pour = intervention locale sur le marché.",
+      "confiance": "check"
+    },
+    "1319": {
+      "positions": [
+        {
+          "positionId": "proteger",
+          "poids": 0.3
+        }
+      ],
+      "note": "Stabilité éco & compétitivité agroalimentaire (CMP, Egalim). Pour = protéger revenus agricoles.",
+      "confiance": "check"
+    },
+    "1473": {
+      "positions": [
+        {
+          "positionId": "appliquer",
+          "poids": 0.5
+        },
+        {
+          "positionId": "durcir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Narcotrafic (CMP). Pour = fermeté pénale renforcée.",
+      "confiance": "sure"
+    },
+    "1624": {
+      "positions": [
+        {
+          "positionId": "durcir",
+          "poids": 1
+        }
+      ],
+      "note": "Autorité justice mineurs (CMP, loi Attal). Pour = fermeté mineurs.",
+      "confiance": "sure"
+    },
+    "1041": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": 0.5
+        }
+      ],
+      "note": "Sûreté dans les transports (CMP). Pour = approche sécuritaire.",
+      "confiance": "sure"
+    },
+    "1195": {
+      "positions": [
+        {
+          "positionId": "appliquer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Statut procureur anti-criminalité organisée. Pour = renforcement régalien.",
+      "confiance": "check"
+    },
+    "1474": {
+      "positions": [
+        {
+          "positionId": "appliquer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Statut procureur national anti-criminalité (CMP). Pour = renforcement régalien.",
+      "confiance": "check"
+    },
+    "2685": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Sécurité des professionnels de santé (CMP). Pour = protection/fermeté.",
+      "confiance": "check"
+    },
+    "5358": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Protection personnes ciblées par criminalité organisée. Pour = sécurité.",
+      "confiance": "check"
+    },
+    "2217": {
+      "positions": [
+        {
+          "positionId": "durcir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Homicide routier / violence routière. Pour = fermeté pénale routière.",
+      "confiance": "check"
+    },
+    "1308": {
+      "positions": [
+        {
+          "positionId": "maitriser",
+          "poids": 1
+        }
+      ],
+      "note": "Durcir accès nationalité Mayotte (CMP). Pour = maîtrise/restriction.",
+      "confiance": "sure"
+    },
+    "4723": {
+      "positions": [
+        {
+          "positionId": "accueillir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Protéger mineurs isolés / sans-abrisme. Pour = accueil/protection migrants vulnérables.",
+      "confiance": "check"
+    },
+    "944": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Profession d'infirmier (revalorisation). Pour = soutien aux soignants.",
+      "confiance": "check"
+    },
+    "2278": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Profession d'infirmier (CMP). Pour = soutien aux soignants.",
+      "confiance": "check"
+    },
+    "5254": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Gratuité parkings hôpitaux. Pour = accès aux soins / solidarité.",
+      "confiance": "check"
+    },
+    "6572": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Soutien innovation thérapeutique cancers. Pour = réinvestissement santé.",
+      "confiance": "check"
+    },
+    "658": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Prise en charge cancer du sein. Pour = solidarité santé.",
+      "confiance": "check"
+    },
+    "2272": {
+      "positions": [
+        {
+          "positionId": "redistribuer",
+          "poids": 0.5
+        }
+      ],
+      "note": "Allocations familiales dès le 1er enfant. Pour = redistribution familiale.",
+      "confiance": "sure"
+    },
+    "4707": {
+      "positions": [
+        {
+          "positionId": "securiser",
+          "poids": 0.3
+        }
+      ],
+      "note": "Protection sociale complémentaire agents territoriaux. Pour = protection sociale.",
+      "confiance": "check"
+    },
+    "3055": {
+      "positions": [
+        {
+          "positionId": "securiser",
+          "poids": 0.5
+        }
+      ],
+      "note": "Emploi des seniors (transposition ANI). Pour = compromis social négocié.",
+      "confiance": "check"
+    },
+    "2256": {
+      "positions": [
+        {
+          "positionId": "securiser",
+          "poids": 0.3
+        }
+      ],
+      "note": "Congé salariés pour don du sang. Pour = droits sociaux des salariés.",
+      "confiance": "check"
+    },
+    "5222": {
+      "positions": [
+        {
+          "positionId": "securiser",
+          "poids": 0.5
+        },
+        {
+          "positionId": "emanciper",
+          "poids": 0.3
+        }
+      ],
+      "note": "Expérimentation 'territoires zéro chômeur'. Pour = approche solidaire de l'emploi.",
+      "confiance": "sure"
+    },
+    "5728": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Soins palliatifs (2e lecture). Pour = accès aux soins de fin de vie.",
+      "confiance": "check"
+    },
+    "2106": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Soins palliatifs (1re lecture). Pour = accès aux soins de fin de vie.",
+      "confiance": "check"
+    },
+    "4839": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Reconnaissance préjudice condamnés homosexualité. Pour = droits LGBT.",
+      "confiance": "sure"
+    },
+    "1553": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Protéger projet parental des discriminations au travail (PMA). Pour = droits/libertés familiales.",
+      "confiance": "sure"
+    },
+    "5283": {
+      "positions": [
+        {
+          "positionId": "accompagner-evol",
+          "poids": 0.3
+        }
+      ],
+      "note": "Intérêt des enfants. Pour = protection de l'enfance (consensuel).",
+      "confiance": "check"
+    },
+    "3061": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Définition pénale du viol/consentement (CMP). Pour = protection victimes VSS.",
+      "confiance": "check"
+    },
+    "6563": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Information/protection victimes violences sexistes. Pour = protection victimes.",
+      "confiance": "check"
+    },
+    "5226": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Commission enquête violences sexuelles sur mineurs. Pour = lutte VSS.",
+      "confiance": "check"
+    },
+    "6512": {
+      "positions": [
+        {
+          "positionId": "egalite",
+          "poids": 0.3
+        }
+      ],
+      "note": "Parcours inclusif enfants à besoins particuliers (nouvelle lecture). Pour = école inclusive/moyens.",
+      "confiance": "check"
+    },
+    "2880": {
+      "positions": [
+        {
+          "positionId": "egalite",
+          "poids": 0.3
+        }
+      ],
+      "note": "Antisémitisme dans l'enseignement supérieur (CMP). Pour = lutte discriminations.",
+      "confiance": "check"
+    },
+    "840": {
+      "positions": [
+        {
+          "positionId": "egalite",
+          "poids": 0.5
+        }
+      ],
+      "note": "Égalité des chances accès grandes écoles. Pour = méritocratie/ouverture sociale.",
+      "confiance": "check"
+    },
+    "5845": {
+      "positions": [
+        {
+          "positionId": "fondamentaux",
+          "poids": 0.3
+        }
+      ],
+      "note": "Enseignement de la défense nationale à l'école. Pour = autorité/nation à l'école.",
+      "confiance": "check"
+    },
+    "1717": {
+      "positions": [
+        {
+          "positionId": "construction",
+          "poids": 0.5
+        }
+      ],
+      "note": "Simplification droit urbanisme/logement. Pour = libérer la construction.",
+      "confiance": "sure"
+    },
+    "3056": {
+      "positions": [
+        {
+          "positionId": "construction",
+          "poids": 0.5
+        }
+      ],
+      "note": "Simplification urbanisme/logement (CMP). Pour = libérer la construction.",
+      "confiance": "sure"
+    },
+    "4962": {
+      "positions": [
+        {
+          "positionId": "social",
+          "poids": 0.3
+        }
+      ],
+      "note": "Logement travailleurs services publics. Pour = logement social ciblé.",
+      "confiance": "check"
+    },
+    "5240": {
+      "positions": [
+        {
+          "positionId": "reduire-perim",
+          "poids": 0.3
+        }
+      ],
+      "note": "Modernisation patrimoine immobilier de l'État. Pour = gestion/cession actifs publics.",
+      "confiance": "check"
+    },
+    "2957": {
+      "positions": [
+        {
+          "positionId": "relativiser",
+          "poids": 0.5
+        },
+        {
+          "positionId": "traditions",
+          "poids": 0.3
+        }
+      ],
+      "note": "Lever contraintes métier d'agriculteur (CMP, loi Duplomb). Pour = productivisme agricole + recul normes env (droite/centre pour, gauche/écolos contre).",
+      "confiance": "sure"
+    },
+    "959": {
+      "positions": [
+        {
+          "positionId": "proteger",
+          "poids": 0.3
+        }
+      ],
+      "note": "Disparition terres agricoles / régulation prix foncier. Pour = protéger l'agriculture.",
+      "confiance": "check"
+    },
+    "6645": {
+      "positions": [
+        {
+          "positionId": "equilibre-rural",
+          "poids": 0.3
+        }
+      ],
+      "note": "Montagne vivante et souveraine. Pour = ruralité/territoires.",
+      "confiance": "check"
+    },
+    "3273": {
+      "positions": [
+        {
+          "positionId": "proteger",
+          "poids": 0.3
+        }
+      ],
+      "note": "Information consommateur origine denrées (REJETÉE). Pour = protectionnisme alimentaire/souveraineté.",
+      "confiance": "check"
+    },
+    "1304": {
+      "positions": [
+        {
+          "positionId": "proportionnelle",
+          "poids": 1
+        }
+      ],
+      "note": "Proportionnelle municipales (loi organique). Pour = plus de proportionnelle.",
+      "confiance": "sure"
+    },
+    "6045": {
+      "positions": [
+        {
+          "positionId": "decentraliser-fort",
+          "poids": 0.3
+        }
+      ],
+      "note": "Simplifier le millefeuille territorial. Pour = décentralisation/simplification.",
+      "confiance": "check"
+    },
+    "6753": {
+      "positions": [
+        {
+          "positionId": "unite",
+          "poids": 0.3
+        }
+      ],
+      "note": "Corps électoral Nouvelle-Calédonie. Institutionnel sensible — RELIRE.",
+      "confiance": "check"
+    },
+    "6346": {
+      "positions": [
+        {
+          "positionId": "accueillir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Restitution biens culturels (CMP). Pour = ouverture/réparation post-coloniale.",
+      "confiance": "check"
+    },
+    "5831": {
+      "positions": [
+        {
+          "positionId": "renforcer-public",
+          "poids": 0.3
+        }
+      ],
+      "note": "Droits voisins éditeurs/presse. Pour = soutien presse face aux plateformes.",
+      "confiance": "check"
+    },
+    "5296": {
+      "positions": [
+        {
+          "positionId": "strategie",
+          "poids": 0.3
+        }
+      ],
+      "note": "JO 2030 Alpes (CMP). Pour = grand projet d'État (faiblement idéologique, État stratège).",
       "confiance": "check"
     }
   }

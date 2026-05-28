@@ -1,4 +1,5 @@
 import React from 'react'
+import { createPortal } from 'react-dom'
 
 // ─── Btn ──────────────────────────────────────────────────────
 export const Btn = ({ children, variant = 'primary', size = 'md', onClick, disabled, type = 'button', style, C }) => {
@@ -72,7 +73,7 @@ export const Field = ({ label, children, hint, C }) => (
 // ─── Modal ────────────────────────────────────────────────────
 export const Modal = ({ open, onClose, title, children, C, maxWidth = 560 }) => {
   if (!open) return null
-  return (
+  return createPortal(
     <div onClick={onClose}
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}>
       <div onClick={e => e.stopPropagation()} className="fadeUp"
@@ -83,7 +84,8 @@ export const Modal = ({ open, onClose, title, children, C, maxWidth = 560 }) => 
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

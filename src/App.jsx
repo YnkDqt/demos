@@ -38,6 +38,10 @@ export default function App() {
     setSelectedDeputeId(id); window.scrollTo({ top: 0 })
   }, [])
 
+  const goToDepute = useCallback((id) => {
+    setRoute('mes-elus'); setSelectedDeputeId(id); window.scrollTo({ top: 0 })
+  }, [])
+
   const page = useMemo(() => {
     if (adminMode === 'mapping') return <PageAdminMapping C={C} />
     if (adminMode === 'axes') return <PageAdminAxes C={C} />
@@ -48,7 +52,7 @@ export default function App() {
     switch (route) {
       case 'mon-coin':  return <PageMonCoin profile={profile} C={C} />
       case 'mes-elus':  return <PageMesElus onSelectDepute={selectDepute} C={C} />
-      case 'mon-match': return <PageMonMatch C={C} />
+      case 'mon-match': return <PageMonMatch onSelectDepute={goToDepute} C={C} />
       case 'decrypter': return <StubPage title="Décrypter" subtitle="Échiquier politique, cartes story, méthodologie." C={C} />
       case 'mes-idees': return <StubPage title="Mes idées" subtitle="Interpellation, pétitions locales, associations, conso responsable." C={C} />
       case 'reglages':  return (
@@ -61,7 +65,7 @@ export default function App() {
       )
       default: return null
     }
-  }, [route, selectedDeputeId, profile, expert, dark, C, selectDepute, adminMode])
+  }, [route, selectedDeputeId, profile, expert, dark, C, selectDepute, goToDepute, adminMode])
 
   return (
     <>

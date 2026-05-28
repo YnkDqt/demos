@@ -50,7 +50,7 @@ function PositionList({ items, accord, C }) {
   )
 }
 
-export default function PageMonMatch({ C }) {
+export default function PageMonMatch({ C, onSelectDepute }) {
   const { data, loading, error } = usePropositions()
   const profiles = useProfiles()
   const axesMap = useAxesMapping()
@@ -81,8 +81,16 @@ export default function PageMonMatch({ C }) {
         setHasResumable(true)
       }
       const h = await listMatchHistory()
-      // Migration V1→V2 silencieuse sur l'historique
-      setHistory(h.map(m => ({ ...m, reponses: migrateReponses(m.reponses, m.version || 1) })))
+      const hist = h.map(m => ({ ...m, reponses: migrateReponses(m.reponses, m.version || 1) }))
+      setHistory(hist)
+      // Pas de Match en cours mais un historique : afficher directement le dernier résultat.
+      if (!(cur && cur.phase === 'questions') && hist.length > 0) {
+        const last = hist[0]
+        savedToHistory.current = true
+        setReponses(last.reponses || {})
+        setOrdre(last.ordre || [])
+        setPhase('recap')
+      }
       initialLoaded.current = true
     })()
   }, [])
@@ -379,11 +387,16 @@ export default function PageMonMatch({ C }) {
           subtitle={matchingReady
             ? `Calculés à partir de ${profiles.data.nbScrutinsMappes} scrutins de référence.`
             : "Tes réponses sont enregistrées."}
-          right={history.length > 0 ? (
-            <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>
-              Historique ({history.length})
-            </Btn>
-          ) : null}
+          right={
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <Btn variant="primary" onClick={startMatch} C={C}>Nouveau match</Btn>
+              {history.length > 0 && (
+                <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>
+                  Historique ({history.length})
+                </Btn>
+              )}
+            </div>
+          }
           C={C}
         />
 
@@ -553,7 +566,10 @@ export default function PageMonMatch({ C }) {
             <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
               {matches.deputes.map((d, i) => (
                 <Card C={C} key={d.id} padding={14}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div
+                    onClick={() => onSelectDepute && onSelectDepute(d.id)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: onSelectDepute ? 'pointer' : 'default' }}
+                  >
                     <div style={{ fontFamily: 'Fraunces, serif', fontSize: 18, fontWeight: 600, color: C.muted, width: 24, textAlign: 'center' }}>#{i + 1}</div>
                     <Avatar name={d.nom} C={C} size={36} />
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -566,6 +582,7 @@ export default function PageMonMatch({ C }) {
                     <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.primary, minWidth: 60, textAlign: 'right' }}>
                       {d.score}%
                     </div>
+                    {onSelectDepute && <span style={{ color: C.muted, fontSize: 13 }}>›</span>}
                   </div>
                 </Card>
               ))}

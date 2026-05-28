@@ -1033,6 +1033,398 @@
       ],
       "note": "JO 2030 Alpes (CMP). Pour = grand projet d'État (faiblement idéologique, État stratège).",
       "confiance": "check"
+    },
+    "3182": {
+      "positions": [
+        {
+          "positionId": "unite",
+          "poids": 0.3
+        }
+      ],
+      "note": "Report renouvellement assemblées Nouvelle-Calédonie. Institutionnel sensible.",
+      "confiance": "check"
+    },
+    "3936": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Loi de finances fin de gestion 2025 (REJETÉE 42%). Pour = ligne budgétaire gouvernement.",
+      "confiance": "check"
+    },
+    "6319": {
+      "positions": [
+        {
+          "positionId": "redistribuer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Lutte fraudes sociales ET fiscales (CMP). Pour = contrôle/recouvrement public.",
+      "confiance": "check"
+    },
+    "6023": {
+      "positions": [
+        {
+          "positionId": "redistribuer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Lutte fraudes sociales ET fiscales (1re lecture). Pour = contrôle/recouvrement public.",
+      "confiance": "check"
+    },
+    "5846": {
+      "positions": [
+        {
+          "positionId": "reduire-perim",
+          "poids": 0.3
+        }
+      ],
+      "note": "Contrôle/responsabilité financière des opérateurs de l'État. Pour = rigueur sur l'État.",
+      "confiance": "check"
+    },
+    "5844": {
+      "positions": [
+        {
+          "positionId": "accompagner",
+          "poids": 0.3
+        }
+      ],
+      "note": "Soutenir collectivités face aux inondations. Pour = adaptation climat + territoires.",
+      "confiance": "check"
+    },
+    "617": {
+      "positions": [
+        {
+          "positionId": "relativiser",
+          "poids": 0.3
+        }
+      ],
+      "note": "Traitement maladies des cultures par drones. Pour = soutien agriculture/innovation technique.",
+      "confiance": "check"
+    },
+    "445": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": 0.3
+        }
+      ],
+      "note": "1re partie loi finances fin gestion 2024 (REJETÉE 27%). Pour = ligne budgétaire gouvernement.",
+      "confiance": "check"
+    },
+    "2975": {
+      "positions": [
+        {
+          "positionId": "territoires",
+          "poids": 0.3
+        }
+      ],
+      "note": "Refondation de Mayotte (CMP). Pour = effort de reconstruction territoriale.",
+      "confiance": "check"
+    },
+    "2954": {
+      "positions": [
+        {
+          "positionId": "proportionnelle",
+          "poids": 0.3
+        }
+      ],
+      "note": "Réforme mode d'élection Conseil de Paris/Lyon/Marseille (PLM). Pour = réforme du scrutin local.",
+      "confiance": "check"
+    },
+    "2874": {
+      "positions": [
+        {
+          "positionId": "territoires",
+          "poids": 0.3
+        }
+      ],
+      "note": "Refondation de Mayotte (1re lecture). Pour = effort de reconstruction territoriale.",
+      "confiance": "check"
+    },
+    "1330": {
+      "positions": [
+        {
+          "positionId": "proportionnelle",
+          "poids": 0.3
+        }
+      ],
+      "note": "Réforme mode d'élection Conseil de Paris/Lyon/Marseille (PLM). Pour = réforme du scrutin local.",
+      "confiance": "check"
+    },
+    "4963": {
+      "positions": [
+        {
+          "positionId": "strategie",
+          "poids": 0.3
+        }
+      ],
+      "note": "JO 2030 Alpes (1re lecture). Pour = grand projet d'État (faiblement idéologique).",
+      "confiance": "check"
+    },
+    "3018": {
+      "positions": [
+        {
+          "positionId": "proportionnelle",
+          "poids": 0.3
+        }
+      ],
+      "note": "Mode d'élection Conseil de Paris/Lyon (PLM). Pour = réforme scrutin local.",
+      "confiance": "check"
+    },
+    "789": {
+      "positions": [
+        {
+          "positionId": "equilibre-rural",
+          "poids": 0.3
+        }
+      ],
+      "note": "Gouvernance chambres d'agriculture. Pour = démocratie agricole.",
+      "confiance": "check"
+    },
+    "589": {
+      "positions": [
+        {
+          "positionId": "equilibre-rural",
+          "poids": 0.3
+        }
+      ],
+      "note": "Exercice de la démocratie agricole. Pour = représentation agricole.",
+      "confiance": "check"
+    },
+    "6285": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Droit de visite parlementaires en lieux de privation de liberté. Pour = contrôle démocratique/droits.",
+      "confiance": "check"
+    },
+    "5856": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Droit de visite parlementaires en lieux de privation de liberté. Pour = droits/contrôle.",
+      "confiance": "check"
+    },
+    "611": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Pannes d'ascenseur non prises en charge. Pour = protection des locataires/usagers.",
+      "confiance": "check"
+    },
+    "5732": {
+      "positions": [
+        {
+          "positionId": "redistribuer",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ fraudes sociales-fiscales. Pour = rejeter le contrôle.",
+      "confiance": "check"
+    },
+    "2221": {
+      "positions": [
+        {
+          "positionId": "proportionnelle",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ vote par correspondance détenus. Pour = refus extension du droit de vote.",
+      "confiance": "check"
+    },
+    "1331": {
+      "positions": [
+        {
+          "positionId": "flexibiliser",
+          "poids": -0.5
+        },
+        {
+          "positionId": "relativiser",
+          "poids": -0.5
+        }
+      ],
+      "note": "Motion rejet (Écolos) c/ simplification vie éco (dérégulation+recul ZFE). Pour = refus de la dérégulation.",
+      "confiance": "sure"
+    },
+    "4439": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ budget fin gestion 2025. Pour = rejet ligne budgétaire gouv.",
+      "confiance": "check"
+    },
+    "439": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ budget fin gestion 2024. Pour = rejet ligne budgétaire gouv.",
+      "confiance": "check"
+    },
+    "4757": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ PLFSS 2026. Pour = rejet budget social gouv.",
+      "confiance": "check"
+    },
+    "6024": {
+      "positions": [
+        {
+          "positionId": "decentraliser-fort",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (PS) c/ simplification millefeuille territorial. Pour = refus de la réforme.",
+      "confiance": "check"
+    },
+    "2956": {
+      "positions": [
+        {
+          "positionId": "relativiser",
+          "poids": -0.5
+        },
+        {
+          "positionId": "traditions",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ loi Duplomb (productivisme, recul normes env). Pour = refus du recul écolo.",
+      "confiance": "sure"
+    },
+    "1623": {
+      "positions": [
+        {
+          "positionId": "durcir",
+          "poids": -1
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ autorité justice mineurs (loi Attal). Pour = refus du durcissement.",
+      "confiance": "sure"
+    },
+    "1307": {
+      "positions": [
+        {
+          "positionId": "maitriser",
+          "poids": -1
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ durcir nationalité Mayotte. Pour = refus de la restriction.",
+      "confiance": "sure"
+    },
+    "6182": {
+      "positions": [
+        {
+          "positionId": "flexibiliser",
+          "poids": -0.5
+        },
+        {
+          "positionId": "relativiser",
+          "poids": -0.5
+        }
+      ],
+      "note": "Motion rejet (PS) c/ simplification vie éco (CMP). Pour = refus de la dérégulation.",
+      "confiance": "sure"
+    },
+    "843": {
+      "positions": [
+        {
+          "positionId": "proteger",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (Écolos) c/ souveraineté agricole. Pour = refus du texte agricole.",
+      "confiance": "check"
+    },
+    "792": {
+      "positions": [
+        {
+          "positionId": "durcir",
+          "poids": -1
+        }
+      ],
+      "note": "Motion rejet (PS) c/ autorité justice mineurs. Pour = refus du durcissement.",
+      "confiance": "sure"
+    },
+    "6181": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": -1
+        }
+      ],
+      "note": "Motion rejet (PS) c/ loi sécurité/rétention. Pour = refus du tout-sécuritaire.",
+      "confiance": "sure"
+    },
+    "2873": {
+      "positions": [
+        {
+          "positionId": "renforcer-public",
+          "poids": 0.3
+        }
+      ],
+      "note": "Motion rejet (Écolos) c/ réforme audiovisuel public. Pour = défense de l'audiovisuel public.",
+      "confiance": "check"
+    },
+    "5286": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ protection commerçants (vidéo). Pour = refus de l'approche sécuritaire.",
+      "confiance": "check"
+    },
+    "6287": {
+      "positions": [
+        {
+          "positionId": "atlantiste",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ programmation militaire. Pour = refus de l'effort de défense.",
+      "confiance": "check"
+    },
+    "4756": {
+      "positions": [
+        {
+          "positionId": "strategie",
+          "poids": -0.3
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ JO 2030. Pour = refus du grand projet.",
+      "confiance": "check"
+    },
+    "1040": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": -0.5
+        }
+      ],
+      "note": "Motion rejet (LFI) c/ sûreté dans les transports. Pour = refus de l'approche sécuritaire.",
+      "confiance": "sure"
     }
   }
 }

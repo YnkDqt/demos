@@ -354,7 +354,7 @@ export default function PageMonMatch({ C }) {
         <Card C={C} style={{ marginBottom: 20 }}>
           <h3 style={{ marginBottom: 2 }}>Ta carte politique</h3>
           <div style={{ fontSize: 13, color: C.muted, marginBottom: 18 }}>
-            Cinq grands repères pour situer ta façon de voir, d\u2019après tes réponses.
+            Cinq grands repères pour situer ta façon de voir, d'après tes réponses.
           </div>
 
           {carte.length === 0 ? (
@@ -399,24 +399,20 @@ export default function PageMonMatch({ C }) {
         {themes.length > 0 && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes positions par thème</h2>
-            <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 28, gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
               {themes.map(t => {
                 const tone = t.dominante.val >= 0 ? C.green : C.red
                 return (
                   <Card C={C} key={t.themeId} padding={14}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
-                      <div style={{ fontSize: 22 }}>{t.emoji}</div>
-                      <div style={{ flex: 1, minWidth: 160 }}>
-                        <div style={{ fontWeight: 500 }}>{t.label}</div>
-                        <div style={{ fontSize: 13, color: C.muted }}>
-                          <strong style={{ color: tone }}>{t.dominante.palierLabel}</strong> à : <span style={{ color: C.text }}>{t.dominante.posLabel}</span>
-                        </div>
-                      </div>
-                      <div style={{ fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 600, color: C.primary }}>
-                        {t.score}/100
-                      </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                      <span style={{ fontWeight: 500, fontSize: 14 }}>{t.label}</span>
                     </div>
-                    <ProgressBar value={t.score} max={100} C={C} height={6} />
+                    <div style={{ fontSize: 13, lineHeight: 1.4 }}>
+                      <strong style={{ color: tone }}>{t.dominante.palierLabel}</strong>
+                      <span style={{ color: C.muted }}> à&nbsp;:</span>
+                      <div style={{ color: C.text, marginTop: 2 }}>{t.dominante.posLabel}</div>
+                    </div>
                   </Card>
                 )
               })}

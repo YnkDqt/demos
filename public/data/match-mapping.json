@@ -1,24 +1,462 @@
 {
-  "_doc": "Mapping scrutin → positions du Match. Édité via l'admin (?admin=mapping) ou à la main.",
-  "_format": {
-    "scrutins": {
-      "<numeroScrutin>": {
-        "positions": [
-          { "positionId": "<id position>", "poids": "1 par défaut, 0..1 (ou négatif si vote Pour = opposition à la position)" }
-        ],
-        "note": "Optionnel — traçabilité éditoriale."
-      }
-    }
-  },
-  "_exemple": {
-    "6899": {
+  "_doc": "Mapping scrutin -> positions du Match. 1er jet expert (legis 17), a relire avant publication via le champ 'confiance'.",
+  "generatedAt": "2026-05-28",
+  "scrutins": {
+    "881": {
       "positions": [
-        { "positionId": "eco-fiscalite-progressive", "poids": 1 },
-        { "positionId": "env-transition-acceleree", "poids": 0.5 }
+        {
+          "positionId": "redistribuer",
+          "poids": 1
+        }
       ],
-      "note": "PLF 2026 — vote sur l'ensemble. Incarne fiscalité progressive ET dépenses transition."
+      "note": "Impôt plancher 2% patrimoine ultra-riches (taxe Zucman). Pour = redistribution forte.",
+      "confiance": "sure"
+    },
+    "217": {
+      "positions": [
+        {
+          "positionId": "60ans",
+          "poids": 1
+        }
+      ],
+      "note": "Abrogation réforme retraites, retour 60 ans. Pour = retraite 60 ans.",
+      "confiance": "sure"
+    },
+    "4438": {
+      "positions": [
+        {
+          "positionId": "nationaliser",
+          "poids": 1
+        }
+      ],
+      "note": "Nationalisation d'ArcelorMittal. Pour = contrôle public secteurs stratégiques.",
+      "confiance": "sure"
+    },
+    "596": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 0.5
+        }
+      ],
+      "note": "Mesures contre la vie chère + régulation concentration éco (outre-mer). Pour = réguler le marché.",
+      "confiance": "check"
+    },
+    "2458": {
+      "positions": [
+        {
+          "positionId": "flexibiliser",
+          "poids": 0.5
+        },
+        {
+          "positionId": "reduire-perim",
+          "poids": 0.5
+        }
+      ],
+      "note": "Simplification vie économique. Pour = alléger normes / libérer l'activité.",
+      "confiance": "sure"
+    },
+    "2214": {
+      "positions": [
+        {
+          "positionId": "inciter",
+          "poids": 0.5
+        }
+      ],
+      "note": "Cadre fiscal stable micro-entrepreneurs. Pour = soutien à l'entreprise.",
+      "confiance": "check"
+    },
+    "6069": {
+      "positions": [
+        {
+          "positionId": "accompagner",
+          "poids": 0.5
+        }
+      ],
+      "note": "Politique nationale d'adaptation au changement climatique. Pour = climat pris au sérieux.",
+      "confiance": "check"
+    },
+    "852": {
+      "positions": [
+        {
+          "positionId": "contraindre",
+          "poids": 1
+        }
+      ],
+      "note": "Interdiction des PFAS (polluants éternels). Pour = contrainte environnementale sur l'industrie.",
+      "confiance": "sure"
+    },
+    "5354": {
+      "positions": [
+        {
+          "positionId": "accompagner",
+          "poids": 0.5
+        }
+      ],
+      "note": "Relance investissements hydroélectricité. Pour = transition par les renouvelables.",
+      "confiance": "check"
+    },
+    "6541": {
+      "positions": [
+        {
+          "positionId": "accompagner",
+          "poids": 0.5
+        }
+      ],
+      "note": "Transport maritime à propulsion vélique (décarbonation). Pour = transition écologique.",
+      "confiance": "check"
+    },
+    "1306": {
+      "positions": [
+        {
+          "positionId": "innover",
+          "poids": 0.5
+        }
+      ],
+      "note": "Conversion centrales charbon vers combustibles moins émetteurs. Pour = transition pragmatique.",
+      "confiance": "check"
+    },
+    "1194": {
+      "positions": [
+        {
+          "positionId": "appliquer",
+          "poids": 0.5
+        },
+        {
+          "positionId": "durcir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Loi 'narcotrafic'. Pour = fermeté pénale renforcée.",
+      "confiance": "sure"
+    },
+    "805": {
+      "positions": [
+        {
+          "positionId": "durcir",
+          "poids": 1
+        }
+      ],
+      "note": "Autorité de la justice envers mineurs délinquants (loi Attal). Pour = fermeté sur les mineurs.",
+      "confiance": "sure"
+    },
+    "1262": {
+      "positions": [
+        {
+          "positionId": "appliquer",
+          "poids": 1
+        }
+      ],
+      "note": "Faire exécuter les peines d'emprisonnement ferme. Pour = application stricte des peines.",
+      "confiance": "sure"
+    },
+    "788": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": 0.5
+        }
+      ],
+      "note": "Sûreté dans les transports. Pour = approche sécuritaire.",
+      "confiance": "sure"
+    },
+    "6318": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": 1
+        }
+      ],
+      "note": "Sécurité/rétention administrative/prévention attentats. Pour = sécurité renforcée.",
+      "confiance": "sure"
+    },
+    "2958": {
+      "positions": [
+        {
+          "positionId": "durcir",
+          "poids": 0.5
+        },
+        {
+          "positionId": "reprimer",
+          "poids": 0.5
+        }
+      ],
+      "note": "Maintien en rétention de condamnés dangereux. Pour = fermeté/rétention.",
+      "confiance": "sure"
+    },
+    "1202": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Définition pénale du viol (consentement). Pour = renforcer protection victimes VSS.",
+      "confiance": "check"
+    },
+    "6124": {
+      "positions": [
+        {
+          "positionId": "reprimer",
+          "poids": 0.5
+        }
+      ],
+      "note": "Pénalisation organisation de rave-parties. Pour = ordre/répression.",
+      "confiance": "sure"
+    },
+    "738": {
+      "positions": [
+        {
+          "positionId": "maitriser",
+          "poids": 1
+        }
+      ],
+      "note": "Durcir accès nationalité à Mayotte. Pour = maîtrise/restriction.",
+      "confiance": "sure"
+    },
+    "4754": {
+      "positions": [
+        {
+          "positionId": "accueillir",
+          "poids": 1
+        }
+      ],
+      "note": "Renouvellement automatique titres de séjour longue durée. Pour = facilite le séjour = ouverture.",
+      "confiance": "sure"
+    },
+    "600": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 1
+        }
+      ],
+      "note": "Nombre minimum de soignants par patient. Pour = réinvestissement hôpital.",
+      "confiance": "sure"
+    },
+    "1607": {
+      "positions": [
+        {
+          "positionId": "territoires",
+          "poids": 1
+        }
+      ],
+      "note": "Lutte déserts médicaux (transpartisan). Pour = accès aux soins partout.",
+      "confiance": "sure"
+    },
+    "516": {
+      "positions": [
+        {
+          "positionId": "reinvestir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Remboursement intégral fauteuils roulants. Pour = solidarité santé (consensuel).",
+      "confiance": "check"
+    },
+    "4696": {
+      "positions": [
+        {
+          "positionId": "reformer",
+          "poids": 0.3
+        }
+      ],
+      "note": "PLFSS 2026 (Sécu). Pour = adoption du budget social du gouvernement.",
+      "confiance": "check"
+    },
+    "2935": {
+      "positions": [
+        {
+          "positionId": "securiser",
+          "poids": 0.5
+        }
+      ],
+      "note": "Emploi des seniors (transposition ANI). Pour = compromis social négocié.",
+      "confiance": "check"
+    },
+    "2107": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.5
+        },
+        {
+          "positionId": "decadrer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Droit à l'aide à mourir (1re lecture). Pour = extension des libertés individuelles.",
+      "confiance": "sure"
+    },
+    "5729": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Aide à mourir (2e lecture). Pour = libertés individuelles / fin de vie.",
+      "confiance": "sure"
+    },
+    "5243": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Fin du 'devoir conjugal'. Pour = libertés individuelles / droits.",
+      "confiance": "sure"
+    },
+    "4836": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.5
+        }
+      ],
+      "note": "Réparation condamnés pour homosexualité 1945-82. Pour = reconnaissance droits LGBT.",
+      "confiance": "sure"
+    },
+    "657": {
+      "positions": [
+        {
+          "positionId": "elargir",
+          "poids": 0.3
+        }
+      ],
+      "note": "Lutte violences sexuelles et sexistes. Pour = protection / progrès droits.",
+      "confiance": "check"
+    },
+    "1550": {
+      "positions": [
+        {
+          "positionId": "egalite",
+          "poids": 0.3
+        }
+      ],
+      "note": "Parcours inclusif enfants à besoins particuliers. Pour = école qui inclut / moyens.",
+      "confiance": "check"
+    },
+    "5435": {
+      "positions": [
+        {
+          "positionId": "reinventer",
+          "poids": 0.3
+        }
+      ],
+      "note": "Éducation à l'alimentation obligatoire à l'école. Pour = école élargie.",
+      "confiance": "check"
+    },
+    "1601": {
+      "positions": [
+        {
+          "positionId": "egalite",
+          "poids": 0.3
+        }
+      ],
+      "note": "Lutte antisémitisme/racisme/haine dans l'enseignement. Pour = lutte discriminations.",
+      "confiance": "check"
+    },
+    "289": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 1
+        }
+      ],
+      "note": "Régulation meublés de tourisme (loi Le Meur). Pour = encadrer le marché locatif.",
+      "confiance": "sure"
+    },
+    "2262": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 1
+        }
+      ],
+      "note": "Encadrement des loyers outre-mer. Pour = encadrer le marché.",
+      "confiance": "sure"
+    },
+    "2215": {
+      "positions": [
+        {
+          "positionId": "construction",
+          "poids": 1
+        }
+      ],
+      "note": "Transformation bureaux en logements. Pour = faciliter la construction.",
+      "confiance": "sure"
+    },
+    "4745": {
+      "positions": [
+        {
+          "positionId": "encadrer",
+          "poids": 0.5
+        }
+      ],
+      "note": "Confiance/équilibre rapports locatifs. Sens à RELIRE (pro-locataire ou pro-bailleur ?).",
+      "confiance": "check"
+    },
+    "844": {
+      "positions": [
+        {
+          "positionId": "proteger",
+          "poids": 0.5
+        }
+      ],
+      "note": "Loi d'orientation souveraineté agricole. Pour = produire en France / protéger l'agriculture.",
+      "confiance": "sure"
+    },
+    "1303": {
+      "positions": [
+        {
+          "positionId": "proportionnelle",
+          "poids": 1
+        }
+      ],
+      "note": "Proportionnelle élections municipales. Pour = plus de proportionnelle.",
+      "confiance": "sure"
+    },
+    "2244": {
+      "positions": [
+        {
+          "positionId": "proportionnelle",
+          "poids": 0.3
+        }
+      ],
+      "note": "Droit de vote par correspondance des détenus. Pour = élargir l'accès au vote / droits.",
+      "confiance": "sure"
+    },
+    "451": {
+      "positions": [
+        {
+          "positionId": "renforcer-public",
+          "poids": 0.3
+        }
+      ],
+      "note": "Réforme financement audiovisuel public. Pour = sécuriser le public (consensuel 95%).",
+      "confiance": "check"
+    },
+    "5192": {
+      "positions": [
+        {
+          "positionId": "reguler-num",
+          "poids": 0.5
+        }
+      ],
+      "note": "Protéger mineurs des risques des réseaux sociaux. Pour = réguler le numérique.",
+      "confiance": "sure"
+    },
+    "6736": {
+      "positions": [
+        {
+          "positionId": "atlantiste",
+          "poids": 0.3
+        }
+      ],
+      "note": "Actualisation programmation militaire 2024-2030. Pour = effort de défense.",
+      "confiance": "check"
     }
-  },
-  "generatedAt": null,
-  "scrutins": {}
+  }
 }

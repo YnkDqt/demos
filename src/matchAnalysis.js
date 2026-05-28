@@ -171,3 +171,46 @@ export function desaccords(propos, reponses, profilParti, n = 5) {
   }
   return list.sort((a, b) => b.gap - a.gap).slice(0, n)
 }
+
+// ─── Intensité lisible d'un profil parti (-100..100) ───────────
+// Traduit le taux d'unanimité du groupe en label parlant.
+export function intensiteLabel(score) {
+  const a = Math.abs(score)
+  const sens = score >= 0 ? 'Pour' : 'Contre'
+  if (a < 40) return { texte: 'Partagés', sens: null, fort: false }
+  if (a < 75) return { texte: `Plutôt ${sens.toLowerCase()}`, sens, fort: false }
+  return { texte: `Massivement ${sens.toLowerCase()}`, sens, fort: true }
+}
+
+// ─── Accords / désaccords détaillés avec un parti ──────────────
+// accords : tu adhères (v>0) ET parti dans le même sens net (|pa|>=40, même signe).
+// desaccords : sens opposés et nets.
+// nbMajeurs : désaccords où TU es tranché (|v|=100) ET parti net à l'inverse (|pa|>=40).
+export function partiBreakdown(propos, reponses, profilParti) {
+  if (!propos || !profilParti) return { accords: [], desaccords: [], nbMajeurs: 0 }
+  const accords = [], desaccords = []
+  let nbMajeurs = 0
+  for (const q of propos.questions) {
+    const r = reponses[q.id] || {}
+    for (const p of q.positions) {
+      const v = r[p.id]
+      if (v === SKIP || v === undefined) continue
+      const pa = profilParti[p.id]
+      if (pa === undefined) continue
+      const item = {
+        posLabel: p.label, qTitre: q.titre, qEmoji: q.emoji,
+        user: v, parti: pa, gap: Math.abs(v - pa)
+      }
+      const memeSens = (v > 0) === (pa > 0)
+      if (memeSens && v !== 0 && Math.abs(pa) >= 40) {
+        accords.push(item)
+      } else if (!memeSens && Math.abs(pa) >= 40) {
+        desaccords.push(item)
+        if (Math.abs(v) === 100) nbMajeurs++
+      }
+    }
+  }
+  accords.sort((a, b) => (Math.abs(b.user) + Math.abs(b.parti)) - (Math.abs(a.user) + Math.abs(a.parti)))
+  desaccords.sort((a, b) => b.gap - a.gap)
+  return { accords, desaccords, nbMajeurs }
+}

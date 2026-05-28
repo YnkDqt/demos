@@ -3,7 +3,7 @@ import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, Badg
 import { usePropositions, useProfiles, useDeputes, useAxesMapping } from '../hooks.js'
 import { carteAxes } from '../axes.js'
 import { computeMatches, matchByTheme } from '../matching.js'
-import { analyseParTheme, topPositions, radarData, desaccords } from '../matchAnalysis.js'
+import { analyseParTheme, topPositions, radarData, partiBreakdown, intensiteLabel } from '../matchAnalysis.js'
 import { PALIERS, PALIER_BY_VALUE, SKIP, PALIER_BG, PALIER_FG, PALIER_BORDER, migrateReponses } from '../paliers.js'
 import GlossText from '../GlossText.jsx'
 import {
@@ -22,6 +22,28 @@ const shuffle = (arr) => {
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a
+}
+
+// Liste de positions (accord ou désaccord) avec ton palier + l'intensité du parti.
+function PositionList({ items, accord, C }) {
+  return (
+    <div style={{ display: 'grid', gap: 6 }}>
+      {items.map((it, i) => {
+        const toi = PALIER_BY_VALUE[it.user]?.label || ''
+        const eux = intensiteLabel(it.parti)
+        return (
+          <div key={i} style={{ background: C.white, padding: '8px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>
+            <div style={{ fontSize: 12, color: C.muted }}>{it.qEmoji} {it.qTitre}</div>
+            <div style={{ fontWeight: 500, fontSize: 13, marginBottom: 4 }}>{it.posLabel}</div>
+            <div style={{ display: 'flex', gap: 6, fontSize: 11, flexWrap: 'wrap' }}>
+              <span className="badge" style={{ background: C.primaryPale, color: C.primaryDeep }}>Toi : {toi}</span>
+              <span className="badge" style={{ background: accord ? C.greenPale : C.redPale, color: accord ? C.green : C.red }}>Eux : {eux.texte}</span>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function PageMonMatch({ C }) {
@@ -188,12 +210,22 @@ export default function PageMonMatch({ C }) {
     return computeMatches(reponses, profiles.data, D.data.deputes, { topPartis: 3, topDeputes: 5 })
   }, [phase, profiles.data, D.data, reponses])
 
-  const partiThemes = useMemo(() => {
-    if (!openParti || !profiles.data || !data) return []
-    const prof = profiles.data.partis[openParti]?.profil
-    if (!prof) return []
-    return matchByTheme(reponses, prof, data)
-  }, [openParti, profiles.data, data, reponses])
+  const partiData = useMemo(() => {
+    if (phase !== 'recap' || !matches?.partis?.length || !profiles.data || !data) return {}
+    const out = {}
+    for (const p of matches.partis) {
+      const prof = profiles.data.partis[p.code]?.profil
+      if (!prof) continue
+      const bd = partiBreakdown(data, reponses, prof)
+      out[p.code] = {
+        themes: matchByTheme(reponses, prof, data),
+        accords: bd.accords.slice(0, 5),
+        desaccords: bd.desaccords.slice(0, 5),
+        nbMajeurs: bd.nbMajeurs
+      }
+    }
+    return out
+  }, [phase, matches, profiles.data, data, reponses])
 
   const partiSelectionne = useMemo(() => {
     if (!compareCode || !profiles.data) return null
@@ -216,14 +248,6 @@ export default function PageMonMatch({ C }) {
     if (phase !== 'recap' || !data) return []
     return topPositions(data, reponses, 5)
   }, [phase, data, reponses])
-
-  const desacc = useMemo(() => {
-    if (phase !== 'recap' || !matches?.partis?.length || !profiles.data) return []
-    const top1 = matches.partis[0]
-    const profilTop1 = profiles.data.partis[top1.code]?.profil
-    if (!profilTop1) return []
-    return desaccords(data, reponses, profilTop1, 5)
-  }, [phase, matches, profiles.data, data, reponses])
 
   if (loading) return (
     <div className="fadeUp">
@@ -336,7 +360,6 @@ export default function PageMonMatch({ C }) {
   if (phase === 'recap') {
     const hasMatching   = matches && matches.partis.length > 0
     const matchingReady = profiles.data && (profiles.data.nbScrutinsMappes || 0) > 0
-    const top1 = matches?.partis?.[0]
 
     return (
       <div className="fadeUp">
@@ -431,9 +454,10 @@ export default function PageMonMatch({ C }) {
         {hasMatching && (
           <>
             <h2 style={{ marginBottom: 12 }}>Tes partis les plus proches</h2>
-            <div style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>
               {matches.partis.map((p, i) => {
                 const open = openParti === p.code
+                const pd = partiData[p.code] || { themes: [], accords: [], desaccords: [], nbMajeurs: 0 }
                 return (
                 <Card C={C} key={p.code} padding={16}>
                   <div
@@ -446,6 +470,11 @@ export default function PageMonMatch({ C }) {
                         <BadgeParti code={p.code} C={C} />
                         <span style={{ fontWeight: 500 }}>{p.nom}</span>
                         <span style={{ fontSize: 12, color: C.muted }}>· {p.nbDeputes} députés</span>
+                        {pd.nbMajeurs > 0 && (
+                          <span className="badge" style={{ background: C.redPale, color: C.red }}>
+                            {pd.nbMajeurs} désaccord{pd.nbMajeurs > 1 ? 's' : ''} majeur{pd.nbMajeurs > 1 ? 's' : ''}
+                          </span>
+                        )}
                       </div>
                       <ProgressBar value={p.score} max={100} C={C} height={8} />
                     </div>
@@ -457,14 +486,12 @@ export default function PageMonMatch({ C }) {
 
                   {open && (
                     <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 13, color: C.muted, marginBottom: 10 }}>
-                        Ton accord avec {p.code}, par thème :
-                      </div>
-                      {partiThemes.length === 0 ? (
+                      <div style={{ fontSize: 13, color: C.muted, marginBottom: 10 }}>Ton accord avec {p.code}, par thème :</div>
+                      {pd.themes.length === 0 ? (
                         <div style={{ fontSize: 13, color: C.muted }}>Pas assez de positions communes pour détailler.</div>
                       ) : (
                         <div style={{ display: 'grid', gap: 8 }}>
-                          {partiThemes.map(t => {
+                          {pd.themes.map(t => {
                             const tone = t.score >= 66 ? C.green : t.score >= 40 ? C.yellow : C.red
                             return (
                               <div key={t.themeId} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -481,43 +508,27 @@ export default function PageMonMatch({ C }) {
                           })}
                         </div>
                       )}
+
+                      <div style={{ display: 'grid', gap: 16, marginTop: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: C.green, marginBottom: 8 }}>Là où tu te rapproches</div>
+                          {pd.accords.length === 0
+                            ? <div style={{ fontSize: 13, color: C.muted }}>Aucun accord net.</div>
+                            : <PositionList items={pd.accords} accord C={C} />}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: C.red, marginBottom: 8 }}>Là où tu t'éloignes</div>
+                          {pd.desaccords.length === 0
+                            ? <div style={{ fontSize: 13, color: C.muted }}>Aucun désaccord net.</div>
+                            : <PositionList items={pd.desaccords} C={C} />}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </Card>
                 )
               })}
             </div>
-
-            {desacc.length > 0 && top1 && (
-              <Card C={C} style={{ marginBottom: 28, background: C.secondaryPale, borderColor: C.secondary }}>
-                <div style={{ marginBottom: 8 }}>
-                  <h3 style={{ marginBottom: 2 }}>Là où tu t'éloignes de {top1.nom}</h3>
-                  <div style={{ fontSize: 13, color: C.muted }}>
-                    Positions où tu prends une direction nette, mais où les députés de {top1.code} votent à l'inverse.
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gap: 6 }}>
-                  {desacc.map((d, i) => {
-                    const userLabel = PALIER_BY_VALUE[d.user]?.label || ''
-                    return (
-                      <div key={i} style={{
-                        background: C.white, padding: '10px 12px', borderRadius: 8,
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'
-                      }}>
-                        <div style={{ flex: 1, minWidth: 200 }}>
-                          <div style={{ fontSize: 13, color: C.muted }}>{d.qEmoji} {d.qTitre}</div>
-                          <div style={{ fontWeight: 500, fontSize: 14 }}>{d.posLabel}</div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, fontSize: 12 }}>
-                          <span className="badge" style={{ background: C.primaryPale, color: C.primaryDeep }}>Toi : {userLabel}</span>
-                          <span className="badge" style={{ background: C.redPale, color: C.red }}>Eux : {d.parti > 0 ? 'Pour' : 'Contre'}</span>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </Card>
-            )}
 
             <h2 style={{ marginBottom: 12 }}>Tes députés les plus proches</h2>
             <div style={{ display: 'grid', gap: 10, marginBottom: 28 }}>

@@ -61,14 +61,14 @@ export const computeMatches = (reponses, profiles, deputes, opts = {}) => {
       const d = deputesIdx.get(id)
       return {
         id,
-        nom:    d ? `${d.prenom} ${d.nom}` : id,
+        nom:    d ? `${d.prenom} ${d.nom}` : null,
         groupe: d?.groupe?.code || null,
         circo:  d?.circo || null,
         score: toPct(cosine(u, dp.profil)),
         couverture: Object.keys(dp.profil).filter(k => u[k] !== undefined).length
       }
     })
-    .filter(d => d.couverture >= (opts.minCouvertureDepute ?? 3))
+    .filter(d => d.nom && d.couverture >= (opts.minCouvertureDepute ?? 3))
     .sort((a, b) => b.score - a.score)
 
   return {

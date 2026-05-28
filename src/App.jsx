@@ -11,6 +11,7 @@ import PageDeputeDetail from './pages/PageDeputeDetail.jsx'
 import PageMonMatch from './pages/PageMonMatch.jsx'
 import PageReglages from './pages/PageReglages.jsx'
 import PageAdminMapping from './pages/PageAdminMapping.jsx'
+import PageAdminAxes from './pages/PageAdminAxes.jsx'
 
 export default function App() {
   const [dark, setDark]     = useState(false)
@@ -39,6 +40,7 @@ export default function App() {
 
   const page = useMemo(() => {
     if (adminMode === 'mapping') return <PageAdminMapping C={C} />
+    if (adminMode === 'axes') return <PageAdminAxes C={C} />
 
     if (route === 'mes-elus' && selectedDeputeId) {
       return <PageDeputeDetail deputeId={selectedDeputeId} onBack={() => setSelectedDeputeId(null)} C={C} />

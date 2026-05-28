@@ -35,3 +35,4 @@ export const useVote     = (scrutinId) => useJSON(`/data/votes/${scrutinId}.json
 export const useVotesByDepute = () => useJSON('/data/votes-by-depute.json')
 export const usePropositions = () => useJSON('/data/propositions-match.json')
 export const useProfiles = () => useJSON('/data/party-profiles.json', { optional: true })
+export const useAxesMapping = () => useJSON('/data/axes-mapping.json', { optional: true })

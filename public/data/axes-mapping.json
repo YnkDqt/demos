@@ -1,0 +1,324 @@
+{
+  "q1-richesses/redistribuer": {
+    "axe": "redist-merite",
+    "pole": -1
+  },
+  "q1-richesses/preserver": null,
+  "q1-richesses/inciter": {
+    "axe": "redist-merite",
+    "pole": 1
+  },
+  "q1-richesses/liberer": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q1-richesses/proteger": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q2-ecologie/contraindre": {
+    "axe": "eco-prod",
+    "pole": -1
+  },
+  "q2-ecologie/accompagner": null,
+  "q2-ecologie/innover": {
+    "axe": "eco-prod",
+    "pole": 1
+  },
+  "q2-ecologie/decroitre": {
+    "axe": "eco-prod",
+    "pole": -1
+  },
+  "q2-ecologie/relativiser": {
+    "axe": "eco-prod",
+    "pole": 1
+  },
+  "q3-securite/reprimer": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q3-securite/equilibrer": null,
+  "q3-securite/encadrer": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q3-securite/refonder": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q3-securite/autodefendre": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q4-travail/reduire": {
+    "axe": "redist-merite",
+    "pole": -1
+  },
+  "q4-travail/securiser": {
+    "axe": "redist-merite",
+    "pole": -1
+  },
+  "q4-travail/flexibiliser": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q4-travail/merite": {
+    "axe": "redist-merite",
+    "pole": 1
+  },
+  "q4-travail/emanciper": null,
+  "q5-retraites/60ans": {
+    "axe": "redist-merite",
+    "pole": -1
+  },
+  "q5-retraites/62ans": null,
+  "q5-retraites/64ans": {
+    "axe": "redist-merite",
+    "pole": 1
+  },
+  "q5-retraites/67ans": {
+    "axe": "redist-merite",
+    "pole": 1
+  },
+  "q5-retraites/capitalisation": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q6-sante/reinvestir": {
+    "axe": "etat-marche",
+    "pole": -1
+  },
+  "q6-sante/reformer": null,
+  "q6-sante/concilier": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q6-sante/responsabiliser": {
+    "axe": "redist-merite",
+    "pole": 1
+  },
+  "q6-sante/territoires": null,
+  "q7-ecole/egalite": {
+    "axe": "redist-merite",
+    "pole": -1
+  },
+  "q7-ecole/profs": null,
+  "q7-ecole/liberte": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q7-ecole/fondamentaux": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q7-ecole/reinventer": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q8-logement/encadrer": {
+    "axe": "etat-marche",
+    "pole": -1
+  },
+  "q8-logement/social": {
+    "axe": "redist-merite",
+    "pole": -1
+  },
+  "q8-logement/construction": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q8-logement/propriete": {
+    "axe": "redist-merite",
+    "pole": 1
+  },
+  "q8-logement/territoires-log": null,
+  "q9-immigration/accueillir": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q9-immigration/reguler": null,
+  "q9-immigration/maitriser": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q9-immigration/preference": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q9-immigration/ouvertes": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q10-justice/reparer": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q10-justice/moyens": null,
+  "q10-justice/appliquer": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q10-justice/durcir": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q10-justice/populaire": null,
+  "q11-europe/federer": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q11-europe/approfondir": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q11-europe/nations": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q11-europe/main": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q11-europe/sortir": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q12-international/atlantiste": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q12-international/europeen": null,
+  "q12-international/singuliere": null,
+  "q12-international/nonaligne": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q12-international/repli": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q13-democratie/directe": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q13-democratie/proportionnelle": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q13-democratie/stabilite": null,
+  "q13-democratie/presidentialiser": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q13-democratie/refonder": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q14-laicite/combat": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q14-laicite/republicaine": null,
+  "q14-laicite/apaisement": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q14-laicite/racines": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q14-laicite/liberte-totale": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q15-culture/renforcer-public": {
+    "axe": "etat-marche",
+    "pole": -1
+  },
+  "q15-culture/exception": null,
+  "q15-culture/moderniser": null,
+  "q15-culture/privatiser": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q15-culture/democratiser": null,
+  "q16-famille/elargir": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q16-famille/accompagner-evol": null,
+  "q16-famille/stabiliser": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q16-famille/traditionnel": {
+    "axe": "aut-lib",
+    "pole": -1
+  },
+  "q16-famille/decadrer": {
+    "axe": "aut-lib",
+    "pole": 1
+  },
+  "q17-numerique/reguler-num": {
+    "axe": "etat-marche",
+    "pole": -1
+  },
+  "q17-numerique/souverain-eu": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q17-numerique/encadrer-num": null,
+  "q17-numerique/liberte-entreprendre": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q17-numerique/controle-individuel": null,
+  "q18-animaux/droits-animaux": {
+    "axe": "eco-prod",
+    "pole": -1
+  },
+  "q18-animaux/encadrer-bien-etre": null,
+  "q18-animaux/equilibre-rural": null,
+  "q18-animaux/traditions": {
+    "axe": "eco-prod",
+    "pole": 1
+  },
+  "q18-animaux/antispe": {
+    "axe": "eco-prod",
+    "pole": -1
+  },
+  "q19-etat-eco/nationaliser": {
+    "axe": "etat-marche",
+    "pole": -1
+  },
+  "q19-etat-eco/strategie": {
+    "axe": "etat-marche",
+    "pole": -1
+  },
+  "q19-etat-eco/reduire-perim": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q19-etat-eco/reformer-fonction": {
+    "axe": "etat-marche",
+    "pole": 1
+  },
+  "q19-etat-eco/ess": null,
+  "q20-territoires/decentraliser-fort": {
+    "axe": "ouv-souv",
+    "pole": 1
+  },
+  "q20-territoires/reequilibrer": null,
+  "q20-territoires/unite": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q20-territoires/recentraliser": {
+    "axe": "ouv-souv",
+    "pole": -1
+  },
+  "q20-territoires/autodetermination": {
+    "axe": "ouv-souv",
+    "pole": 1
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty, ConfirmDialog, Modal } from '../atoms.jsx'
-import { usePropositions, useProfiles, useDeputes } from '../hooks.js'
+import { usePropositions, useProfiles, useDeputes, useAxesMapping } from '../hooks.js'
+import { carteAxes } from '../axes.js'
 import { computeMatches } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, desaccords } from '../matchAnalysis.js'
 import { PALIERS, PALIER_BY_VALUE, SKIP, PALIER_BG, PALIER_FG, PALIER_BORDER, migrateReponses } from '../paliers.js'
@@ -26,6 +27,7 @@ const shuffle = (arr) => {
 export default function PageMonMatch({ C }) {
   const { data, loading, error } = usePropositions()
   const profiles = useProfiles()
+  const axesMap = useAxesMapping()
   const D = useDeputes()
 
   const [phase, setPhase]       = useState('intro')
@@ -197,6 +199,11 @@ export default function PageMonMatch({ C }) {
     return analyseParTheme(data, reponses)
   }, [phase, data, reponses])
 
+  const carte = useMemo(() => {
+    if (phase !== 'recap' || !data || !axesMap.data) return []
+    return carteAxes(data, reponses, axesMap.data)
+  }, [phase, data, reponses, axesMap.data])
+
   const tops = useMemo(() => {
     if (phase !== 'recap' || !data) return []
     return topPositions(data, reponses, 5)
@@ -344,11 +351,49 @@ export default function PageMonMatch({ C }) {
           <KPI label="Positions tranchées" value={tops.length} hint="très favorable ou très opposé" C={C} />
         </div>
 
-        <Card C={C} style={{ marginBottom: 20, textAlign: 'center', padding: '32px 20px' }}>
-          <h3 style={{ marginBottom: 6 }}>Ta carte politique</h3>
-          <div style={{ fontSize: 14, color: C.muted, maxWidth: 460, margin: '0 auto', lineHeight: 1.5 }}>
-            Visualisation par thème en préparation. La précédente comparait des intensités, ce qui ne reflétait pas fidèlement tes positions — on la refait proprement.
+        <Card C={C} style={{ marginBottom: 20 }}>
+          <h3 style={{ marginBottom: 2 }}>Ta carte politique</h3>
+          <div style={{ fontSize: 13, color: C.muted, marginBottom: 18 }}>
+            Cinq grands repères pour situer ta façon de voir, d\u2019après tes réponses.
           </div>
+
+          {carte.length === 0 ? (
+            <div style={{ fontSize: 14, color: C.muted, padding: '8px 0' }}>
+              Carte en préparation (référentiel des axes non chargé).
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {carte.map(a => {
+                const pct = (a.score + 100) / 2 // 0..100
+                return (
+                  <div key={a.id}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                      <span style={{ color: a.renseigne && a.score < -19 ? C.primary : C.muted }}>{a.neg}</span>
+                      <span style={{ color: a.renseigne && a.score > 19 ? C.secondary : C.muted }}>{a.pos}</span>
+                    </div>
+                    <div style={{ position: 'relative', height: 10, borderRadius: 999, background: C.sandDark }}>
+                      <div style={{ position: 'absolute', left: '50%', top: -3, bottom: -3, width: 1, background: C.border }} />
+                      {a.renseigne && (
+                        <div style={{
+                          position: 'absolute', top: '50%', left: `${pct}%`,
+                          width: 16, height: 16, borderRadius: '50%',
+                          background: a.score < 0 ? C.primary : a.score > 0 ? C.secondary : C.muted,
+                          border: `2px solid ${C.white}`, boxShadow: C.shadow,
+                          transform: 'translate(-50%,-50%)'
+                        }} />
+                      )}
+                    </div>
+                    <div style={{ fontSize: 13, color: a.renseigne ? C.text : C.muted, marginTop: 7, lineHeight: 1.45 }}>
+                      {a.renseigne
+                        ? a.phrase
+                        : `Pas encore d\u2019avis tranché ici \u2014 réponds à plus de questions sur ce thème.`}
+                      {a.renseigne && <span style={{ color: C.muted }}> ({a.n} réponse{a.n > 1 ? 's' : ''})</span>}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </Card>
 
         {themes.length > 0 && (

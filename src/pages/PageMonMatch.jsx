@@ -268,6 +268,27 @@ export default function PageMonMatch({ C, onSelectDepute }) {
     return topPositions(data, reponses, 5)
   }, [phase, data, reponses])
 
+  // Couverture : parmi tes positions tranchées (±100), lesquelles sont mesurables
+  // par les votes (présentes dans au moins un profil parti) vs muettes (angle mort).
+  const couverture = useMemo(() => {
+    if (phase !== 'recap' || !data || !profiles.data?.partis) return null
+    const mesurables = new Set()
+    for (const p of Object.values(profiles.data.partis)) {
+      for (const posId of Object.keys(p.profil || {})) mesurables.add(posId)
+    }
+    const fortes = [] // positions où tu es à ±100
+    for (const q of data.questions) {
+      const r = reponses[q.id] || {}
+      for (const p of q.positions) {
+        if (Math.abs(r[p.id]) === 100) {
+          fortes.push({ posLabel: p.label, qEmoji: q.emoji, mesurable: mesurables.has(p.id) })
+        }
+      }
+    }
+    const muettes = fortes.filter(f => !f.mesurable)
+    return { nbFortes: fortes.length, nbMesurables: fortes.length - muettes.length, muettes }
+  }, [phase, data, reponses, profiles.data])
+
   if (loading) return (
     <div className="fadeUp">
       <Card C={C} style={{ textAlign: 'center', padding: 40 }}>
@@ -477,6 +498,25 @@ export default function PageMonMatch({ C, onSelectDepute }) {
 
         {hasMatching && (
           <>
+            {couverture && couverture.muettes.length > 0 && (
+              <Card C={C} style={{ marginBottom: 16, background: C.sand }}>
+                <div style={{ fontSize: 14, lineHeight: 1.5 }}>
+                  Ton score s'appuie sur <strong>{couverture.nbMesurables} de tes {couverture.nbFortes} positions tranchées</strong>.
+                  Le reste porte sur des sujets que l'Assemblée ne vote pas (ou peu), donc <strong>non mesurables par les votes</strong> :
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
+                  {couverture.muettes.map((m, i) => (
+                    <span key={i} className="badge" style={{ background: C.white, color: C.muted, border: `1px solid ${C.border}` }}>
+                      {m.qEmoji} {m.posLabel}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ fontSize: 12, color: C.muted, marginTop: 10 }}>
+                  Ces convictions comptent pour toi mais n'entrent pas dans le calcul de proximité. Garde-le en tête en lisant les scores.
+                </div>
+              </Card>
+            )}
+
             <h2 style={{ marginBottom: 12 }}>Tes partis les plus proches</h2>
             <div style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
               {(showAllPartis ? matches.partis : matches.partis.slice(0, 3)).map((p, i) => {

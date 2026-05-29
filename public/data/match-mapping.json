@@ -329,13 +329,8 @@
       "confiance": "check"
     },
     "1550": {
-      "positions": [
-        {
-          "positionId": "egalite",
-          "poids": 0.3
-        }
-      ],
-      "note": "Parcours inclusif enfants à besoins particuliers. Pour = école qui inclut / moyens.",
+      "positions": [],
+      "note": "Parcours inclusif enfants à besoins particuliers. Pour = école qui inclut / moyens. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "5435": {
@@ -349,13 +344,8 @@
       "confiance": "check"
     },
     "1601": {
-      "positions": [
-        {
-          "positionId": "egalite",
-          "poids": 0.3
-        }
-      ],
-      "note": "Lutte antisémitisme/racisme/haine dans l'enseignement. Pour = lutte discriminations.",
+      "positions": [],
+      "note": "Lutte antisémitisme/racisme/haine dans l'enseignement. Pour = lutte discriminations. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "289": {
@@ -851,33 +841,18 @@
       "confiance": "check"
     },
     "6512": {
-      "positions": [
-        {
-          "positionId": "egalite",
-          "poids": 0.3
-        }
-      ],
-      "note": "Parcours inclusif enfants à besoins particuliers (nouvelle lecture). Pour = école inclusive/moyens.",
+      "positions": [],
+      "note": "Parcours inclusif enfants à besoins particuliers (nouvelle lecture). Pour = école inclusive/moyens. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "2880": {
-      "positions": [
-        {
-          "positionId": "egalite",
-          "poids": 0.3
-        }
-      ],
-      "note": "Antisémitisme dans l'enseignement supérieur (CMP). Pour = lutte discriminations.",
+      "positions": [],
+      "note": "Antisémitisme dans l'enseignement supérieur (CMP). Pour = lutte discriminations. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "840": {
-      "positions": [
-        {
-          "positionId": "egalite",
-          "poids": 0.5
-        }
-      ],
-      "note": "Égalité des chances accès grandes écoles. Pour = méritocratie/ouverture sociale.",
+      "positions": [],
+      "note": "Égalité des chances accès grandes écoles. Pour = méritocratie/ouverture sociale. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "5845": {
@@ -1055,23 +1030,13 @@
       "confiance": "check"
     },
     "6319": {
-      "positions": [
-        {
-          "positionId": "redistribuer",
-          "poids": 0.3
-        }
-      ],
-      "note": "Lutte fraudes sociales ET fiscales (CMP). Pour = contrôle/recouvrement public.",
+      "positions": [],
+      "note": "Lutte fraudes sociales ET fiscales (CMP). Pour = contrôle/recouvrement public. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "6023": {
-      "positions": [
-        {
-          "positionId": "redistribuer",
-          "poids": 0.3
-        }
-      ],
-      "note": "Lutte fraudes sociales ET fiscales (1re lecture). Pour = contrôle/recouvrement public.",
+      "positions": [],
+      "note": "Lutte fraudes sociales ET fiscales (1re lecture). Pour = contrôle/recouvrement public. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "5846": {
@@ -1225,13 +1190,8 @@
       "confiance": "check"
     },
     "5732": {
-      "positions": [
-        {
-          "positionId": "redistribuer",
-          "poids": -0.3
-        }
-      ],
-      "note": "Motion rejet (LFI) c/ fraudes sociales-fiscales. Pour = rejeter le contrôle.",
+      "positions": [],
+      "note": "Motion rejet (LFI) c/ fraudes sociales-fiscales. Pour = rejeter le contrôle. [auto: position polluante retirée]",
       "confiance": "check"
     },
     "2221": {

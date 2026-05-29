@@ -306,19 +306,19 @@
   "q19-etat-eco/ess": null,
   "q20-territoires/decentraliser-fort": {
     "axe": "ouv-souv",
-    "pole": 1
+    "pole": -1
   },
   "q20-territoires/reequilibrer": null,
   "q20-territoires/unite": {
     "axe": "ouv-souv",
-    "pole": -1
+    "pole": 1
   },
   "q20-territoires/recentraliser": {
     "axe": "ouv-souv",
-    "pole": -1
+    "pole": 1
   },
   "q20-territoires/autodetermination": {
     "axe": "ouv-souv",
-    "pole": 1
+    "pole": -1
   }
 }

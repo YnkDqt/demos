@@ -481,13 +481,16 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
                         .filter(Boolean)
                         .sort((x, y) => x.pct - y.pct)
                       if (items.length === 0) return null
-                      const MIN_GAP = 9
+                      // Demi-largeur estimée en % (barre ≈ 600px, char ≈ 6px, padding 12px).
+                      const halfW = (code) => (code.length * 6 + 12) / 12
+                      const MARGIN = 0.5
                       const rows = []
                       items.forEach(it => {
                         let placed = false
                         for (let r = 0; r < rows.length; r++) {
                           const last = rows[r][rows[r].length - 1]
-                          if (it.pct - last.pct >= MIN_GAP) {
+                          const need = halfW(it.code) + halfW(last.code) + MARGIN
+                          if (it.pct - last.pct >= need) {
                             rows[r].push(it); it.row = r; placed = true; break
                           }
                         }

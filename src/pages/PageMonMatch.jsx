@@ -472,21 +472,43 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
                         }} />
                       )}
                     </div>
-                    {expert && partisOnAxes && (
-                      <div style={{ position: 'relative', height: 22, marginTop: 6 }}>
-                        {Object.entries(partisOnAxes).map(([code, axes]) => {
+                    {expert && partisOnAxes && (() => {
+                      const items = Object.entries(partisOnAxes)
+                        .map(([code, axes]) => {
                           const ax = axes.find(x => x.id === a.id)
-                          if (!ax || !ax.renseigne) return null
-                          const ppct = (ax.score + 100) / 2
-                          return (
-                            <div key={code} title={`${code} : ${ax.score > 0 ? '+' : ''}${ax.score}`}
-                              style={{ position: 'absolute', left: `${ppct}%`, top: 0, transform: 'translateX(-50%)' }}>
-                              <BadgeParti code={code} C={C} />
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
+                          return ax && ax.renseigne ? { code, pct: (ax.score + 100) / 2, score: ax.score } : null
+                        })
+                        .filter(Boolean)
+                        .sort((x, y) => x.pct - y.pct)
+                      if (items.length === 0) return null
+                      const MIN_GAP = 9
+                      const rows = []
+                      items.forEach(it => {
+                        let placed = false
+                        for (let r = 0; r < rows.length; r++) {
+                          const last = rows[r][rows[r].length - 1]
+                          if (it.pct - last.pct >= MIN_GAP) {
+                            rows[r].push(it); it.row = r; placed = true; break
+                          }
+                        }
+                        if (!placed) { rows.push([it]); it.row = rows.length - 1 }
+                      })
+                      const ROW_H = 18
+                      return (
+                        <div style={{ position: 'relative', height: rows.length * ROW_H, marginTop: 6 }}>
+                          {items.map(it => (
+                            <span key={it.code} title={`${it.code} : ${it.score > 0 ? '+' : ''}${it.score}`}
+                              style={{
+                                position: 'absolute', left: `${it.pct}%`, top: it.row * ROW_H,
+                                transform: 'translateX(-50%)',
+                                fontSize: 10, padding: '1px 6px', borderRadius: 999,
+                                background: C.primaryPale, color: C.primaryDeep,
+                                fontWeight: 600, whiteSpace: 'nowrap', lineHeight: '14px'
+                              }}>{it.code}</span>
+                          ))}
+                        </div>
+                      )
+                    })()}
                     <div style={{ fontSize: 13, color: a.renseigne ? C.text : C.muted, marginTop: 7, lineHeight: 1.45 }}>
                       {a.renseigne
                         ? a.phrase

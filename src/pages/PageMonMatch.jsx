@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty, ConfirmDialog, Modal } from '../atoms.jsx'
 import { usePropositions, useProfiles, useDeputes, useAxesMapping } from '../hooks.js'
-import { carteAxes } from '../axes.js'
+import { carteAxes, partiAxes } from '../axes.js'
 import { computeMatches, matchByTheme } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, partiBreakdown, intensiteLabel } from '../matchAnalysis.js'
 import { PALIERS, PALIER_BY_VALUE, SKIP, PALIER_BG, PALIER_FG, PALIER_BORDER, migrateReponses } from '../paliers.js'
@@ -50,7 +50,7 @@ function PositionList({ items, accord, C }) {
   )
 }
 
-export default function PageMonMatch({ C, onSelectDepute }) {
+export default function PageMonMatch({ C, onSelectDepute, expert }) {
   const { data, loading, error } = usePropositions()
   const profiles = useProfiles()
   const axesMap = useAxesMapping()
@@ -250,6 +250,19 @@ export default function PageMonMatch({ C, onSelectDepute }) {
     if (!compareCode || !profiles.data) return null
     return profiles.data.partis[compareCode] || null
   }, [compareCode, profiles.data])
+
+  // Placement de chaque parti du top sur les 5 axes (mode expert).
+  // Map : code parti → { axes: [{id, score, renseigne}], couleur }.
+  const partisOnAxes = useMemo(() => {
+    if (!expert || !matches?.partis?.length || !profiles.data || !data || !axesMap.data) return null
+    const out = {}
+    for (const p of matches.partis) {
+      const prof = profiles.data.partis[p.code]?.profil
+      if (!prof) continue
+      out[p.code] = partiAxes(prof, data, axesMap.data)
+    }
+    return out
+  }, [expert, matches, profiles.data, data, axesMap.data])
 
   // Radar désactivé (calcul d'intensité non fidèle) — refonte à venir. radarData/inversion/compare conservés pour réactivation.
 
@@ -455,10 +468,25 @@ export default function PageMonMatch({ C, onSelectDepute }) {
                           width: 16, height: 16, borderRadius: '50%',
                           background: a.score < 0 ? C.primary : a.score > 0 ? C.secondary : C.muted,
                           border: `2px solid ${C.white}`, boxShadow: C.shadow,
-                          transform: 'translate(-50%,-50%)'
+                          transform: 'translate(-50%,-50%)', zIndex: 2
                         }} />
                       )}
                     </div>
+                    {expert && partisOnAxes && (
+                      <div style={{ position: 'relative', height: 22, marginTop: 6 }}>
+                        {Object.entries(partisOnAxes).map(([code, axes]) => {
+                          const ax = axes.find(x => x.id === a.id)
+                          if (!ax || !ax.renseigne) return null
+                          const ppct = (ax.score + 100) / 2
+                          return (
+                            <div key={code} title={`${code} : ${ax.score > 0 ? '+' : ''}${ax.score}`}
+                              style={{ position: 'absolute', left: `${ppct}%`, top: 0, transform: 'translateX(-50%)' }}>
+                              <BadgeParti code={code} C={C} />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                     <div style={{ fontSize: 13, color: a.renseigne ? C.text : C.muted, marginTop: 7, lineHeight: 1.45 }}>
                       {a.renseigne
                         ? a.phrase
@@ -522,6 +550,9 @@ export default function PageMonMatch({ C, onSelectDepute }) {
               {(showAllPartis ? matches.partis : matches.partis.slice(0, 3)).map((p, i) => {
                 const open = openParti === p.code
                 const pd = partiData[p.code] || { themes: [], accords: [], desaccords: [], nbMajeurs: 0 }
+                const meta = profiles.data?.partis?.[p.code] || {}
+                const nbScr = meta.nbScrutinsParticipes
+                const coh   = meta.cohesion
                 return (
                 <Card C={C} key={p.code} padding={16}>
                   <div
@@ -534,6 +565,14 @@ export default function PageMonMatch({ C, onSelectDepute }) {
                         <BadgeParti code={p.code} C={C} />
                         <span style={{ fontWeight: 500 }}>{p.nom}</span>
                         <span style={{ fontSize: 12, color: C.muted }}>· {p.nbDeputes} députés</span>
+                        {nbScr != null && nbScr > 0 && (
+                          <span style={{ fontSize: 12, color: C.muted }}>· profil sur {nbScr} scrutins</span>
+                        )}
+                        {expert && coh != null && (
+                          <span className="badge" style={{ background: C.primaryPale, color: C.primaryDeep }}>
+                            Cohésion {coh}%
+                          </span>
+                        )}
                         {pd.nbMajeurs > 0 && (
                           <span className="badge" style={{ background: C.redPale, color: C.red }}>
                             {pd.nbMajeurs} désaccord{pd.nbMajeurs > 1 ? 's' : ''} majeur{pd.nbMajeurs > 1 ? 's' : ''}
@@ -628,9 +667,22 @@ export default function PageMonMatch({ C, onSelectDepute }) {
               ))}
             </div>
 
-            <div style={{ fontSize: 12, color: C.muted, marginBottom: 24, fontStyle: 'italic' }}>
-              Le score est une similarité entre tes positions et les votes réels des députés/partis à l'Assemblée nationale, sur {matches.nbScrutinsMappes} scrutins de référence. Il ne reflète pas une appartenance politique mais une proximité de positions.
-            </div>
+            <details style={{ marginBottom: 24 }}>
+              <summary style={{ cursor: 'pointer', fontSize: 13, color: C.muted, fontStyle: 'italic' }}>
+                Comment ces scores sont-ils calculés ?
+              </summary>
+              <div style={{ marginTop: 10, fontSize: 13, color: C.text, lineHeight: 1.55 }}>
+                <p style={{ marginBottom: 8 }}>
+                  Chaque parti et député dispose d'un profil idéologique reconstruit à partir de ses <strong>votes réels</strong> sur {matches.nbScrutinsMappes} scrutins de référence. Chaque scrutin est rattaché à une ou plusieurs positions de ce Match.
+                </p>
+                <p style={{ marginBottom: 8 }}>
+                  Le score (%) est une <strong>similarité cosinus signée</strong> entre ton vecteur de positions et le leur, sur l'intersection des positions exprimées. Les "Sans avis" et les sujets non votés sont ignorés.
+                </p>
+                <p style={{ marginBottom: 0 }}>
+                  Le score ne reflète pas une appartenance politique mais une proximité de positions sur les sujets que l'Assemblée a tranchés.
+                </p>
+              </div>
+            </details>
           </>
         )}
 

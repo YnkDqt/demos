@@ -53,13 +53,13 @@ export default function App() {
     if (adminMode === 'axes') return <PageAdminAxes C={C} />
 
     if (route === 'mes-elus' && selectedDeputeId) {
-      return <PageDeputeDetail deputeId={selectedDeputeId} onBack={() => setSelectedDeputeId(null)} C={C} />
+      return <PageDeputeDetail deputeId={selectedDeputeId} onBack={() => setSelectedDeputeId(null)} expert={expert} C={C} />
     }
     switch (route) {
       case 'mon-coin':  return <PageMonCoin profile={profile} C={C} />
       case 'mes-elus':  return <PageMesElus onSelectDepute={selectDepute} initialGroupe={groupeFilter} key={groupeFilter || 'all'} C={C} />
       case 'les-partis': return <PageLesPartis onSelectGroupe={goToGroupe} C={C} />
-      case 'mon-match': return <PageMonMatch onSelectDepute={goToDepute} C={C} />
+      case 'mon-match': return <PageMonMatch onSelectDepute={goToDepute} expert={expert} C={C} />
       case 'decrypter': return <StubPage title="Décrypter" subtitle="Échiquier politique, cartes story, méthodologie." C={C} />
       case 'mes-idees': return <StubPage title="Mes idées" subtitle="Interpellation, pétitions locales, associations, conso responsable." C={C} />
       case 'reglages':  return (

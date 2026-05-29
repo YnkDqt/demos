@@ -112,8 +112,22 @@ console.log(`[profiles] ${scrutinIndex.size} scrutins indexés`)
 // ─── Accumulation par député ───────────────────────────────────
 const profilDeputes = new Map()
 const ensureDepute = (id) => {
-  if (!profilDeputes.has(id)) profilDeputes.set(id, { sum: {}, n: {} })
+  if (!profilDeputes.has(id)) profilDeputes.set(id, { sum: {}, n: {}, nbScrutinsExprimes: 0 })
   return profilDeputes.get(id)
+}
+
+// Index député → code groupe, pour calculer la cohésion par groupe scrutin par scrutin.
+const deputeToGroupe = new Map()
+for (const d of deputes.deputes) {
+  if (d.groupe?.code) deputeToGroupe.set(d.id, d.groupe.code)
+}
+// Stats de cohésion par groupe : pour chaque scrutin où ≥ COHESION_MIN votants du groupe,
+// on note la proportion du vote dominant (Pour/Contre/Abst) parmi les votants exprimés.
+const COHESION_MIN = 5
+const groupeCohesion = new Map() // code → { sumProp, nbScrutins }
+const ensureGroupe = (code) => {
+  if (!groupeCohesion.has(code)) groupeCohesion.set(code, { sumProp: 0, nbScrutins: 0 })
+  return groupeCohesion.get(code)
 }
 
 let nbMatched = 0
@@ -129,9 +143,31 @@ for (const [scrutinNum, raw] of entries) {
   }
   nbMatched++
 
+  // Cohésion par groupe pour ce scrutin : compte Pour/Contre/Abst des votants du groupe.
+  const tally = new Map() // code → { pour, contre, abst }
+  for (const [acteurId, type] of votesOnScrutin) {
+    if (type === 'nonVotants') continue
+    const grp = deputeToGroupe.get(acteurId)
+    if (!grp) continue
+    if (!tally.has(grp)) tally.set(grp, { pour: 0, contre: 0, abst: 0 })
+    const t = tally.get(grp)
+    if (type === 'pour') t.pour++
+    else if (type === 'contre') t.contre++
+    else if (type === 'abstention') t.abst++
+  }
+  for (const [code, t] of tally) {
+    const total = t.pour + t.contre + t.abst
+    if (total < COHESION_MIN) continue
+    const dominant = Math.max(t.pour, t.contre, t.abst)
+    const g = ensureGroupe(code)
+    g.sumProp += dominant / total
+    g.nbScrutins += 1
+  }
+
   for (const [acteurId, type] of votesOnScrutin) {
     if (type === 'nonVotants') continue
     const p = ensureDepute(acteurId)
+    p.nbScrutinsExprimes++
     const sign = type === 'pour' ? 1 : type === 'contre' ? -1 : 0
     for (const { positionId, poids } of positions) {
       p.sum[positionId] = (p.sum[positionId] || 0) + sign * poids
@@ -151,7 +187,7 @@ const normalize = (raw) => {
     profil[posId] = Math.max(-100, Math.min(100, Math.round(score)))
     couverture[posId] = Math.round(n * 10) / 10
   }
-  return { profil, couverture }
+  return { profil, couverture, nbScrutinsExprimes: raw.nbScrutinsExprimes || 0 }
 }
 
 const deputesOut = {}
@@ -185,7 +221,10 @@ for (const [code, p] of partis) {
     profil[posId] = Math.round(sumProfil[posId] / sumPoids[posId])
     couverture[posId] = Math.round(sumPoids[posId] * 10) / 10
   }
-  partisOut[code] = { nom: p.nom, nbDeputes: p.deputeIds.length, profil, couverture }
+  const coh = groupeCohesion.get(code)
+  const cohesion = coh && coh.nbScrutins > 0 ? Math.round((coh.sumProp / coh.nbScrutins) * 100) : null
+  const nbScrutinsParticipes = coh?.nbScrutins || 0
+  partisOut[code] = { nom: p.nom, nbDeputes: p.deputeIds.length, profil, couverture, cohesion, nbScrutinsParticipes }
 }
 
 const out = {

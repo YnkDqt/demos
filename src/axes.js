@@ -114,3 +114,30 @@ export function carteAxes(data, reponses, mapping) {
     }
   })
 }
+
+// Position d'un parti sur les 5 axes, à partir de son profil de votes.
+// Même logique que carteAxes mais lit profilParti[positionId] au lieu des réponses utilisateur.
+// → [{ id, score (-100..100), n, renseigne }]
+export function partiAxes(profilParti, data, mapping) {
+  if (!data || !mapping || !profilParti) return AXES.map(a => ({ id: a.id, score: 0, n: 0, renseigne: false }))
+  const acc = Object.fromEntries(AXES.map(a => [a.id, { sum: 0, n: 0 }]))
+
+  for (const q of data.questions) {
+    for (const p of q.positions) {
+      const v = profilParti[p.id]
+      if (v == null) continue
+      const tag = mapping[`${q.id}/${p.id}`]
+      if (!tag) continue
+      const bucket = acc[tag.axe]
+      if (!bucket) continue
+      bucket.sum += v * tag.pole
+      bucket.n   += 1
+    }
+  }
+
+  return AXES.map(a => {
+    const { sum, n } = acc[a.id]
+    const renseigne = n > 0
+    return { id: a.id, score: renseigne ? Math.round(sum / n) : 0, n, renseigne }
+  })
+}

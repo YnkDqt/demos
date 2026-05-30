@@ -945,13 +945,8 @@
       "confiance": "sure"
     },
     "6045": {
-      "positions": [
-        {
-          "positionId": "decentraliser-fort",
-          "poids": 0.3
-        }
-      ],
-      "note": "Simplifier le millefeuille territorial. Pour = décentralisation/simplification.",
+      "positions": [],
+      "note": "Simplifier le millefeuille territorial. Pour = décentralisation/simplification. [auto: hors-sujet pour cet axe, retiré]",
       "confiance": "check"
     },
     "6753": {
@@ -985,13 +980,8 @@
       "confiance": "check"
     },
     "5296": {
-      "positions": [
-        {
-          "positionId": "strategie",
-          "poids": 0.3
-        }
-      ],
-      "note": "JO 2030 Alpes (CMP). Pour = grand projet d'État (faiblement idéologique, État stratège).",
+      "positions": [],
+      "note": "JO 2030 Alpes (CMP). Pour = grand projet d'État (faiblement idéologique, État stratège). [auto: hors-sujet pour cet axe, retiré]",
       "confiance": "check"
     },
     "3182": {
@@ -1105,13 +1095,8 @@
       "confiance": "check"
     },
     "4963": {
-      "positions": [
-        {
-          "positionId": "strategie",
-          "poids": 0.3
-        }
-      ],
-      "note": "JO 2030 Alpes (1re lecture). Pour = grand projet d'État (faiblement idéologique).",
+      "positions": [],
+      "note": "JO 2030 Alpes (1re lecture). Pour = grand projet d'État (faiblement idéologique). [auto: hors-sujet pour cet axe, retiré]",
       "confiance": "check"
     },
     "3018": {
@@ -1234,13 +1219,8 @@
       "confiance": "check"
     },
     "6024": {
-      "positions": [
-        {
-          "positionId": "decentraliser-fort",
-          "poids": -0.3
-        }
-      ],
-      "note": "Motion rejet (PS) c/ simplification millefeuille territorial. Pour = refus de la réforme.",
+      "positions": [],
+      "note": "Motion rejet (PS) c/ simplification millefeuille territorial. Pour = refus de la réforme. [auto: hors-sujet pour cet axe, retiré]",
       "confiance": "check"
     },
     "2956": {
@@ -1352,13 +1332,8 @@
       "confiance": "check"
     },
     "4756": {
-      "positions": [
-        {
-          "positionId": "strategie",
-          "poids": -0.3
-        }
-      ],
-      "note": "Motion rejet (LFI) c/ JO 2030. Pour = refus du grand projet.",
+      "positions": [],
+      "note": "Motion rejet (LFI) c/ JO 2030. Pour = refus du grand projet. [auto: hors-sujet pour cet axe, retiré]",
       "confiance": "check"
     },
     "1040": {

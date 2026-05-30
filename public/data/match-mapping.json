@@ -57,13 +57,8 @@
       "confiance": "sure"
     },
     "2214": {
-      "positions": [
-        {
-          "positionId": "inciter",
-          "poids": 0.5
-        }
-      ],
-      "note": "Cadre fiscal stable micro-entrepreneurs. Pour = soutien à l'entreprise.",
+      "positions": [],
+      "note": "Cadre fiscal stable micro-entrepreneurs. Pour = soutien à l'entreprise. [auto: sens inversé/consensuel, retiré de redist-merite]",
       "confiance": "check"
     },
     "6069": {
@@ -379,13 +374,8 @@
       "confiance": "sure"
     },
     "4745": {
-      "positions": [
-        {
-          "positionId": "propriete",
-          "poids": 0.3
-        }
-      ],
-      "note": "Rapports locatifs — RELIRE (loi pro-bailleur assouplissant les locations). Pour = côté propriétaire.",
+      "positions": [],
+      "note": "Rapports locatifs — RELIRE (loi pro-bailleur assouplissant les locations). Pour = côté propriétaire. [auto: sens inversé/consensuel, retiré de redist-merite]",
       "confiance": "check"
     },
     "844": {
@@ -886,13 +876,8 @@
       "confiance": "sure"
     },
     "4962": {
-      "positions": [
-        {
-          "positionId": "social",
-          "poids": 0.3
-        }
-      ],
-      "note": "Logement travailleurs services publics. Pour = logement social ciblé.",
+      "positions": [],
+      "note": "Logement travailleurs services publics. Pour = logement social ciblé. [auto: sens inversé/consensuel, retiré de redist-merite]",
       "confiance": "check"
     },
     "5240": {

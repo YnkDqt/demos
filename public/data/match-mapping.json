@@ -6,19 +6,14 @@
       "positions": [
         {
           "positionId": "redistribuer",
-          "poids": 1
+          "poids": 1.0
         }
       ],
       "note": "Impôt plancher 2% patrimoine ultra-riches (taxe Zucman). Pour = redistribution forte.",
       "confiance": "sure"
     },
     "217": {
-      "positions": [
-        {
-          "positionId": "60ans",
-          "poids": 1
-        }
-      ],
+      "positions": [],
       "note": "Abrogation réforme retraites, retour 60 ans. Pour = retraite 60 ans.",
       "confiance": "sure"
     },
@@ -260,12 +255,7 @@
       "confiance": "check"
     },
     "2935": {
-      "positions": [
-        {
-          "positionId": "securiser",
-          "poids": 0.5
-        }
-      ],
+      "positions": [],
       "note": "Emploi des seniors (transposition ANI). Pour = compromis social négocié.",
       "confiance": "check"
     },
@@ -374,9 +364,14 @@
       "confiance": "sure"
     },
     "4745": {
-      "positions": [],
-      "note": "Rapports locatifs — RELIRE (loi pro-bailleur assouplissant les locations). Pour = côté propriétaire. [auto: sens inversé/consensuel, retiré de redist-merite]",
-      "confiance": "check"
+      "positions": [
+        {
+          "positionId": "social",
+          "poids": 0.5
+        }
+      ],
+      "note": "Relations locatives — protection des locataires (G100/D0). Pour = régulation/protection sociale logement.",
+      "confiance": "sure"
     },
     "844": {
       "positions": [
@@ -697,12 +692,7 @@
       "confiance": "check"
     },
     "2272": {
-      "positions": [
-        {
-          "positionId": "redistribuer",
-          "poids": 0.5
-        }
-      ],
+      "positions": [],
       "note": "Allocations familiales dès le 1er enfant. Pour = redistribution familiale.",
       "confiance": "sure"
     },
@@ -710,38 +700,24 @@
       "positions": [
         {
           "positionId": "securiser",
-          "poids": 0.3
-        }
-      ],
-      "note": "Protection sociale complémentaire agents territoriaux. Pour = protection sociale.",
-      "confiance": "check"
-    },
-    "3055": {
-      "positions": [
-        {
-          "positionId": "securiser",
           "poids": 0.5
         }
       ],
+      "note": "Protection sociale complémentaire agents territoriaux. Pour = droits sociaux.",
+      "confiance": "check"
+    },
+    "3055": {
+      "positions": [],
       "note": "Emploi des seniors (transposition ANI). Pour = compromis social négocié.",
       "confiance": "check"
     },
     "2256": {
-      "positions": [
-        {
-          "positionId": "securiser",
-          "poids": 0.3
-        }
-      ],
+      "positions": [],
       "note": "Congé salariés pour don du sang. Pour = droits sociaux des salariés.",
       "confiance": "check"
     },
     "5222": {
       "positions": [
-        {
-          "positionId": "securiser",
-          "poids": 0.5
-        },
         {
           "positionId": "emanciper",
           "poids": 0.3
@@ -1344,6 +1320,26 @@
         }
       ],
       "note": "Motion rejet (LFI) c/ sûreté dans les transports. Pour = refus de l'approche sécuritaire.",
+      "confiance": "sure"
+    },
+    "874": {
+      "positions": [
+        {
+          "positionId": "merite",
+          "poids": 0.5
+        }
+      ],
+      "note": "Amendement (Di Filippo) vidant la taxe Zucman. Pour = anti-redistribution / mérite.",
+      "confiance": "sure"
+    },
+    "861": {
+      "positions": [
+        {
+          "positionId": "merite",
+          "poids": 0.5
+        }
+      ],
+      "note": "Amendement (Di Filippo) vidant la taxe Zucman. Pour = anti-redistribution / mérite.",
       "confiance": "sure"
     }
   }

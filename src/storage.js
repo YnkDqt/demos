@@ -86,6 +86,18 @@ export async function clearMatchCurrent() {
   return removeItem('match:current')
 }
 
+// ─── Niveau 1 : visions ────────────────────────────────────────
+export async function saveVisionPicks(picks) {
+  return setItem('match:visions', { version: 1, savedAt: new Date().toISOString(), picks })
+}
+export async function loadVisionPicks() {
+  const d = await getItem('match:visions')
+  return Array.isArray(d?.picks) ? d.picks : []
+}
+export async function clearVisionPicks() {
+  return removeItem('match:visions')
+}
+
 const genId = () => {
   const d = new Date()
   const pad = (n) => String(n).padStart(2, '0')

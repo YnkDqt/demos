@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty, ConfirmDialog, Modal } from '../atoms.jsx'
-import { usePropositions, useProfiles, useDeputes, useAxesMapping, useMatchCourt } from '../hooks.js'
+import { usePropositions, useProfiles, useDeputes, useAxesMapping, useMatchCourt, usePartisInfo } from '../hooks.js'
 import { carteAxes, partiAxes } from '../axes.js'
 import { computeMatches, matchByTheme } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, partiBreakdown, intensiteLabel } from '../matchAnalysis.js'
@@ -8,7 +8,8 @@ import { PALIERS, PALIER_BY_VALUE, SKIP, PALIER_BG, PALIER_FG, PALIER_BORDER, mi
 import GlossText from '../GlossText.jsx'
 import {
   saveMatchCurrent, loadMatchCurrent, clearMatchCurrent,
-  saveMatchToHistory, listMatchHistory, deleteMatchFromHistory
+  saveMatchToHistory, listMatchHistory, deleteMatchFromHistory,
+  saveVisionPicks, loadVisionPicks, clearVisionPicks
 } from '../storage.js'
 import { formatDate } from '../utils.js'
 import {
@@ -26,6 +27,7 @@ const shuffle = (arr) => {
 
 // ─── NIVEAU 1 : VISIONS ──────────────────────────────────────
 const VISION_RANK_W = [3, 2, 1]
+const NO_GROUP_VISIONS = ['anticapitaliste', 'libertarien']
 const FAMILLE_LABEL = {
   'gauche-radicale': 'Gauche de rupture',
   'gauche': 'Gauche sociale et écologiste',
@@ -86,6 +88,42 @@ function AxisBar({ axe, value, C }) {
   )
 }
 
+// Cadran 2D : éco (x) × autorité (y). Repères familles + point utilisateur.
+function Quadrant({ familles, user, highlight, C }) {
+  const W = 340, H = 300, pad = 30
+  const X = v => pad + ((v + 100) / 200) * (W - 2 * pad)
+  const Y = v => pad + ((100 - v) / 200) * (H - 2 * pad) // +100 (Libertés) en haut
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
+      <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} rx={10}
+        fill={C.sand} stroke={C.border} />
+      <line x1={W / 2} y1={pad} x2={W / 2} y2={H - pad} stroke={C.border} />
+      <line x1={pad} y1={H / 2} x2={W - pad} y2={H / 2} stroke={C.border} />
+      <text x={W / 2} y={14} textAnchor="middle" fontSize="10" fill={C.muted}>Libertés</text>
+      <text x={W / 2} y={H - 4} textAnchor="middle" fontSize="10" fill={C.muted}>Ordre / Autorité</text>
+      <text x={6} y={H / 2} fontSize="10" fill={C.muted}>Collectif</text>
+      <text x={W - 6} y={H / 2} textAnchor="end" fontSize="10" fill={C.muted}>Marché</text>
+      {familles.map(f => {
+        const hot = f.key === highlight
+        return (
+          <g key={f.key}>
+            <circle cx={X(f.eco)} cy={Y(f.autorite)} r={hot ? 5 : 4}
+              fill={hot ? C.primary : C.white} stroke={hot ? C.primary : C.muted} strokeWidth={1.5} />
+            <text x={X(f.eco)} y={Y(f.autorite) - 8}
+              textAnchor={f.eco > 40 ? 'end' : f.eco < -40 ? 'start' : 'middle'}
+              fontSize="9.5" fontWeight={hot ? 700 : 500}
+              fill={hot ? C.primaryDeep : C.muted}>{f.label}</text>
+          </g>
+        )
+      })}
+      <circle cx={X(user.eco)} cy={Y(user.autorite)} r={9}
+        fill={C.primary} stroke={C.white} strokeWidth={3} />
+      <circle cx={X(user.eco)} cy={Y(user.autorite)} r={11}
+        fill="none" stroke={C.primary} strokeWidth={1} opacity={0.5} />
+    </svg>
+  )
+}
+
 // Liste de positions (accord ou désaccord) avec ton palier + l'intensité du parti.
 function PositionList({ items, accord, C }) {
   return (
@@ -117,6 +155,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   const profiles = useProfiles()
   const axesMap = useAxesMapping()
   const MC = useMatchCourt()
+  const PI = usePartisInfo()
   const D = useDeputes()
 
   const [phase, setPhase]       = useState('visions')
@@ -236,6 +275,13 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   }
 
   useEffect(() => {
+    (async () => {
+      const p = await loadVisionPicks()
+      if (p.length) { setVisionPicks(p); if (p.length === 3) setVisionResultOpen(true) }
+    })()
+  }, [])
+
+  useEffect(() => {
     if (MC.data && visionOrder.length === 0) setVisionOrder(shuffle(MC.data.visions.map(v => v.id)))
   }, [MC.data, visionOrder.length])
 
@@ -246,10 +292,17 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   const toggleVision = (id) => {
     setVisionResultOpen(false)
     setVisionPicks(prev => {
-      if (prev.includes(id)) return prev.filter(x => x !== id)
-      if (prev.length >= 3) return prev
-      return [...prev, id]
+      let next
+      if (prev.includes(id)) next = prev.filter(x => x !== id)
+      else if (prev.length >= 3) next = prev
+      else next = [...prev, id]
+      saveVisionPicks(next)
+      return next
     })
+  }
+
+  const clearVisions = () => {
+    setVisionPicks([]); setVisionResultOpen(false); clearVisionPicks()
   }
 
   const questionsById = useMemo(
@@ -418,6 +471,23 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
     const gloss = MC.data.glossaire
     const res = visionResultOpen && visionPicks.length === 3 ? visionResult(visionPicks, visions) : null
 
+    // Repères familles pour le cadran : moyenne des placements des visions de chaque famille.
+    const facc = {}
+    for (const v of visions) {
+      const f = facc[v.famille] || (facc[v.famille] = { eco: 0, autorite: 0, n: 0 })
+      f.eco += v.placement.eco; f.autorite += v.placement.autorite; f.n++
+    }
+    const familleCoords = Object.entries(facc).map(([key, f]) => ({
+      key,
+      label: PI.data?.familles?.[key]?.label || FAMILLE_LABEL[key] || key,
+      eco: Math.round(f.eco / f.n), autorite: Math.round(f.autorite / f.n)
+    }))
+    const fiche = res && PI.data?.familles?.[res.famille]
+    const groupes = res && PI.data?.groupes
+      ? Object.entries(PI.data.groupes).filter(([, g]) => g.famille === res.famille)
+      : []
+    const sansGroupe = res && NO_GROUP_VISIONS.includes(res.visions[0]?.id)
+
     return (
       <div className="fadeUp">
         <PageTitle
@@ -429,88 +499,132 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
           C={C}
         />
 
-        <Card C={C} style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 13, color: C.muted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
-            Niveau 1 · 2 min
-          </div>
-          <p style={{ marginBottom: 0 }}>
-            Voici {visions.length} grandes visions de société. Choisis les <strong>3 qui résonnent le plus</strong> avec toi, dans l'ordre. Pas de bonne réponse : on cherche ta tendance de fond.
-          </p>
-        </Card>
+        {!res && (
+          <>
+            <Card C={C} style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, color: C.muted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                Niveau 1 · 2 min
+              </div>
+              <p style={{ marginBottom: 0 }}>
+                Voici {visions.length} grandes visions de société. Choisis les <strong>3 qui résonnent le plus</strong> avec toi, dans l'ordre. Pas de bonne réponse : on cherche ta tendance de fond.
+              </p>
+            </Card>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 20 }}>
-          {orderedVisions.map(v => {
-            const rank = visionPicks.indexOf(v.id)
-            const picked = rank !== -1
-            const full = visionPicks.length >= 3 && !picked
-            return (
-              <Card C={C} key={v.id} padding={16}
-                onClick={() => !full && toggleVision(v.id)}
-                style={{
-                  cursor: full ? 'default' : 'pointer',
-                  opacity: full ? 0.5 : 1,
-                  borderColor: picked ? C.primary : C.border,
-                  background: picked ? C.primaryPale : C.white,
-                  transition: 'all .15s'
-                }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <div style={{
-                    flexShrink: 0, width: 26, height: 26, borderRadius: 99,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 700, fontSize: 13,
-                    background: picked ? C.primary : C.sand,
-                    color: picked ? C.white : C.muted,
-                    border: `1px solid ${picked ? C.primary : C.border}`
-                  }}>
-                    {picked ? rank + 1 : ''}
-                  </div>
-                  <div style={{ fontSize: 14, lineHeight: 1.55, color: C.text }}>
-                    <GlossText texte={v.texte} glossaire={gloss} C={C} />
-                  </div>
-                </div>
-              </Card>
-            )
-          })}
-        </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 20 }}>
+              {orderedVisions.map(v => {
+                const rank = visionPicks.indexOf(v.id)
+                const picked = rank !== -1
+                const full = visionPicks.length >= 3 && !picked
+                return (
+                  <Card C={C} key={v.id} padding={16}
+                    onClick={() => !full && toggleVision(v.id)}
+                    style={{
+                      cursor: full ? 'default' : 'pointer',
+                      opacity: full ? 0.5 : 1,
+                      borderColor: picked ? C.primary : C.border,
+                      background: picked ? C.primaryPale : C.white,
+                      transition: 'all .15s'
+                    }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <div style={{
+                        flexShrink: 0, width: 26, height: 26, borderRadius: 99,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 700, fontSize: 13,
+                        background: picked ? C.primary : C.sand,
+                        color: picked ? C.white : C.muted,
+                        border: `1px solid ${picked ? C.primary : C.border}`
+                      }}>
+                        {picked ? rank + 1 : ''}
+                      </div>
+                      <div style={{ fontSize: 14, lineHeight: 1.55, color: C.text }}>
+                        <GlossText texte={v.texte} glossaire={gloss} C={C} />
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
 
-        <div style={{
-          position: 'sticky', bottom: 0, padding: '12px 0',
-          background: `linear-gradient(transparent, ${C.bg || C.white} 30%)`,
-          display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap'
-        }}>
-          <span style={{ fontSize: 13, color: C.muted }}>{visionPicks.length}/3 choisies</span>
-          <Btn variant="primary"
-            onClick={() => { setVisionResultOpen(true); window.scrollTo({ top: document.body.scrollHeight }) }}
-            disabled={visionPicks.length !== 3} C={C}>
-            Voir ma tendance →
-          </Btn>
-          {visionPicks.length > 0 && (
-            <Btn variant="ghost" onClick={() => { setVisionPicks([]); setVisionResultOpen(false) }} C={C}>Effacer</Btn>
-          )}
-        </div>
+            <div style={{
+              position: 'sticky', bottom: 0, padding: '12px 0',
+              background: `linear-gradient(transparent, ${C.bg || C.white} 30%)`,
+              display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap'
+            }}>
+              <span style={{ fontSize: 13, color: C.muted }}>{visionPicks.length}/3 choisies</span>
+              <Btn variant="primary"
+                onClick={() => { setVisionResultOpen(true); window.scrollTo({ top: 0 }) }}
+                disabled={visionPicks.length !== 3} C={C}>
+                Voir ma tendance →
+              </Btn>
+              {visionPicks.length > 0 && (
+                <Btn variant="ghost" onClick={clearVisions} C={C}>Effacer</Btn>
+              )}
+            </div>
+          </>
+        )}
 
         {res && (
-          <Card C={C} className="fadeUp" style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 13, color: C.muted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
-              Ta tendance
-            </div>
-            <h2 style={{ marginBottom: 14 }}>{FAMILLE_LABEL[res.famille] || res.famille}</h2>
+          <>
+            <Card C={C} style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 13, color: C.muted }}>
+                  Tes 3 choix : {res.visions.map((v, i) => `${i + 1}. ${v.label}`).join(' · ')}
+                </div>
+                <Btn variant="ghost" size="sm" onClick={() => setVisionResultOpen(false)} C={C}>Modifier</Btn>
+              </div>
+            </Card>
 
-            <AxisBar axe="eco" value={res.placement.eco} C={C} />
-            <AxisBar axe="autorite" value={res.placement.autorite} C={C} />
-            <AxisBar axe="identite" value={res.placement.identite} C={C} />
+            <Card C={C} className="fadeUp">
+              <div style={{ fontSize: 13, color: C.muted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                Ta tendance
+              </div>
+              <h2 style={{ marginBottom: 14 }}>{fiche?.label || FAMILLE_LABEL[res.famille] || res.famille}</h2>
 
-            <div style={{ marginTop: 14, fontSize: 14, color: C.text }}>
-              Visions retenues : {res.visions.map(v => v.label).join(', ')}.
-            </div>
-            <div style={{ marginTop: 4, fontSize: 13, color: C.muted }}>
-              C'est une première orientation, basée sur ce qui te séduit. Pour la confronter aux votes réels à l'Assemblée, fais le match détaillé.
-            </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, alignItems: 'center' }}>
+                <div style={{ maxWidth: 360, margin: '0 auto', width: '100%' }}>
+                  <Quadrant familles={familleCoords} user={res.placement} highlight={res.famille} C={C} />
+                </div>
+                <div>
+                  <AxisBar axe="identite" value={res.placement.identite} C={C} />
+                  {fiche?.resume && (
+                    <p style={{ fontSize: 14, lineHeight: 1.55, marginTop: 6, marginBottom: 0 }}>{fiche.resume}</p>
+                  )}
+                </div>
+              </div>
 
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
-              <Btn variant="primary" onClick={() => setPhase('intro')} C={C}>Aller plus loin : match détaillé →</Btn>
-            </div>
-          </Card>
+              <div style={{ marginTop: 20 }}>
+                <div style={{ fontSize: 13, color: C.muted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                  Groupes proches à l'Assemblée
+                </div>
+                {groupes.length === 0 ? (
+                  <p style={{ fontSize: 14, color: C.muted, marginBottom: 0 }}>
+                    Cette sensibilité n'a pas de groupe dédié à l'Assemblée.
+                  </p>
+                ) : (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {groupes.map(([code, g]) => (
+                      <span key={code} className="badge" style={{ background: C.primaryPale, color: C.primaryDeep, fontWeight: 500 }}>
+                        {code} — {g.nomComplet}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {sansGroupe && (
+                  <p style={{ fontSize: 13, color: C.muted, marginTop: 8, marginBottom: 0, fontStyle: 'italic' }}>
+                    Ta vision n°1 ({res.visions[0].label}) n'a pas d'élu dédié à l'Assemblée : les groupes ci-dessus sont les plus proches de ta famille, pas une correspondance exacte.
+                  </p>
+                )}
+              </div>
+
+              <div style={{ marginTop: 14, fontSize: 13, color: C.muted }}>
+                C'est une première orientation, basée sur ce qui te séduit. Pour la confronter aux <strong style={{ color: C.text }}>votes réels</strong> à l'Assemblée, fais le match détaillé.
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
+                <Btn variant="primary" onClick={() => setPhase('intro')} C={C}>Aller plus loin : match détaillé →</Btn>
+              </div>
+            </Card>
+          </>
         )}
 
         <Modal open={historyOpen} onClose={() => setHistoryOpen(false)} title={`Historique (${history.length})`} C={C}>

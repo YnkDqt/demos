@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty, ConfirmDialog, Modal } from '../atoms.jsx'
-import { usePropositions, useProfiles, useDeputes, useAxesMapping } from '../hooks.js'
+import { usePropositions, useProfiles, useDeputes, useAxesMapping, useMatchCourt } from '../hooks.js'
 import { carteAxes, partiAxes } from '../axes.js'
 import { computeMatches, matchByTheme } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, partiBreakdown, intensiteLabel } from '../matchAnalysis.js'
@@ -22,6 +22,68 @@ const shuffle = (arr) => {
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a
+}
+
+// ─── NIVEAU 1 : VISIONS ──────────────────────────────────────
+const VISION_RANK_W = [3, 2, 1]
+const FAMILLE_LABEL = {
+  'gauche-radicale': 'Gauche de rupture',
+  'gauche': 'Gauche sociale et écologiste',
+  'centre': 'Centre',
+  'droite': 'Droite',
+  'droite-radicale': 'Droite nationale'
+}
+const AXES_POLES = {
+  eco:      { gauche: 'Collectif / État',  droite: 'Marché / Individu' },
+  autorite: { gauche: 'Ordre / Autorité',  droite: 'Libertés' },
+  identite: { gauche: 'Ouverture',         droite: 'Souveraineté' }
+}
+
+// Agrège le top 3 : placement pondéré sur les 3 axes + famille dominante.
+function visionResult(picks, visions) {
+  const byId = Object.fromEntries(visions.map(v => [v.id, v]))
+  const acc = { eco: 0, autorite: 0, identite: 0 }
+  const famW = {}
+  let wTot = 0
+  picks.forEach((id, i) => {
+    const v = byId[id]; if (!v) return
+    const w = VISION_RANK_W[i] || 1
+    wTot += w
+    acc.eco += (v.placement.eco || 0) * w
+    acc.autorite += (v.placement.autorite || 0) * w
+    acc.identite += (v.placement.identite || 0) * w
+    famW[v.famille] = (famW[v.famille] || 0) + w
+  })
+  if (!wTot) return null
+  const placement = {
+    eco: Math.round(acc.eco / wTot),
+    autorite: Math.round(acc.autorite / wTot),
+    identite: Math.round(acc.identite / wTot)
+  }
+  const famille = Object.entries(famW).sort((a, b) => b[1] - a[1])[0][0]
+  return { placement, famille, visions: picks.map(id => byId[id]).filter(Boolean) }
+}
+
+// Barre d'axe -100..+100 avec marqueur de position.
+function AxisBar({ axe, value, C }) {
+  const pct = (value + 100) / 2 // 0..100
+  const poles = AXES_POLES[axe]
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.muted, marginBottom: 4 }}>
+        <span>{poles.gauche}</span>
+        <span>{poles.droite}</span>
+      </div>
+      <div style={{ position: 'relative', height: 8, background: C.border, borderRadius: 99 }}>
+        <div style={{ position: 'absolute', left: '50%', top: -3, bottom: -3, width: 1, background: C.muted, opacity: .4 }} />
+        <div style={{
+          position: 'absolute', left: `calc(${pct}% - 7px)`, top: -3,
+          width: 14, height: 14, borderRadius: 99,
+          background: C.primary, border: `2px solid ${C.white}`, boxShadow: `0 0 0 1px ${C.primary}`
+        }} />
+      </div>
+    </div>
+  )
 }
 
 // Liste de positions (accord ou désaccord) avec ton palier + l'intensité du parti.
@@ -54,9 +116,12 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   const { data, loading, error } = usePropositions()
   const profiles = useProfiles()
   const axesMap = useAxesMapping()
+  const MC = useMatchCourt()
   const D = useDeputes()
 
-  const [phase, setPhase]       = useState('intro')
+  const [phase, setPhase]       = useState('visions')
+  const [visionPicks, setVisionPicks] = useState([])
+  const [visionResultOpen, setVisionResultOpen] = useState(false)
   const [idx, setIdx]           = useState(0)
   const [reponses, setReponses] = useState({})
   const [enBrefOpen, setEnBrefOpen] = useState(false)
@@ -139,7 +204,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   }
 
   const restart = () => {
-    setPhase('intro'); setIdx(0); setReponses({}); setOrdre([]); setEnBrefOpen(false)
+    setPhase('visions'); setIdx(0); setReponses({}); setOrdre([]); setEnBrefOpen(false)
     setCompareCode(null); setInversion(false)
     savedToHistory.current = false
     window.scrollTo({ top: 0 })
@@ -167,6 +232,19 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
     await deleteMatchFromHistory(id)
     const h = await listMatchHistory()
     setHistory(h.map(m => ({ ...m, reponses: migrateReponses(m.reponses) })))
+  }
+
+  useEffect(() => {
+    if (phase === 'visions' && !MC.loading && !MC.data) setPhase('intro')
+  }, [phase, MC.loading, MC.data])
+
+  const toggleVision = (id) => {
+    setVisionResultOpen(false)
+    setVisionPicks(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id)
+      if (prev.length >= 3) return prev
+      return [...prev, id]
+    })
   }
 
   const questionsById = useMemo(
@@ -317,18 +395,158 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   )
   if (!data) return null
 
+  // ─── NIVEAU 1 : VISIONS ──────────────────────────────────────
+  if (phase === 'visions') {
+    if (MC.loading) return (
+      <div className="fadeUp">
+        <Card C={C} style={{ textAlign: 'center', padding: 40 }}>
+          <Spinner C={C} size={32} />
+        </Card>
+      </div>
+    )
+    if (!MC.data) return null
+
+    const visions = MC.data.visions
+    const gloss = MC.data.glossaire
+    const res = visionResultOpen && visionPicks.length === 3 ? visionResult(visionPicks, visions) : null
+
+    return (
+      <div className="fadeUp">
+        <PageTitle
+          title="Mon match"
+          subtitle="Commence par l'essentiel : quelles visions de société te parlent ?"
+          right={history.length > 0 ? (
+            <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>Historique ({history.length})</Btn>
+          ) : null}
+          C={C}
+        />
+
+        <Card C={C} style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: C.muted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+            Niveau 1 · 2 min
+          </div>
+          <p style={{ marginBottom: 0 }}>
+            Voici {visions.length} grandes visions de société. Choisis les <strong>3 qui résonnent le plus</strong> avec toi, dans l'ordre. Pas de bonne réponse : on cherche ta tendance de fond.
+          </p>
+        </Card>
+
+        <div style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
+          {visions.map(v => {
+            const rank = visionPicks.indexOf(v.id)
+            const picked = rank !== -1
+            const full = visionPicks.length >= 3 && !picked
+            return (
+              <Card C={C} key={v.id} padding={16}
+                onClick={() => !full && toggleVision(v.id)}
+                style={{
+                  cursor: full ? 'default' : 'pointer',
+                  opacity: full ? 0.5 : 1,
+                  borderColor: picked ? C.primary : C.border,
+                  background: picked ? C.primaryPale : C.white,
+                  transition: 'all .15s'
+                }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <div style={{
+                    flexShrink: 0, width: 26, height: 26, borderRadius: 99,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 700, fontSize: 13,
+                    background: picked ? C.primary : C.sand,
+                    color: picked ? C.white : C.muted,
+                    border: `1px solid ${picked ? C.primary : C.border}`
+                  }}>
+                    {picked ? rank + 1 : ''}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 6 }}>{v.label}</div>
+                    <div style={{ fontSize: 14, lineHeight: 1.55, color: C.text }}>
+                      <GlossText texte={v.texte} glossaire={gloss} C={C} />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+
+        <div style={{
+          position: 'sticky', bottom: 0, padding: '12px 0',
+          background: `linear-gradient(transparent, ${C.bg || C.white} 30%)`,
+          display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap'
+        }}>
+          <span style={{ fontSize: 13, color: C.muted }}>{visionPicks.length}/3 choisies</span>
+          <Btn variant="primary"
+            onClick={() => { setVisionResultOpen(true); window.scrollTo({ top: document.body.scrollHeight }) }}
+            disabled={visionPicks.length !== 3} C={C}>
+            Voir ma tendance →
+          </Btn>
+          {visionPicks.length > 0 && (
+            <Btn variant="ghost" onClick={() => { setVisionPicks([]); setVisionResultOpen(false) }} C={C}>Effacer</Btn>
+          )}
+        </div>
+
+        {res && (
+          <Card C={C} className="fadeUp" style={{ marginTop: 12 }}>
+            <div style={{ fontSize: 13, color: C.muted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+              Ta tendance
+            </div>
+            <h2 style={{ marginBottom: 14 }}>{FAMILLE_LABEL[res.famille] || res.famille}</h2>
+
+            <AxisBar axe="eco" value={res.placement.eco} C={C} />
+            <AxisBar axe="autorite" value={res.placement.autorite} C={C} />
+            <AxisBar axe="identite" value={res.placement.identite} C={C} />
+
+            <div style={{ marginTop: 14, fontSize: 14, color: C.text }}>
+              Visions retenues : {res.visions.map(v => v.label).join(', ')}.
+            </div>
+            <div style={{ marginTop: 4, fontSize: 13, color: C.muted }}>
+              C'est une première orientation, basée sur ce qui te séduit. Pour la confronter aux votes réels à l'Assemblée, fais le match détaillé.
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
+              <Btn variant="primary" onClick={() => setPhase('intro')} C={C}>Aller plus loin : match détaillé →</Btn>
+            </div>
+          </Card>
+        )}
+
+        <Modal open={historyOpen} onClose={() => setHistoryOpen(false)} title={`Historique (${history.length})`} C={C}>
+          {history.length === 0 ? (
+            <Empty title="Aucun Match dans l'historique" C={C} />
+          ) : (
+            <div style={{ display: 'grid', gap: 8 }}>
+              {history.map(m => {
+                const nbRep = Object.keys(m.reponses || {}).length
+                return (
+                  <Card C={C} key={m.id} padding={12}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                      <div>
+                        <div style={{ fontWeight: 500, fontSize: 14 }}>Match du {formatDate(m.completedAt)}</div>
+                        <div style={{ fontSize: 12, color: C.muted }}>{nbRep} question{nbRep > 1 ? 's' : ''} répondue{nbRep > 1 ? 's' : ''}</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <Btn variant="ghost" size="sm" onClick={() => removeFromHistory(m.id)} C={C}>Supprimer</Btn>
+                        <Btn variant="primary" size="sm" onClick={() => openHistoryItem(m)} C={C}>Voir</Btn>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </Modal>
+      </div>
+    )
+  }
+
   // ─── INTRO ───────────────────────────────────────────────────
   if (phase === 'intro') {
     return (
       <div className="fadeUp">
         <PageTitle
-          title="Mon match"
-          subtitle="Trouve quels partis et députés te ressemblent vraiment."
-          right={history.length > 0 ? (
-            <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>
-              Historique ({history.length})
-            </Btn>
-          ) : null}
+          title="Match détaillé"
+          subtitle="Niveau 4 — le questionnaire complet, croisé avec les votes réels."
+          right={
+            <Btn variant="ghost" onClick={() => setPhase('visions')} C={C}>← Niveaux</Btn>
+          }
           C={C}
         />
 

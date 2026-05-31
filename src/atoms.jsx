@@ -34,8 +34,8 @@ export const Btn = ({ children, variant = 'primary', size = 'md', onClick, disab
 }
 
 // ─── Card ─────────────────────────────────────────────────────
-export const Card = ({ children, style, C, padding = 20 }) => (
-  <div style={{
+export const Card = ({ children, style, C, padding = 20, onClick, className }) => (
+  <div onClick={onClick} className={className} style={{
     background: C.white, border: `1px solid ${C.border}`,
     borderRadius: 12, padding, boxShadow: C.shadow, ...style
   }}>{children}</div>

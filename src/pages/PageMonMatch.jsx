@@ -45,7 +45,7 @@ const FAMILLE_SHORT = {
 const VISION_SHORT = {
   'anticapitaliste': 'Anticapitaliste',
   'gauche-transformation': 'Gauche radicale',
-  'gauche-sociale-eco': 'Gauche écolo',
+  'gauche-sociale-eco': 'Gauche socialiste',
   'centre': 'Centre',
   'droite': 'Droite',
   'droite-nationale': 'Droite nationale',
@@ -294,7 +294,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   useEffect(() => {
     (async () => {
       const p = await loadVisionPicks()
-      if (p.length) { setVisionPicks(p); if (p.length === 3) setVisionResultOpen(true) }
+      if (p.length) { setVisionPicks(p); setVisionResultOpen(true) }
     })()
   }, [])
 
@@ -486,7 +486,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
       ? visionOrder.map(id => visions.find(v => v.id === id)).filter(Boolean)
       : visions
     const gloss = MC.data.glossaire
-    const res = visionResultOpen && visionPicks.length === 3 ? visionResult(visionPicks, visions) : null
+    const res = visionResultOpen && visionPicks.length >= 1 ? visionResult(visionPicks, visions) : null
 
     // Cadran : les 7 visions, celles que tu as choisies mises en avant.
     const visionPoints = visions.map(v => ({
@@ -529,7 +529,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
                 Niveau 1 · 2 min
               </div>
               <p style={{ marginBottom: 0 }}>
-                Voici {visions.length} grandes visions de société. Choisis les <strong>3 qui résonnent le plus</strong> avec toi, dans l'ordre. Pas de bonne réponse : on cherche ta tendance de fond.
+                Voici {visions.length} grandes visions de société. Choisis-en <strong>1 à 3 qui résonnent le plus</strong> avec toi, dans l'ordre (la 1re compte le plus). Pas de bonne réponse : on cherche ta tendance de fond.
               </p>
             </Card>
 
@@ -573,10 +573,10 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
               background: `linear-gradient(transparent, ${C.bg || C.white} 30%)`,
               display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap'
             }}>
-              <span style={{ fontSize: 13, color: C.muted }}>{visionPicks.length}/3 choisies</span>
+              <span style={{ fontSize: 13, color: C.muted }}>{visionPicks.length} choisie{visionPicks.length > 1 ? 's' : ''} · 3 max</span>
               <Btn variant="primary"
                 onClick={() => { setVisionResultOpen(true); window.scrollTo({ top: 0 }) }}
-                disabled={visionPicks.length !== 3} C={C}>
+                disabled={visionPicks.length === 0} C={C}>
                 Voir ma tendance →
               </Btn>
               {visionPicks.length > 0 && (

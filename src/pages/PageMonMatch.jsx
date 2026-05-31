@@ -122,6 +122,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   const [phase, setPhase]       = useState('visions')
   const [visionPicks, setVisionPicks] = useState([])
   const [visionResultOpen, setVisionResultOpen] = useState(false)
+  const [visionOrder, setVisionOrder] = useState([])
   const [idx, setIdx]           = useState(0)
   const [reponses, setReponses] = useState({})
   const [enBrefOpen, setEnBrefOpen] = useState(false)
@@ -233,6 +234,10 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
     const h = await listMatchHistory()
     setHistory(h.map(m => ({ ...m, reponses: migrateReponses(m.reponses) })))
   }
+
+  useEffect(() => {
+    if (MC.data && visionOrder.length === 0) setVisionOrder(shuffle(MC.data.visions.map(v => v.id)))
+  }, [MC.data, visionOrder.length])
 
   useEffect(() => {
     if (phase === 'visions' && !MC.loading && !MC.data) setPhase('intro')
@@ -407,6 +412,9 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
     if (!MC.data) return null
 
     const visions = MC.data.visions
+    const orderedVisions = visionOrder.length
+      ? visionOrder.map(id => visions.find(v => v.id === id)).filter(Boolean)
+      : visions
     const gloss = MC.data.glossaire
     const res = visionResultOpen && visionPicks.length === 3 ? visionResult(visionPicks, visions) : null
 
@@ -430,8 +438,8 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
           </p>
         </Card>
 
-        <div style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
-          {visions.map(v => {
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 20 }}>
+          {orderedVisions.map(v => {
             const rank = visionPicks.indexOf(v.id)
             const picked = rank !== -1
             const full = visionPicks.length >= 3 && !picked
@@ -456,11 +464,8 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
                   }}>
                     {picked ? rank + 1 : ''}
                   </div>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 6 }}>{v.label}</div>
-                    <div style={{ fontSize: 14, lineHeight: 1.55, color: C.text }}>
-                      <GlossText texte={v.texte} glossaire={gloss} C={C} />
-                    </div>
+                  <div style={{ fontSize: 14, lineHeight: 1.55, color: C.text }}>
+                    <GlossText texte={v.texte} glossaire={gloss} C={C} />
                   </div>
                 </div>
               </Card>

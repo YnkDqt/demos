@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PageTitle, Card, Btn, Spinner, ErrorBox, ProgressBar, KPI, Avatar, BadgeParti, Empty, ConfirmDialog, Modal } from '../atoms.jsx'
-import { usePropositions, useProfiles, useDeputes, useAxesMapping, useMatchCourt, usePartisInfo } from '../hooks.js'
+import { usePropositions, useProfiles, useDeputes, useAxesMapping, useMatchCourt, usePartisInfo, usePartisElargis } from '../hooks.js'
 import { carteAxes, partiAxes } from '../axes.js'
 import { computeMatches, matchByTheme } from '../matching.js'
 import { analyseParTheme, topPositions, radarData, partiBreakdown, intensiteLabel } from '../matchAnalysis.js'
@@ -161,6 +161,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   const axesMap = useAxesMapping()
   const MC = useMatchCourt()
   const PI = usePartisInfo()
+  const PE = usePartisElargis()
   const D = useDeputes()
 
   const [phase, setPhase]       = useState('visions')
@@ -488,8 +489,18 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
       eco: Math.round(f.eco / f.n), autorite: Math.round(f.autorite / f.n)
     }))
     const fiche = res && PI.data?.familles?.[res.famille]
-    const groupes = res && PI.data?.groupes
-      ? Object.entries(PI.data.groupes).filter(([, g]) => g.famille === res.famille)
+    const proches = res && PE.data?.partis
+      ? PE.data.partis
+          .map(p => ({
+            ...p,
+            d: Math.hypot(
+              p.placement.eco - res.placement.eco,
+              p.placement.autorite - res.placement.autorite,
+              p.placement.identite - res.placement.identite
+            )
+          }))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, 6)
       : []
     const sansGroupe = res && NO_GROUP_VISIONS.includes(res.visions[0]?.id)
 
@@ -604,24 +615,36 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
 
               <div style={{ marginTop: 20 }}>
                 <div style={{ fontSize: 13, color: C.muted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
-                  Groupes proches à l'Assemblée
+                  Partis les plus proches de toi
                 </div>
-                {groupes.length === 0 ? (
-                  <p style={{ fontSize: 14, color: C.muted, marginBottom: 0 }}>
-                    Cette sensibilité n'a pas de groupe dédié à l'Assemblée.
-                  </p>
+                {proches.length === 0 ? (
+                  <p style={{ fontSize: 14, color: C.muted, marginBottom: 0 }}>Liste des partis indisponible.</p>
                 ) : (
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {groupes.map(([code, g]) => (
-                      <span key={code} className="badge" style={{ background: C.primaryPale, color: C.primaryDeep, fontWeight: 500 }}>
-                        {code} — {g.nomComplet}
-                      </span>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8 }}>
+                    {proches.map(p => (
+                      <div key={p.id} style={{
+                        border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 12px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8
+                      }}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: 14 }}>{p.nom}</div>
+                          <div style={{ fontSize: 12, color: C.muted }}>{FAMILLE_SHORT[p.famille] || p.famille}</div>
+                        </div>
+                        <span className="badge" style={p.assemblee
+                          ? { background: C.primaryPale, color: C.primaryDeep, fontWeight: 500, whiteSpace: 'nowrap' }
+                          : { background: C.sand, color: C.muted, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                          {p.assemblee ? 'À l\u2019Assemblée' : 'Hors Assemblée'}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 )}
+                <p style={{ fontSize: 12, color: C.muted, marginTop: 8, marginBottom: 0, fontStyle: 'italic' }}>
+                  Classés du plus proche au moins proche, selon ta position sur les 3 axes. Placement des partis indicatif (estimation éditoriale, non officielle).
+                </p>
                 {sansGroupe && (
-                  <p style={{ fontSize: 13, color: C.muted, marginTop: 8, marginBottom: 0, fontStyle: 'italic' }}>
-                    Ta vision n°1 ({res.visions[0].label}) n'a pas d'élu dédié à l'Assemblée : les groupes ci-dessus sont les plus proches de ta famille, pas une correspondance exacte.
+                  <p style={{ fontSize: 13, color: C.muted, marginTop: 6, marginBottom: 0 }}>
+                    Ta vision n°1 ({res.visions[0].label}) n'a pas de parti dédié réellement implanté ; les plus proches ci-dessus restent une approximation.
                   </p>
                 )}
               </div>

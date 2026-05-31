@@ -1,0 +1,28 @@
+{
+  "_doc": "Liste élargie de partis connus du paysage politique français (dans ET hors Assemblée), pour proposer un scope plus large que les seuls groupes de l'hémicycle. Sert au Niveau 1 (orientation 'partis proches de toi').",
+  "source": "Placement sur les 3 axes : estimation ÉDITORIALE et indicative (Démos), non officielle. Familles alignées sur partis-info.json. Le champ 'groupe' relie au groupe AN quand le parti y siège.",
+  "maj": "2026-05",
+  "axes": {
+    "eco": { "neg": "Collectif / État", "pos": "Marché / Individu" },
+    "autorite": { "neg": "Ordre / Autorité", "pos": "Libertés" },
+    "identite": { "neg": "Ouverture", "pos": "Souveraineté" }
+  },
+  "partis": [
+    { "id": "lo",   "nom": "Lutte ouvrière",            "sigle": "LO",         "famille": "gauche-radicale", "assemblee": false, "groupe": null,        "placement": { "eco": -100, "autorite": -5,  "identite": -35 } },
+    { "id": "npa",  "nom": "Nouveau Parti anticapitaliste", "sigle": "NPA",    "famille": "gauche-radicale", "assemblee": false, "groupe": null,        "placement": { "eco": -100, "autorite": 25,  "identite": -45 } },
+    { "id": "pcf",  "nom": "Parti communiste français",  "sigle": "PCF",        "famille": "gauche-radicale", "assemblee": true,  "groupe": "GDR",       "placement": { "eco": -85,  "autorite": -5,  "identite": -5  } },
+    { "id": "lfi",  "nom": "La France insoumise",        "sigle": "LFI",        "famille": "gauche-radicale", "assemblee": true,  "groupe": "LFI-NFP",   "placement": { "eco": -80,  "autorite": 20,  "identite": -30 } },
+    { "id": "eelv", "nom": "Les Écologistes (EELV)",     "sigle": "EELV",       "famille": "gauche",          "assemblee": true,  "groupe": "EcoS",      "placement": { "eco": -50,  "autorite": 50,  "identite": -55 } },
+    { "id": "pp",   "nom": "Place publique",             "sigle": "PP",         "famille": "gauche",          "assemblee": false, "groupe": null,        "placement": { "eco": -45,  "autorite": 35,  "identite": -45 } },
+    { "id": "ps",   "nom": "Parti socialiste",           "sigle": "PS",         "famille": "gauche",          "assemblee": true,  "groupe": "SOC",       "placement": { "eco": -45,  "autorite": 30,  "identite": -25 } },
+    { "id": "modem","nom": "Mouvement démocrate",        "sigle": "MoDem",      "famille": "centre",          "assemblee": true,  "groupe": "Dem",       "placement": { "eco": 20,   "autorite": 20,  "identite": -10 } },
+    { "id": "ren",  "nom": "Renaissance",                "sigle": "Renaissance","famille": "centre",          "assemblee": true,  "groupe": "EPR",       "placement": { "eco": 35,   "autorite": 15,  "identite": 5   } },
+    { "id": "hor",  "nom": "Horizons",                   "sigle": "Horizons",   "famille": "centre",          "assemblee": true,  "groupe": "HOR",       "placement": { "eco": 45,   "autorite": 5,   "identite": 15  } },
+    { "id": "udi",  "nom": "Union des démocrates et indépendants", "sigle": "UDI", "famille": "centre",      "assemblee": false, "groupe": null,        "placement": { "eco": 45,   "autorite": 5,   "identite": 20  } },
+    { "id": "lr",   "nom": "Les Républicains",           "sigle": "LR",         "famille": "droite",          "assemblee": true,  "groupe": "DR",        "placement": { "eco": 60,   "autorite": -40, "identite": 45  } },
+    { "id": "udr",  "nom": "Union des droites pour la République", "sigle": "UDR", "famille": "droite-radicale", "assemblee": true, "groupe": "UDR",     "placement": { "eco": 45,   "autorite": -55, "identite": 70  } },
+    { "id": "dlf",  "nom": "Debout la France",           "sigle": "DLF",        "famille": "droite-radicale", "assemblee": false, "groupe": null,        "placement": { "eco": 20,   "autorite": -50, "identite": 75  } },
+    { "id": "rn",   "nom": "Rassemblement national",     "sigle": "RN",         "famille": "droite-radicale", "assemblee": true,  "groupe": "RN",        "placement": { "eco": 10,   "autorite": -65, "identite": 90  } },
+    { "id": "rec",  "nom": "Reconquête",                 "sigle": "Reconquête", "famille": "droite-radicale", "assemblee": false, "groupe": null,        "placement": { "eco": 40,   "autorite": -75, "identite": 95  } }
+  ]
+}

@@ -38,3 +38,4 @@ export const useProfiles = () => useJSON('/data/party-profiles.json', { optional
 export const useAxesMapping = () => useJSON('/data/axes-mapping.json', { optional: true })
 export const useMatchCourt = () => useJSON('/data/match-court.json', { optional: true })
 export const usePartisInfo = () => useJSON('/data/partis-info.json', { optional: true })
+export const usePartisElargis = () => useJSON('/data/partis-elargis.json', { optional: true })

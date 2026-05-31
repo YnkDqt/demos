@@ -19,84 +19,307 @@
     "depense publique": "tout ce que l'Etat finance (sante, ecole, aides, fonctionnaires...)",
     "redistribuer": "prendre via l'impot aux plus aises pour aider les plus modestes",
     "priorite nationale": "aussi appelee preference nationale : reserver des droits aux nationaux",
-    "Bruxelles": "siege des institutions europeennes, designe ici l'UE et ses decisions"
+    "Bruxelles": "siege des institutions europeennes, designe ici l'UE et ses decisions",
+    "solidarite internationale": "Principe selon lequel la priorité va aux travailleurs ou aux peuples du monde entier plutôt qu'aux seuls habitants d'un pays ; les frontières y sont vues comme secondaires.",
+    "capitalisme": "Système économique où les entreprises et les moyens de production appartiennent à des acteurs privés qui cherchent à réaliser des profits.",
+    "transition ecologique": "Transformation de l'économie et des modes de vie pour réduire les émissions et la pression sur l'environnement (énergie, transports, agriculture).",
+    "fiscalite": "L'ensemble des impôts et taxes que l'État prélève sur les revenus, le patrimoine et la consommation pour financer ses dépenses.",
+    "fuite des capitaux": "Départ de l'argent et des fortunes vers d'autres pays, souvent pour échapper à des impôts jugés trop élevés.",
+    "regulation": "Ensemble de règles fixées par la puissance publique pour encadrer une activité économique (concurrence, prix, sécurité, environnement).",
+    "union europeenne": "Union de 27 pays européens qui partagent des règles communes, un marché unique et, pour beaucoup, la monnaie euro.",
+    "marche libre": "Économie où l'offre et la demande fixent les prix avec un minimum d'intervention de l'État.",
+    "pragmatisme": "Approche qui juge les idées à leurs résultats concrets plutôt qu'à une doctrine, quitte à emprunter à plusieurs camps.",
+    "etat de droit": "Système où tout le monde, y compris l'État et la police, est soumis à la loi et au contrôle des juges.",
+    "technocratique": "Se dit d'une décision prise surtout par des experts et des gestionnaires, au risque de paraître éloignée des citoyens.",
+    "merite": "Idée que la réussite et les revenus doivent récompenser l'effort et le talent de chacun, plutôt que l'origine ou l'aide de l'État.",
+    "protectionnisme": "Politique qui protège les entreprises nationales de la concurrence étrangère, par exemple via des taxes sur les produits importés.",
+    "inflation": "Hausse générale et durable des prix, qui fait baisser ce que l'on peut acheter avec une même somme d'argent.",
+    "reglementation": "Ensemble des règles et obligations légales qui encadrent une activité ; les libertariens veulent les réduire au minimum."
   },
   "visions": [
     {
       "id": "anticapitaliste",
       "label": "Gauche anticapitaliste et revolutionnaire",
       "famille": "gauche-radicale",
-      "placement": { "eco": -100, "autorite": 20, "identite": -80 },
-      "texte": "Le systeme economique actuel est juge injuste par nature et impossible a reparer : il faut le changer radicalement en redonnant le pouvoir et les grandes entreprises aux travailleurs. On supprime la recherche du profit pour baser la societe sur la gratuite des besoins vitaux (sante, logement, transports), l'egalite absolue, une ecologie de rupture qui refuse la surproduction, et la solidarite internationale plutot que les frontieres. La securite s'envisage par la fin des institutions jugees oppressives et par l'entraide communautaire, car la delinquance est vue comme le pur produit de la misere sociale. Le prix a payer : une confrontation inevitable avec les puissances financieres, une desorganisation initiale de l'economie, et la fin de la liberte de s'enrichir massivement ou de posseder une entreprise privee."
+      "placement": {
+        "eco": -100,
+        "autorite": 20,
+        "identite": -80
+      },
+      "texte": "Le système économique actuel est jugé injuste par nature et impossible à réparer : il faut le changer radicalement en redonnant le pouvoir et les grandes entreprises aux travailleurs. On supprime la recherche du profit pour baser la société sur la gratuité des besoins vitaux (santé, logement, transports), l'égalité absolue, une écologie de rupture qui refuse la surproduction, et la [[solidarite internationale|solidarité internationale]] plutôt que les frontières. La sécurité s'envisage par la fin des institutions jugées oppressives et par l'entraide communautaire, car la délinquance est vue comme le pur produit de la misère sociale. Le prix à payer : une confrontation inévitable avec les puissances financières, une désorganisation initiale de l'économie, et la fin de la liberté de s'enrichir massivement ou de posséder une entreprise privée."
     },
     {
       "id": "gauche-transformation",
       "label": "Gauche de transformation",
       "famille": "gauche-radicale",
-      "placement": { "eco": -70, "autorite": -10, "identite": -50 },
-      "texte": "Les richesses produites doivent etre massivement partagees pour que personne ne soit laisse de cote, avec un Etat fort qui planifie l'economie, garantit a tous les services publics essentiels (sante, ecole, logement) et protege activement les minorites. On encadre strictement le capitalisme pour engager une transition ecologique profonde, et on aborde la securite par la prevention, l'education et l'attaque des causes sociales de la delinquance plutot que par la seule reponse penale. Le prix a payer : une taxation tres forte sur les hauts revenus et les entreprises, qui peut decourager l'investissement prive, ralentir la croissance ou inciter a la fuite des capitaux a l'etranger."
+      "placement": {
+        "eco": -70,
+        "autorite": -10,
+        "identite": -50
+      },
+      "texte": "Les richesses produites doivent être massivement partagées pour que personne ne soit laissé de côté, avec un État fort qui [[planification|planifie l'économie]], garantit à tous les services publics essentiels (santé, école, logement) et protège activement les minorités. On encadre strictement le [[capitalisme]] pour engager une [[transition ecologique|transition écologique]] profonde, et on aborde la sécurité par la prévention, l'éducation et l'attaque des causes sociales de la délinquance plutôt que par la seule réponse pénale. Le prix à payer : une [[fiscalite|taxation]] très forte sur les hauts revenus et les entreprises, qui peut décourager l'investissement privé, ralentir la croissance ou inciter à la [[fuite des capitaux]] à l'étranger."
     },
     {
       "id": "gauche-sociale-eco",
       "label": "Gauche sociale et ecologiste",
       "famille": "gauche",
-      "placement": { "eco": -40, "autorite": 50, "identite": -40 },
-      "texte": "La societe doit proteger les plus fragiles, elargir les droits de chacun et faire de l'ecologie la priorite absolue, tout en conservant une economie de marche ouverte sur le monde. On ne supprime pas le capitalisme, mais on corrige ses exces par des taxes vertes, des lois sociales et une regulation forte en s'appuyant sur l'Union europeenne, tout en cherchant un equilibre de securite entre la fermete judiciaire et une police de proximite respectueuse des libertes publiques. Le prix a payer : une fiscalite qui reste elevee pour les classes moyennes et les entreprises, et le risque de compromis permanents qui decoivent tant les partisans d'une rupture ecologique que ceux de la liberte totale des marches."
+      "placement": {
+        "eco": -40,
+        "autorite": 50,
+        "identite": -40
+      },
+      "texte": "La société doit protéger les plus fragiles, élargir les droits de chacun et faire de l'écologie la priorité absolue, tout en conservant une [[economie de marche|économie de marché]] ouverte sur le monde. On ne supprime pas le [[capitalisme]], mais on corrige ses excès par des taxes vertes, des lois sociales et une [[regulation|régulation]] forte en s'appuyant sur l'[[union europeenne|Union européenne]], tout en cherchant un équilibre de sécurité entre la fermeté judiciaire et une police de proximité respectueuse des libertés publiques. Le prix à payer : une [[fiscalite|fiscalité]] qui reste élevée pour les classes moyennes et les entreprises, et le risque de compromis permanents qui déçoivent tant les partisans d'une rupture écologique que ceux de la liberté totale des [[marche libre|marchés]]."
     },
     {
       "id": "centre",
       "label": "Centre / Majorite presidentielle",
       "famille": "centre",
-      "placement": { "eco": 40, "autorite": 10, "identite": -50 },
-      "texte": "Chacun doit etre libre d'entreprendre, de travailler et de reussir, l'Etat intervenant principalement comme un filet de securite pour proteger les citoyens et corriger les inegalites les plus criantes. On refuse les dogmes ideologiques pour preferer le pragmatisme, les reformes progressives et l'adaptation a la competition economique mondiale dans un cadre resolument pro-europeen, avec une reponse de securite ferme mais strictement encadree par l'Etat de droit. Le prix a payer : des choix politiques souvent percus comme tiedes, trop timides ou purement technocratiques, qui donnent l'impression de manquer de vision a long terme et ne satisfont pleinement aucun camp."
+      "placement": {
+        "eco": 40,
+        "autorite": 10,
+        "identite": -50
+      },
+      "texte": "Chacun doit être libre d'entreprendre, de travailler et de réussir, l'État intervenant principalement comme un filet de sécurité pour protéger les citoyens et corriger les inégalités les plus criantes. On refuse les dogmes idéologiques pour préférer le [[pragmatisme]], les réformes progressives et l'adaptation à la compétition économique mondiale dans un cadre résolument pro-européen, avec une réponse de sécurité ferme mais strictement encadrée par l'[[etat de droit|État de droit]]. Le prix à payer : des choix politiques souvent perçus comme tièdes, trop timides ou purement [[technocratique|technocratiques]], qui donnent l'impression de manquer de vision à long terme et ne satisfont pleinement aucun camp."
     },
     {
       "id": "droite",
       "label": "Droite",
       "famille": "droite",
-      "placement": { "eco": 60, "autorite": -50, "identite": 10 },
-      "texte": "Le travail, le merite et la responsabilite individuelle sont les moteurs de la reussite, ce qui implique un Etat plus leger qui baisse les impots pour laisser respirer les entreprises et l'initiative privee. On est profondement attache aux traditions, a la transmission des valeurs familiales et a la maitrise stricte de l'immigration, tout en faisant de l'ordre public la priorite absolue via une grande fermete penale, des peines plus lourdes et un soutien total a l'autorite des forces de l'ordre. Le prix a payer : moins d'impots signifie moins de budget pour la solidarite ; les services publics sont moins finances, ce qui fragilise les plus demunis ou ceux qui subissent des accidents de la vie."
+      "placement": {
+        "eco": 60,
+        "autorite": -50,
+        "identite": 10
+      },
+      "texte": "Le travail, le [[merite|mérite]] et la responsabilité individuelle sont les moteurs de la réussite, ce qui implique un État plus léger qui baisse les impôts pour laisser respirer les entreprises et l'initiative privée. On est profondément attaché aux traditions, à la transmission des valeurs familiales et à la maîtrise stricte de l'immigration, tout en faisant de l'ordre public la priorité absolue via une grande fermeté pénale, des peines plus lourdes et un soutien total à l'autorité des forces de l'ordre. Le prix à payer : moins d'impôts signifie moins de budget pour la solidarité ; les services publics sont moins financés, ce qui fragilise les plus démunis ou ceux qui subissent des accidents de la vie."
     },
     {
       "id": "droite-nationale",
       "label": "Droite nationale",
       "famille": "droite-radicale",
-      "placement": { "eco": -20, "autorite": -80, "identite": 90 },
-      "texte": "La priorite absolue est de proteger la nation, ses citoyens, son identite et sa culture en controlant drastiquement les frontieres et en reduisant l'influence de l'Union europeenne. L'economie repose sur un protectionnisme fort pour favoriser les entreprises locales et sur des aides sociales reservees en priorite aux nationaux, le tout soutenu par une securite intransigeante basee sur la tolerance zero, la justice ultra-repressive et l'expulsion des delinquants etrangers. Le prix a payer : un risque d'isolement diplomatique, des tensions sociales internes exacerbees, et des complications economiques potentielles comme de l'inflation liee aux taxes sur les produits importes."
+      "placement": {
+        "eco": -20,
+        "autorite": -80,
+        "identite": 90
+      },
+      "texte": "La priorité absolue est de protéger la nation, ses citoyens, son identité et sa culture en contrôlant drastiquement les frontières et en réduisant l'influence de l'[[union europeenne|Union européenne]]. L'économie repose sur un [[protectionnisme]] fort pour favoriser les entreprises locales et sur des aides sociales réservées [[priorite nationale|en priorité aux nationaux]], le tout soutenu par une sécurité intransigeante basée sur la tolérance zéro, la justice ultra-répressive et l'expulsion des délinquants étrangers. Le prix à payer : un risque d'isolement diplomatique, des tensions sociales internes exacerbées, et des complications économiques potentielles comme de l'[[inflation]] liée aux taxes sur les produits importés."
     },
     {
       "id": "libertarien",
       "label": "Libertarisme / Ultra-liberalisme",
       "famille": "droite",
-      "placement": { "eco": 100, "autorite": 90, "identite": 20 },
-      "texte": "La liberte individuelle et la propriete privee sont sacrees, et l'Etat est vu comme un obstacle qui doit etre reduit au strict minimum, voire supprime. Chacun doit etre totalement libre de vivre comme il l'entend et de mener ses affaires sans aucun impot, taxe ou reglementation, le marche libre et les contrats prives suffisant a organiser la societe (ecoles, routes et hopitaux prives). La securite et la justice sont gerees par le libre choix de chacun ou des agences privees, l'Etat n'ayant aucun droit d'interdire les choix personnels (consommation, moeurs, port d'arme). Le prix a payer : la fin de toute solidarite nationale organisee, une societe du \"chacun pour soi\" ou les plus pauvres ou les malades ne beneficient d'aucune aide reelle, et le risque d'une loi du plus fort sur le plan economique."
+      "placement": {
+        "eco": 100,
+        "autorite": 90,
+        "identite": 20
+      },
+      "texte": "La liberté individuelle et la propriété privée sont sacrées, et l'État est vu comme un obstacle qui doit être réduit au strict minimum, voire supprimé. Chacun doit être totalement libre de vivre comme il l'entend et de mener ses affaires sans aucun impôt, taxe ou [[reglementation|réglementation]], le [[marche libre|marché libre]] et les contrats privés suffisant à organiser la société (écoles, routes et hôpitaux privés). La sécurité et la justice sont gérées par le libre choix de chacun ou des agences privées, l'État n'ayant aucun droit d'interdire les choix personnels (consommation, [[moeurs|mœurs]], port d'arme). Le prix à payer : la fin de toute solidarité nationale organisée, une société du \"chacun pour soi\" où les plus pauvres ou les malades ne bénéficient d'aucune aide réelle, et le risque d'une loi du plus fort sur le plan économique."
     }
   ],
   "idees": [
-    { "id": "i01", "famille": "gauche-radicale", "titre": "Redistribution forte (impot sur les hauts patrimoines)", "glose": "financer les services publics en taxant le capital et les grandes fortunes", "glossaire": ["capital"] },
-    { "id": "i02", "famille": "gauche-radicale", "titre": "Services publics etendus", "glose": "plus d'hopitaux, d'ecoles et de transports publics, finances par l'impot", "glossaire": [] },
-    { "id": "i03", "famille": "gauche-radicale", "titre": "Planification ecologique", "glose": "l'Etat fixe le cap et contraint les entreprises a suivre", "glossaire": ["planification"] },
-    { "id": "i04", "famille": "gauche-radicale", "titre": "Augmentation des salaires et du SMIC", "glose": "relever les bas salaires par la loi, au risque d'un cout pour les employeurs", "glossaire": [] },
-    { "id": "i05", "famille": "gauche-radicale", "titre": "Critique du libre-echange", "glose": "limiter les accords commerciaux pour proteger la production francaise", "glossaire": ["libre-echange"] },
-    { "id": "i06", "famille": "gauche", "titre": "Protection sociale et solidarite", "glose": "un filet d'aides large : chomage, minima sociaux, secu genereuse", "glossaire": ["minima sociaux"] },
-    { "id": "i07", "famille": "gauche", "titre": "Transition ecologique", "glose": "sortir des energies fossiles, en accompagnant les gens plutot qu'en les punissant", "glossaire": ["energies fossiles"] },
-    { "id": "i08", "famille": "gauche", "titre": "Regulation du marche", "glose": "garder l'economie de marche mais l'encadrer par des regles strictes", "glossaire": ["economie de marche"] },
-    { "id": "i09", "famille": "gauche", "titre": "Droits sociaux et societaux", "glose": "elargir les droits des minorites, des femmes, sur la fin de vie et les moeurs", "glossaire": ["moeurs"] },
-    { "id": "i10", "famille": "gauche", "titre": "Service public renforce", "glose": "reinvestir dans l'hopital et l'ecole sans tout nationaliser", "glossaire": ["nationaliser"] },
-    { "id": "i11", "famille": "centre", "titre": "Economie de marche encadree", "glose": "laisser entreprendre librement, avec quelques garde-fous publics", "glossaire": ["economie de marche"] },
-    { "id": "i12", "famille": "centre", "titre": "Pro-europeen", "glose": "transferer davantage de decisions a l'Europe, quitte a deleguer une part de notre souverainete", "glossaire": [] },
-    { "id": "i13", "famille": "centre", "titre": "Reformes \u00ab en meme temps \u00bb", "glose": "chercher le compromis, ni rupture de gauche ni de droite", "glossaire": [] },
-    { "id": "i14", "famille": "centre", "titre": "Soutien a l'entreprise et a l'innovation", "glose": "baisser les charges et assouplir le droit du travail pour favoriser l'emploi, quitte a reduire les protections des salaries", "glossaire": ["charges"] },
-    { "id": "i15", "famille": "centre", "titre": "Modernisation de l'Etat", "glose": "une administration plus efficace, quitte a reduire ses effectifs", "glossaire": [] },
-    { "id": "i16", "famille": "droite", "titre": "Liberte economique, baisse des impots", "glose": "payer moins d'impots, quitte a reduire la depense publique", "glossaire": ["depense publique"] },
-    { "id": "i17", "famille": "droite", "titre": "Fermete securitaire et penale", "glose": "plus de police et de videosurveillance, peines appliquees sans laxisme", "glossaire": [] },
-    { "id": "i18", "famille": "droite", "titre": "Maitrise de l'immigration", "glose": "durcir les conditions d'entree et de sejour", "glossaire": [] },
-    { "id": "i19", "famille": "droite", "titre": "Reduction de la depense publique", "glose": "moins d'aides et moins de fonctionnaires pour reduire la dette", "glossaire": ["depense publique"] },
-    { "id": "i20", "famille": "droite", "titre": "Valeurs d'ordre et de merite", "glose": "recompenser l'effort individuel plutot que de redistribuer", "glossaire": ["redistribuer"] },
-    { "id": "i21", "famille": "droite-radicale", "titre": "Souverainete nationale", "glose": "reprendre a l'UE le pouvoir de decider seuls", "glossaire": [] },
-    { "id": "i22", "famille": "droite-radicale", "titre": "Forte restriction de l'immigration", "glose": "reduire fortement l'immigration, legale comme illegale", "glossaire": [] },
-    { "id": "i23", "famille": "droite-radicale", "titre": "Priorite nationale", "glose": "reserver certaines aides et certains emplois aux Francais d'abord", "glossaire": ["priorite nationale"] },
-    { "id": "i24", "famille": "droite-radicale", "titre": "Securite et fermete penale", "glose": "tolerance zero, peines lourdes, autorite de l'Etat avant tout", "glossaire": [] },
-    { "id": "i25", "famille": "droite-radicale", "titre": "Critique de l'Union europeenne", "glose": "reduire le poids de Bruxelles, voire renegocier l'adhesion", "glossaire": ["Bruxelles"] }
+    {
+      "id": "i01",
+      "famille": "gauche-radicale",
+      "titre": "Redistribution forte (impot sur les hauts patrimoines)",
+      "glose": "financer les services publics en taxant le capital et les grandes fortunes",
+      "glossaire": [
+        "capital"
+      ]
+    },
+    {
+      "id": "i02",
+      "famille": "gauche-radicale",
+      "titre": "Services publics etendus",
+      "glose": "plus d'hopitaux, d'ecoles et de transports publics, finances par l'impot",
+      "glossaire": []
+    },
+    {
+      "id": "i03",
+      "famille": "gauche-radicale",
+      "titre": "Planification ecologique",
+      "glose": "l'Etat fixe le cap et contraint les entreprises a suivre",
+      "glossaire": [
+        "planification"
+      ]
+    },
+    {
+      "id": "i04",
+      "famille": "gauche-radicale",
+      "titre": "Augmentation des salaires et du SMIC",
+      "glose": "relever les bas salaires par la loi, au risque d'un cout pour les employeurs",
+      "glossaire": []
+    },
+    {
+      "id": "i05",
+      "famille": "gauche-radicale",
+      "titre": "Critique du libre-echange",
+      "glose": "limiter les accords commerciaux pour proteger la production francaise",
+      "glossaire": [
+        "libre-echange"
+      ]
+    },
+    {
+      "id": "i06",
+      "famille": "gauche",
+      "titre": "Protection sociale et solidarite",
+      "glose": "un filet d'aides large : chomage, minima sociaux, secu genereuse",
+      "glossaire": [
+        "minima sociaux"
+      ]
+    },
+    {
+      "id": "i07",
+      "famille": "gauche",
+      "titre": "Transition ecologique",
+      "glose": "sortir des energies fossiles, en accompagnant les gens plutot qu'en les punissant",
+      "glossaire": [
+        "energies fossiles"
+      ]
+    },
+    {
+      "id": "i08",
+      "famille": "gauche",
+      "titre": "Regulation du marche",
+      "glose": "garder l'economie de marche mais l'encadrer par des regles strictes",
+      "glossaire": [
+        "economie de marche"
+      ]
+    },
+    {
+      "id": "i09",
+      "famille": "gauche",
+      "titre": "Droits sociaux et societaux",
+      "glose": "elargir les droits des minorites, des femmes, sur la fin de vie et les moeurs",
+      "glossaire": [
+        "moeurs"
+      ]
+    },
+    {
+      "id": "i10",
+      "famille": "gauche",
+      "titre": "Service public renforce",
+      "glose": "reinvestir dans l'hopital et l'ecole sans tout nationaliser",
+      "glossaire": [
+        "nationaliser"
+      ]
+    },
+    {
+      "id": "i11",
+      "famille": "centre",
+      "titre": "Economie de marche encadree",
+      "glose": "laisser entreprendre librement, avec quelques garde-fous publics",
+      "glossaire": [
+        "economie de marche"
+      ]
+    },
+    {
+      "id": "i12",
+      "famille": "centre",
+      "titre": "Pro-europeen",
+      "glose": "transferer davantage de decisions a l'Europe, quitte a deleguer une part de notre souverainete",
+      "glossaire": []
+    },
+    {
+      "id": "i13",
+      "famille": "centre",
+      "titre": "Reformes « en meme temps »",
+      "glose": "chercher le compromis, ni rupture de gauche ni de droite",
+      "glossaire": []
+    },
+    {
+      "id": "i14",
+      "famille": "centre",
+      "titre": "Soutien a l'entreprise et a l'innovation",
+      "glose": "baisser les charges et assouplir le droit du travail pour favoriser l'emploi, quitte a reduire les protections des salaries",
+      "glossaire": [
+        "charges"
+      ]
+    },
+    {
+      "id": "i15",
+      "famille": "centre",
+      "titre": "Modernisation de l'Etat",
+      "glose": "une administration plus efficace, quitte a reduire ses effectifs",
+      "glossaire": []
+    },
+    {
+      "id": "i16",
+      "famille": "droite",
+      "titre": "Liberte economique, baisse des impots",
+      "glose": "payer moins d'impots, quitte a reduire la depense publique",
+      "glossaire": [
+        "depense publique"
+      ]
+    },
+    {
+      "id": "i17",
+      "famille": "droite",
+      "titre": "Fermete securitaire et penale",
+      "glose": "plus de police et de videosurveillance, peines appliquees sans laxisme",
+      "glossaire": []
+    },
+    {
+      "id": "i18",
+      "famille": "droite",
+      "titre": "Maitrise de l'immigration",
+      "glose": "durcir les conditions d'entree et de sejour",
+      "glossaire": []
+    },
+    {
+      "id": "i19",
+      "famille": "droite",
+      "titre": "Reduction de la depense publique",
+      "glose": "moins d'aides et moins de fonctionnaires pour reduire la dette",
+      "glossaire": [
+        "depense publique"
+      ]
+    },
+    {
+      "id": "i20",
+      "famille": "droite",
+      "titre": "Valeurs d'ordre et de merite",
+      "glose": "recompenser l'effort individuel plutot que de redistribuer",
+      "glossaire": [
+        "redistribuer"
+      ]
+    },
+    {
+      "id": "i21",
+      "famille": "droite-radicale",
+      "titre": "Souverainete nationale",
+      "glose": "reprendre a l'UE le pouvoir de decider seuls",
+      "glossaire": []
+    },
+    {
+      "id": "i22",
+      "famille": "droite-radicale",
+      "titre": "Forte restriction de l'immigration",
+      "glose": "reduire fortement l'immigration, legale comme illegale",
+      "glossaire": []
+    },
+    {
+      "id": "i23",
+      "famille": "droite-radicale",
+      "titre": "Priorite nationale",
+      "glose": "reserver certaines aides et certains emplois aux Francais d'abord",
+      "glossaire": [
+        "priorite nationale"
+      ]
+    },
+    {
+      "id": "i24",
+      "famille": "droite-radicale",
+      "titre": "Securite et fermete penale",
+      "glose": "tolerance zero, peines lourdes, autorite de l'Etat avant tout",
+      "glossaire": []
+    },
+    {
+      "id": "i25",
+      "famille": "droite-radicale",
+      "titre": "Critique de l'Union europeenne",
+      "glose": "reduire le poids de Bruxelles, voire renegocier l'adhesion",
+      "glossaire": [
+        "Bruxelles"
+      ]
+    }
   ]
 }

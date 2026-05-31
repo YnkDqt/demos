@@ -35,6 +35,13 @@ const FAMILLE_LABEL = {
   'droite': 'Droite',
   'droite-radicale': 'Droite nationale'
 }
+const FAMILLE_SHORT = {
+  'gauche-radicale': 'Gauche radicale',
+  'gauche': 'Gauche',
+  'centre': 'Centre',
+  'droite': 'Droite',
+  'droite-radicale': 'Droite nationale'
+}
 const AXES_POLES = {
   eco:      { gauche: 'Collectif / État',  droite: 'Marché / Individu' },
   autorite: { gauche: 'Ordre / Autorité',  droite: 'Libertés' },
@@ -90,36 +97,34 @@ function AxisBar({ axe, value, C }) {
 
 // Cadran 2D : éco (x) × autorité (y). Repères familles + point utilisateur.
 function Quadrant({ familles, user, highlight, C }) {
-  const W = 340, H = 300, pad = 30
+  const W = 420, H = 360, pad = 46
   const X = v => pad + ((v + 100) / 200) * (W - 2 * pad)
   const Y = v => pad + ((100 - v) / 200) * (H - 2 * pad) // +100 (Libertés) en haut
+  const halo = { paintOrder: 'stroke', stroke: C.bg || '#fff', strokeWidth: 3, strokeLinejoin: 'round' }
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
-      <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} rx={10}
+      <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} rx={12}
         fill={C.sand} stroke={C.border} />
       <line x1={W / 2} y1={pad} x2={W / 2} y2={H - pad} stroke={C.border} />
       <line x1={pad} y1={H / 2} x2={W - pad} y2={H / 2} stroke={C.border} />
-      <text x={W / 2} y={14} textAnchor="middle" fontSize="10" fill={C.muted}>Libertés</text>
-      <text x={W / 2} y={H - 4} textAnchor="middle" fontSize="10" fill={C.muted}>Ordre / Autorité</text>
-      <text x={6} y={H / 2} fontSize="10" fill={C.muted}>Collectif</text>
-      <text x={W - 6} y={H / 2} textAnchor="end" fontSize="10" fill={C.muted}>Marché</text>
-      {familles.map(f => {
-        const hot = f.key === highlight
-        return (
-          <g key={f.key}>
-            <circle cx={X(f.eco)} cy={Y(f.autorite)} r={hot ? 5 : 4}
-              fill={hot ? C.primary : C.white} stroke={hot ? C.primary : C.muted} strokeWidth={1.5} />
-            <text x={X(f.eco)} y={Y(f.autorite) - 8}
-              textAnchor={f.eco > 40 ? 'end' : f.eco < -40 ? 'start' : 'middle'}
-              fontSize="9.5" fontWeight={hot ? 700 : 500}
-              fill={hot ? C.primaryDeep : C.muted}>{f.label}</text>
-          </g>
-        )
-      })}
+      <text x={W / 2} y={20} textAnchor="middle" fontSize="12" fontWeight="600" fill={C.muted}>Libertés</text>
+      <text x={W / 2} y={H - 8} textAnchor="middle" fontSize="12" fontWeight="600" fill={C.muted}>Ordre / Autorité</text>
+      <text x={10} y={H / 2 - 6} fontSize="12" fontWeight="600" fill={C.muted}>Collectif</text>
+      <text x={W - 10} y={H / 2 - 6} textAnchor="end" fontSize="12" fontWeight="600" fill={C.muted}>Marché</text>
+      {familles.filter(f => f.key !== highlight).map(f => (
+        <g key={f.key}>
+          <circle cx={X(f.eco)} cy={Y(f.autorite)} r={5} fill={C.white} stroke={C.muted} strokeWidth={1.5} />
+          <text x={X(f.eco)} y={Y(f.autorite) - 10}
+            textAnchor={f.eco > 30 ? 'end' : f.eco < -30 ? 'start' : 'middle'}
+            fontSize="11" fontWeight="500" fill={C.text} style={halo}>{f.label}</text>
+        </g>
+      ))}
       <circle cx={X(user.eco)} cy={Y(user.autorite)} r={9}
         fill={C.primary} stroke={C.white} strokeWidth={3} />
-      <circle cx={X(user.eco)} cy={Y(user.autorite)} r={11}
-        fill="none" stroke={C.primary} strokeWidth={1} opacity={0.5} />
+      <circle cx={X(user.eco)} cy={Y(user.autorite)} r={12}
+        fill="none" stroke={C.primary} strokeWidth={1.5} opacity={0.45} />
+      <text x={X(user.eco)} y={Y(user.autorite) + 24} textAnchor="middle"
+        fontSize="11.5" fontWeight="700" fill={C.primaryDeep} style={halo}>Toi</text>
     </svg>
   )
 }
@@ -479,7 +484,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
     }
     const familleCoords = Object.entries(facc).map(([key, f]) => ({
       key,
-      label: PI.data?.familles?.[key]?.label || FAMILLE_LABEL[key] || key,
+      label: FAMILLE_SHORT[key] || key,
       eco: Math.round(f.eco / f.n), autorite: Math.round(f.autorite / f.n)
     }))
     const fiche = res && PI.data?.familles?.[res.famille]
@@ -585,9 +590,14 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
                   <Quadrant familles={familleCoords} user={res.placement} highlight={res.famille} C={C} />
                 </div>
                 <div>
+                  <div style={{ fontSize: 13, color: C.muted, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                    Tes 3 axes
+                  </div>
+                  <AxisBar axe="eco" value={res.placement.eco} C={C} />
+                  <AxisBar axe="autorite" value={res.placement.autorite} C={C} />
                   <AxisBar axe="identite" value={res.placement.identite} C={C} />
                   {fiche?.resume && (
-                    <p style={{ fontSize: 14, lineHeight: 1.55, marginTop: 6, marginBottom: 0 }}>{fiche.resume}</p>
+                    <p style={{ fontSize: 14, lineHeight: 1.55, marginTop: 14, marginBottom: 0 }}>{fiche.resume}</p>
                   )}
                 </div>
               </div>

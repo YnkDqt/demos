@@ -42,6 +42,15 @@ const FAMILLE_SHORT = {
   'droite': 'Droite',
   'droite-radicale': 'Droite nationale'
 }
+const VISION_SHORT = {
+  'anticapitaliste': 'Anticapitaliste',
+  'gauche-transformation': 'Gauche radicale',
+  'gauche-sociale-eco': 'Gauche écolo',
+  'centre': 'Centre',
+  'droite': 'Droite',
+  'droite-nationale': 'Droite nationale',
+  'libertarien': 'Libertarien'
+}
 const AXES_POLES = {
   eco:      { gauche: 'Collectif / État',  droite: 'Marché / Individu' },
   autorite: { gauche: 'Ordre / Autorité',  droite: 'Libertés' },
@@ -95,8 +104,8 @@ function AxisBar({ axe, value, C }) {
   )
 }
 
-// Cadran 2D : éco (x) × autorité (y). Repères familles + point utilisateur.
-function Quadrant({ familles, user, highlight, C }) {
+// Cadran 2D : éco (x) × autorité (y). Points de repère + point utilisateur.
+function Quadrant({ points, user, C }) {
   const W = 420, H = 360, pad = 46
   const X = v => pad + ((v + 100) / 200) * (W - 2 * pad)
   const Y = v => pad + ((100 - v) / 200) * (H - 2 * pad) // +100 (Libertés) en haut
@@ -111,12 +120,14 @@ function Quadrant({ familles, user, highlight, C }) {
       <text x={W / 2} y={H - 8} textAnchor="middle" fontSize="12" fontWeight="600" fill={C.muted}>Ordre / Autorité</text>
       <text x={10} y={H / 2 - 6} fontSize="12" fontWeight="600" fill={C.muted}>Collectif</text>
       <text x={W - 10} y={H / 2 - 6} textAnchor="end" fontSize="12" fontWeight="600" fill={C.muted}>Marché</text>
-      {familles.filter(f => f.key !== highlight).map(f => (
-        <g key={f.key}>
-          <circle cx={X(f.eco)} cy={Y(f.autorite)} r={5} fill={C.white} stroke={C.muted} strokeWidth={1.5} />
-          <text x={X(f.eco)} y={Y(f.autorite) - 10}
-            textAnchor={f.eco > 30 ? 'end' : f.eco < -30 ? 'start' : 'middle'}
-            fontSize="11" fontWeight="500" fill={C.text} style={halo}>{f.label}</text>
+      {points.map(p => (
+        <g key={p.key}>
+          <circle cx={X(p.eco)} cy={Y(p.autorite)} r={p.hot ? 5.5 : 4}
+            fill={p.hot ? C.primary : C.white} stroke={p.hot ? C.primary : C.muted} strokeWidth={1.5} />
+          <text x={X(p.eco)} y={Y(p.autorite) - 9}
+            textAnchor={p.eco > 30 ? 'end' : p.eco < -30 ? 'start' : 'middle'}
+            fontSize="10.5" fontWeight={p.hot ? 700 : 500}
+            fill={p.hot ? C.primaryDeep : C.muted} style={halo}>{p.label}</text>
         </g>
       ))}
       <circle cx={X(user.eco)} cy={Y(user.autorite)} r={9}
@@ -477,16 +488,12 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
     const gloss = MC.data.glossaire
     const res = visionResultOpen && visionPicks.length === 3 ? visionResult(visionPicks, visions) : null
 
-    // Repères familles pour le cadran : moyenne des placements des visions de chaque famille.
-    const facc = {}
-    for (const v of visions) {
-      const f = facc[v.famille] || (facc[v.famille] = { eco: 0, autorite: 0, n: 0 })
-      f.eco += v.placement.eco; f.autorite += v.placement.autorite; f.n++
-    }
-    const familleCoords = Object.entries(facc).map(([key, f]) => ({
-      key,
-      label: FAMILLE_SHORT[key] || key,
-      eco: Math.round(f.eco / f.n), autorite: Math.round(f.autorite / f.n)
+    // Cadran : les 7 visions, celles que tu as choisies mises en avant.
+    const visionPoints = visions.map(v => ({
+      key: v.id,
+      label: VISION_SHORT[v.id] || v.label,
+      eco: v.placement.eco, autorite: v.placement.autorite,
+      hot: visionPicks.includes(v.id)
     }))
     const fiche = res && PI.data?.familles?.[res.famille]
     const proches = res && PE.data?.partis
@@ -598,7 +605,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, alignItems: 'center' }}>
                 <div style={{ maxWidth: 360, margin: '0 auto', width: '100%' }}>
-                  <Quadrant familles={familleCoords} user={res.placement} highlight={res.famille} C={C} />
+                  <Quadrant points={visionPoints} user={res.placement} C={C} />
                 </div>
                 <div>
                   <div style={{ fontSize: 13, color: C.muted, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>

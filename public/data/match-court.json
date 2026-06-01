@@ -116,11 +116,12 @@
     },
     {
       "id": "i02",
-      "titre": "Services publics étendus",
+      "titre": "Services publics forts",
       "camps": {
         "gauche-transformation": 3,
         "anticapitaliste": 2,
-        "gauche-sociale-eco": 2
+        "gauche-sociale-eco": 3,
+        "centre": 1
       },
       "glose": "plus d'hôpitaux, d'écoles et de transports publics, financés par l'impôt",
       "glossaire": []
@@ -215,19 +216,6 @@
       ]
     },
     {
-      "id": "i10",
-      "titre": "Service public renforcé",
-      "camps": {
-        "gauche-sociale-eco": 3,
-        "gauche-transformation": 1,
-        "centre": 1
-      },
-      "glose": "réinvestir dans l'hôpital et l'école sans tout nationaliser",
-      "glossaire": [
-        "nationaliser"
-      ]
-    },
-    {
       "id": "i11",
       "titre": "Économie de marché encadrée",
       "camps": {
@@ -298,12 +286,12 @@
     },
     {
       "id": "i17",
-      "titre": "Fermeté sécuritaire et pénale",
+      "titre": "Sécurité et fermeté pénale",
       "camps": {
         "droite": 3,
-        "droite-nationale": 2
+        "droite-nationale": 3
       },
-      "glose": "plus de police et de vidéosurveillance, peines appliquées sans laxisme",
+      "glose": "plus de police, tolérance zéro, peines appliquées sans laxisme",
       "glossaire": []
     },
     {
@@ -372,16 +360,6 @@
       "glossaire": [
         "priorite nationale"
       ]
-    },
-    {
-      "id": "i24",
-      "titre": "Sécurité et fermeté pénale",
-      "camps": {
-        "droite-nationale": 3,
-        "droite": 1
-      },
-      "glose": "tolérance zéro, peines lourdes, autorité de l'État avant tout",
-      "glossaire": []
     },
     {
       "id": "i25",

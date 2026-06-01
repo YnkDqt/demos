@@ -906,7 +906,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
               </p>
             </Card>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12, marginBottom: 20 }}>
               {idees.map(it => {
                 const picked = ideePicks.includes(it.id)
                 const full = ideePicks.length >= IDEE_MAX && !picked

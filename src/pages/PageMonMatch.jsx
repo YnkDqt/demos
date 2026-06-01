@@ -9,7 +9,8 @@ import GlossText from '../GlossText.jsx'
 import {
   saveMatchCurrent, loadMatchCurrent, clearMatchCurrent,
   saveMatchToHistory, listMatchHistory, deleteMatchFromHistory,
-  saveVisionPicks, loadVisionPicks, clearVisionPicks
+  saveVisionPicks, loadVisionPicks, clearVisionPicks,
+  saveIdeePicks, loadIdeePicks, clearIdeePicks
 } from '../storage.js'
 import { formatDate } from '../utils.js'
 import {
@@ -27,6 +28,7 @@ const shuffle = (arr) => {
 
 // ─── NIVEAU 1 : VISIONS ──────────────────────────────────────
 const VISION_RANK_W = [3, 2, 1]
+const IDEE_MAX = 6
 const NO_GROUP_VISIONS = ['anticapitaliste', 'libertarien']
 const FAMILLE_LABEL = {
   'gauche-radicale': 'Gauche de rupture',
@@ -80,6 +82,62 @@ function visionResult(picks, visions) {
   }
   const famille = Object.entries(famW).sort((a, b) => b[1] - a[1])[0][0]
   return { placement, famille, visions: picks.map(id => byId[id]).filter(Boolean) }
+}
+
+// Top 6 partis les plus proches d'un placement (distance euclidienne 3 axes).
+function prochesFor(placement, partis) {
+  if (!placement || !Array.isArray(partis)) return []
+  return partis
+    .map(p => ({
+      ...p,
+      d: Math.hypot(
+        p.placement.eco - placement.eco,
+        p.placement.autorite - placement.autorite,
+        p.placement.identite - placement.identite
+      )
+    }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 6)
+}
+
+// N2 : agrège les idées cochées (camps pondérés → vecteur de visions),
+// en déduit un placement + famille, puis le mélange 50/50 avec le N1 s'il existe.
+function ideesResult(idPicks, idees, visions, n1) {
+  const byId = Object.fromEntries(visions.map(v => [v.id, v]))
+  const vec = {}
+  idees.forEach(it => {
+    if (!idPicks.includes(it.id)) return
+    for (const [vid, w] of Object.entries(it.camps || {})) vec[vid] = (vec[vid] || 0) + w
+  })
+  const entries = Object.entries(vec)
+  if (!entries.length) return null
+  let wTot = 0
+  const acc = { eco: 0, autorite: 0, identite: 0 }
+  const famW = {}
+  for (const [vid, w] of entries) {
+    const v = byId[vid]; if (!v) continue
+    wTot += w
+    acc.eco += v.placement.eco * w
+    acc.autorite += v.placement.autorite * w
+    acc.identite += v.placement.identite * w
+    famW[v.famille] = (famW[v.famille] || 0) + w
+  }
+  let placement = { eco: acc.eco / wTot, autorite: acc.autorite / wTot, identite: acc.identite / wTot }
+  if (n1) {
+    placement = {
+      eco: (placement.eco + n1.placement.eco) / 2,
+      autorite: (placement.autorite + n1.placement.autorite) / 2,
+      identite: (placement.identite + n1.placement.identite) / 2
+    }
+    n1.visions.forEach((v, i) => { famW[v.famille] = (famW[v.famille] || 0) + (VISION_RANK_W[i] || 1) })
+  }
+  placement = {
+    eco: Math.round(placement.eco),
+    autorite: Math.round(placement.autorite),
+    identite: Math.round(placement.identite)
+  }
+  const famille = Object.entries(famW).sort((a, b) => b[1] - a[1])[0][0]
+  return { placement, famille, hotVisions: entries.map(([vid]) => vid), blended: !!n1 }
 }
 
 // Barre d'axe -100..+100 avec marqueur de position.
@@ -175,10 +233,12 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   const PE = usePartisElargis()
   const D = useDeputes()
 
-  const [phase, setPhase]       = useState('visions')
+  const [phase, setPhase]       = useState('hub')
   const [visionPicks, setVisionPicks] = useState([])
   const [visionResultOpen, setVisionResultOpen] = useState(false)
   const [visionOrder, setVisionOrder] = useState([])
+  const [ideePicks, setIdeePicks] = useState([])
+  const [ideeResultOpen, setIdeeResultOpen] = useState(false)
   const [idx, setIdx]           = useState(0)
   const [reponses, setReponses] = useState({})
   const [enBrefOpen, setEnBrefOpen] = useState(false)
@@ -205,14 +265,6 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
       const h = await listMatchHistory()
       const hist = h.map(m => ({ ...m, reponses: migrateReponses(m.reponses, m.version || 1) }))
       setHistory(hist)
-      // Pas de Match en cours mais un historique : afficher directement le dernier résultat.
-      if (!(cur && cur.phase === 'questions') && hist.length > 0) {
-        const last = hist[0]
-        savedToHistory.current = true
-        setReponses(last.reponses || {})
-        setOrdre(last.ordre || [])
-        setPhase('recap')
-      }
       initialLoaded.current = true
     })()
   }, [])
@@ -261,7 +313,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   }
 
   const restart = () => {
-    setPhase('visions'); setIdx(0); setReponses({}); setOrdre([]); setEnBrefOpen(false)
+    setPhase('hub'); setIdx(0); setReponses({}); setOrdre([]); setEnBrefOpen(false)
     setCompareCode(null); setInversion(false)
     savedToHistory.current = false
     window.scrollTo({ top: 0 })
@@ -299,6 +351,13 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   }, [])
 
   useEffect(() => {
+    (async () => {
+      const p = await loadIdeePicks()
+      if (p.length) { setIdeePicks(p); setIdeeResultOpen(true) }
+    })()
+  }, [])
+
+  useEffect(() => {
     if (MC.data && visionOrder.length === 0) setVisionOrder(shuffle(MC.data.visions.map(v => v.id)))
   }, [MC.data, visionOrder.length])
 
@@ -320,6 +379,22 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
 
   const clearVisions = () => {
     setVisionPicks([]); setVisionResultOpen(false); clearVisionPicks()
+  }
+
+  const toggleIdee = (id) => {
+    setIdeeResultOpen(false)
+    setIdeePicks(prev => {
+      let next
+      if (prev.includes(id)) next = prev.filter(x => x !== id)
+      else if (prev.length >= IDEE_MAX) next = prev
+      else next = [...prev, id]
+      saveIdeePicks(next)
+      return next
+    })
+  }
+
+  const clearIdees = () => {
+    setIdeePicks([]); setIdeeResultOpen(false); clearIdeePicks()
   }
 
   const questionsById = useMemo(
@@ -470,6 +545,106 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
   )
   if (!data) return null
 
+  // ─── HUB : accueil "Mon Match" ───────────────────────────────
+  if (phase === 'hub') {
+    const n1Done = visionPicks.length > 0
+    const n2Done = ideePicks.length > 0
+    const n4Done = history.length > 0
+    const levels = [
+      {
+        n: '1', titre: 'Visions de société', duree: '~2 min',
+        desc: 'Choisis les grands récits qui te parlent. Donne une première tendance.',
+        state: n1Done ? 'Fait — revoir' : 'Commencer ici',
+        primary: !n1Done, go: () => setPhase('visions')
+      },
+      {
+        n: '2', titre: 'Idées non négociables', duree: '~3 min',
+        desc: 'Coche les idées qui comptent vraiment pour toi. Affine ta tendance.',
+        state: n2Done ? 'Fait — revoir' : (n1Done ? 'Suite logique' : 'À faire'),
+        primary: n1Done && !n2Done, go: () => setPhase('idees')
+      },
+      {
+        n: '3', titre: 'Dilemmes', duree: 'bientôt',
+        desc: 'Les arbitrages à ressources limitées, là où il faut trancher.',
+        state: 'Bientôt', disabled: true
+      },
+      {
+        n: '4', titre: 'Match détaillé', duree: '~10 min',
+        desc: 'Le questionnaire complet, croisé avec les votes réels à l\u2019Assemblée.',
+        state: n4Done ? 'Dernier résultat dispo' : 'À faire',
+        go: () => n4Done ? openHistoryItem(history[0]) : setPhase('intro')
+      }
+    ]
+    return (
+      <div className="fadeUp">
+        <PageTitle
+          title="Mon match"
+          subtitle="Trouve ta tendance, étape par étape. Commence au niveau 1, ou choisis ton point d'entrée."
+          right={history.length > 0 ? (
+            <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>Historique ({history.length})</Btn>
+          ) : null}
+          C={C}
+        />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
+          {levels.map(l => (
+            <Card C={C} key={l.n} padding={18}
+              onClick={l.disabled ? undefined : l.go}
+              style={{
+                cursor: l.disabled ? 'default' : 'pointer',
+                opacity: l.disabled ? 0.55 : 1,
+                borderColor: l.primary ? C.primary : C.border,
+                background: l.primary ? C.primaryPale : C.white,
+                transition: 'all .15s'
+              }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                <div style={{
+                  flexShrink: 0, width: 30, height: 30, borderRadius: 99,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 700, fontSize: 15,
+                  background: l.primary ? C.primary : C.sand,
+                  color: l.primary ? C.white : C.muted,
+                  border: `1px solid ${l.primary ? C.primary : C.border}`
+                }}>{l.n}</div>
+                <div style={{ fontWeight: 600, fontSize: 16 }}>{l.titre}</div>
+                <span style={{ marginLeft: 'auto', fontSize: 12, color: C.muted }}>{l.duree}</span>
+              </div>
+              <p style={{ fontSize: 14, lineHeight: 1.5, color: C.text, margin: '0 0 12px' }}>{l.desc}</p>
+              <span className="badge" style={l.primary
+                ? { background: C.primary, color: C.white, fontWeight: 600 }
+                : { background: C.sand, color: C.muted, fontWeight: 500 }}>{l.state}</span>
+            </Card>
+          ))}
+        </div>
+
+        <Modal open={historyOpen} onClose={() => setHistoryOpen(false)} title={`Historique (${history.length})`} C={C}>
+          {history.length === 0 ? (
+            <Empty title="Aucun Match dans l'historique" C={C} />
+          ) : (
+            <div style={{ display: 'grid', gap: 8 }}>
+              {history.map(m => {
+                const nbRep = Object.keys(m.reponses || {}).length
+                return (
+                  <Card C={C} key={m.id} padding={12}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                      <div>
+                        <div style={{ fontWeight: 500, fontSize: 14 }}>Match du {formatDate(m.completedAt)}</div>
+                        <div style={{ fontSize: 12, color: C.muted }}>{nbRep} question{nbRep > 1 ? 's' : ''} répondue{nbRep > 1 ? 's' : ''}</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <Btn variant="ghost" size="sm" onClick={() => removeFromHistory(m.id)} C={C}>Supprimer</Btn>
+                        <Btn variant="primary" size="sm" onClick={() => openHistoryItem(m)} C={C}>Voir</Btn>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </Modal>
+      </div>
+    )
+  }
+
   // ─── NIVEAU 1 : VISIONS ──────────────────────────────────────
   if (phase === 'visions') {
     if (MC.loading) return (
@@ -496,19 +671,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
       hot: visionPicks.includes(v.id)
     }))
     const fiche = res && PI.data?.familles?.[res.famille]
-    const proches = res && PE.data?.partis
-      ? PE.data.partis
-          .map(p => ({
-            ...p,
-            d: Math.hypot(
-              p.placement.eco - res.placement.eco,
-              p.placement.autorite - res.placement.autorite,
-              p.placement.identite - res.placement.identite
-            )
-          }))
-          .sort((a, b) => a.d - b.d)
-          .slice(0, 6)
-      : []
+    const proches = res ? prochesFor(res.placement, PE.data?.partis) : []
     const sansGroupe = res && NO_GROUP_VISIONS.includes(res.visions[0]?.id)
 
     return (
@@ -516,9 +679,14 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
         <PageTitle
           title="Mon match"
           subtitle="Commence par l'essentiel : quelles visions de société te parlent ?"
-          right={history.length > 0 ? (
-            <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>Historique ({history.length})</Btn>
-          ) : null}
+          right={
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Btn variant="ghost" onClick={() => setPhase('hub')} C={C}>← Niveaux</Btn>
+              {history.length > 0 && (
+                <Btn variant="ghost" onClick={() => setHistoryOpen(true)} C={C}>Historique ({history.length})</Btn>
+              )}
+            </div>
+          }
           C={C}
         />
 
@@ -657,11 +825,12 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
               </div>
 
               <div style={{ marginTop: 14, fontSize: 13, color: C.muted }}>
-                C'est une première orientation, basée sur ce qui te séduit. Pour la confronter aux <strong style={{ color: C.text }}>votes réels</strong> à l'Assemblée, fais le match détaillé.
+                C'est une première orientation, basée sur ce qui te séduit. Tu peux l'<strong style={{ color: C.text }}>affiner</strong> avec tes idées non négociables, ou la confronter directement aux <strong style={{ color: C.text }}>votes réels</strong>.
               </div>
 
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
-                <Btn variant="primary" onClick={() => setPhase('intro')} C={C}>Aller plus loin : match détaillé →</Btn>
+                <Btn variant="primary" onClick={() => { setPhase('idees'); window.scrollTo({ top: 0 }) }} C={C}>Affiner avec mes idées →</Btn>
+                <Btn variant="ghost" onClick={() => setPhase('intro')} C={C}>Match détaillé →</Btn>
               </div>
             </Card>
           </>
@@ -696,6 +865,181 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
     )
   }
 
+  // ─── NIVEAU 2 : IDÉES ────────────────────────────────────────
+  if (phase === 'idees') {
+    if (MC.loading) return (
+      <div className="fadeUp"><Card C={C} style={{ textAlign: 'center', padding: 40 }}><Spinner C={C} size={32} /></Card></div>
+    )
+    if (!MC.data) { setPhase('hub'); return null }
+
+    const visions = MC.data.visions
+    const idees = MC.data.idees
+    const gloss = MC.data.glossaire
+    const n1 = visionPicks.length ? visionResult(visionPicks, visions) : null
+    const res = ideeResultOpen && ideePicks.length >= 1 ? ideesResult(ideePicks, idees, visions, n1) : null
+
+    const visionPoints = visions.map(v => ({
+      key: v.id, label: VISION_SHORT[v.id] || v.label,
+      eco: v.placement.eco, autorite: v.placement.autorite,
+      hot: res ? res.hotVisions.includes(v.id) : false
+    }))
+    const fiche = res && PI.data?.familles?.[res.famille]
+    const proches = res ? prochesFor(res.placement, PE.data?.partis) : []
+
+    return (
+      <div className="fadeUp">
+        <PageTitle
+          title="Mes idées non négociables"
+          subtitle={n1 ? "Niveau 2 — on affine ta tendance du niveau 1." : "Niveau 2 — coche ce qui compte vraiment pour toi."}
+          right={<Btn variant="ghost" onClick={() => setPhase('hub')} C={C}>← Niveaux</Btn>}
+          C={C}
+        />
+
+        {!res && (
+          <>
+            <Card C={C} style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, color: C.muted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                Niveau 2 · 3 min
+              </div>
+              <p style={{ marginBottom: 0 }}>
+                Voici {idees.length} idées qui traversent les camps. Coche tes <strong>5 à 6 idées non négociables</strong> (6 max) — celles auxquelles tu ne renoncerais pas. {n1 ? 'On les combine avec ta tendance du niveau 1.' : 'Tu peux faire le niveau 1 avant pour une tendance plus fine.'}
+              </p>
+            </Card>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 20 }}>
+              {idees.map(it => {
+                const picked = ideePicks.includes(it.id)
+                const full = ideePicks.length >= IDEE_MAX && !picked
+                return (
+                  <Card C={C} key={it.id} padding={16}
+                    onClick={() => !full && toggleIdee(it.id)}
+                    style={{
+                      cursor: full ? 'default' : 'pointer',
+                      opacity: full ? 0.5 : 1,
+                      borderColor: picked ? C.primary : C.border,
+                      background: picked ? C.primaryPale : C.white,
+                      transition: 'all .15s'
+                    }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <div style={{
+                        flexShrink: 0, width: 22, height: 22, borderRadius: 6,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 700, fontSize: 13,
+                        background: picked ? C.primary : C.sand,
+                        color: picked ? C.white : C.muted,
+                        border: `1px solid ${picked ? C.primary : C.border}`
+                      }}>{picked ? '\u2713' : ''}</div>
+                      <div>
+                        <h3 style={{ margin: '0 0 4px', fontSize: 16, lineHeight: 1.3 }}>{it.titre}</h3>
+                        <div style={{ fontSize: 13, lineHeight: 1.5, color: C.muted }}>{it.glose}</div>
+                        {it.glossaire?.length > 0 && (
+                          <div style={{ fontSize: 12, marginTop: 6 }} onClick={e => e.stopPropagation()}>
+                            <GlossText texte={it.glossaire.map(t => `[[${t}]]`).join(' · ')} glossaire={gloss} C={C} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+
+            <div style={{
+              position: 'sticky', bottom: 0, padding: '12px 0',
+              background: `linear-gradient(transparent, ${C.bg || C.white} 30%)`,
+              display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap'
+            }}>
+              <span style={{ fontSize: 13, color: C.muted }}>{ideePicks.length} / {IDEE_MAX}</span>
+              <Btn variant="primary"
+                onClick={() => { setIdeeResultOpen(true); window.scrollTo({ top: 0 }) }}
+                disabled={ideePicks.length === 0} C={C}>
+                Voir ma tendance affinée →
+              </Btn>
+              {ideePicks.length > 0 && <Btn variant="ghost" onClick={clearIdees} C={C}>Effacer</Btn>}
+            </div>
+          </>
+        )}
+
+        {res && (
+          <>
+            <Card C={C} style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 13, color: C.muted }}>
+                  {ideePicks.length} idée{ideePicks.length > 1 ? 's' : ''} cochée{ideePicks.length > 1 ? 's' : ''}{res.blended ? ' · combinées avec ton niveau 1' : ''}
+                </div>
+                <Btn variant="ghost" size="sm" onClick={() => setIdeeResultOpen(false)} C={C}>Modifier</Btn>
+              </div>
+            </Card>
+
+            <Card C={C} className="fadeUp">
+              <div style={{ fontSize: 13, color: C.muted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                Ta tendance affinée
+              </div>
+              <h2 style={{ marginBottom: 14 }}>{fiche?.label || FAMILLE_LABEL[res.famille] || res.famille}</h2>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, alignItems: 'center' }}>
+                <div style={{ maxWidth: 360, margin: '0 auto', width: '100%' }}>
+                  <Quadrant points={visionPoints} user={res.placement} C={C} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, color: C.muted, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                    Tes 3 axes
+                  </div>
+                  <AxisBar axe="eco" value={res.placement.eco} C={C} />
+                  <AxisBar axe="autorite" value={res.placement.autorite} C={C} />
+                  <AxisBar axe="identite" value={res.placement.identite} C={C} />
+                  {fiche?.resume && (
+                    <p style={{ fontSize: 14, lineHeight: 1.55, marginTop: 14, marginBottom: 0 }}>{fiche.resume}</p>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ marginTop: 20 }}>
+                <div style={{ fontSize: 13, color: C.muted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.04em', fontWeight: 500 }}>
+                  Partis les plus proches de toi
+                </div>
+                {proches.length === 0 ? (
+                  <p style={{ fontSize: 14, color: C.muted, marginBottom: 0 }}>Liste des partis indisponible.</p>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8 }}>
+                    {proches.map(p => (
+                      <div key={p.id} style={{
+                        border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 12px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8
+                      }}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: 14 }}>{p.nom}</div>
+                          <div style={{ fontSize: 12, color: C.muted }}>{FAMILLE_SHORT[p.famille] || p.famille}</div>
+                        </div>
+                        <span className="badge" style={p.assemblee
+                          ? { background: C.primaryPale, color: C.primaryDeep, fontWeight: 500, whiteSpace: 'nowrap' }
+                          : { background: C.sand, color: C.muted, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                          {p.assemblee ? 'À l\u2019Assemblée' : 'Hors Assemblée'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p style={{ fontSize: 12, color: C.muted, marginTop: 8, marginBottom: 0, fontStyle: 'italic' }}>
+                  Classés du plus proche au moins proche. Placement des partis indicatif (estimation éditoriale, non officielle).
+                </p>
+              </div>
+
+              <div style={{ marginTop: 14, fontSize: 13, color: C.muted }}>
+                {res.blended ? 'Ce point combine tes visions (niveau 1) et tes idées (niveau 2).' : 'Fais le niveau 1 pour enrichir ce résultat avec tes visions de fond.'} Pour le confronter aux <strong style={{ color: C.text }}>votes réels</strong>, fais le match détaillé.
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
+                <Btn variant="primary" onClick={() => setPhase('intro')} C={C}>Aller plus loin : match détaillé →</Btn>
+                {!n1 && <Btn variant="ghost" onClick={() => setPhase('visions')} C={C}>Faire le niveau 1 →</Btn>}
+              </div>
+            </Card>
+          </>
+        )}
+      </div>
+    )
+  }
+
   // ─── INTRO ───────────────────────────────────────────────────
   if (phase === 'intro') {
     return (
@@ -704,7 +1048,7 @@ export default function PageMonMatch({ C, onSelectDepute, expert }) {
           title="Match détaillé"
           subtitle="Niveau 4 — le questionnaire complet, croisé avec les votes réels."
           right={
-            <Btn variant="ghost" onClick={() => setPhase('visions')} C={C}>← Niveaux</Btn>
+            <Btn variant="ghost" onClick={() => setPhase('hub')} C={C}>← Niveaux</Btn>
           }
           C={C}
         />

@@ -98,6 +98,18 @@ export async function clearVisionPicks() {
   return removeItem('match:visions')
 }
 
+// ─── Niveau 2 : idées ──────────────────────────────────────────
+export async function saveIdeePicks(picks) {
+  return setItem('match:idees', { version: 1, savedAt: new Date().toISOString(), picks })
+}
+export async function loadIdeePicks() {
+  const d = await getItem('match:idees')
+  return Array.isArray(d?.picks) ? d.picks : []
+}
+export async function clearIdeePicks() {
+  return removeItem('match:idees')
+}
+
 const genId = () => {
   const d = new Date()
   const pad = (n) => String(n).padStart(2, '0')
